@@ -825,7 +825,7 @@ namespace BabisW
                 NoticeBoard.Text = WebStuff.DownloadString(
                     "https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Notice");
             }
-            catch (WebException ex)
+            catch (Exception ex)
             {
                 NoticeBoard.Text = "No announcements are available right now.";
                 Console.WriteLine("Notice unavailable: " + ex.Message);
@@ -840,7 +840,7 @@ namespace BabisW
                 Changelog.Text = WebStuff.DownloadString(
                     "https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Changelog");
             }
-            catch (WebException ex)
+            catch (Exception ex)
             {
                 Changelog.Text = "No changelog is available right now.";
                 Console.WriteLine("Changelog unavailable: " + ex.Message);
