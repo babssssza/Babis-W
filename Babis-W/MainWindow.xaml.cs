@@ -204,56 +204,6 @@ namespace BabisW
                 Directory.CreateDirectory("Workspace");
             }
 
-            // check the WRD wrapper version first & update if req
-            Console.WriteLine("Checking to see if WeAreDevs API wrapper is up to date");
-
-            try
-            {
-                RegistryKey SettingReg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Babis-WWRDWrapper");
-                object wrapperVersionValue = SettingReg?.GetValue("WrapperVersion");
-                string WRDVer = wrapperVersionValue?.ToString();
-
-                if (!string.IsNullOrWhiteSpace(WRDVer))
-                {
-                    string VersionWRDWrapper = WebStuff.DownloadString(RepositoryRawBase + "/Babis-W/UpdateStuff/VersionWRDWrapper");
-                    if (WRDVer != VersionWRDWrapper.Split(new[] { '\r', '\n' }).FirstOrDefault())
-                    {
-                        Console.WriteLine("Wrapper not up to date, downloading new version");
-
-                        if (File.Exists("Babis-WWRDWrapper.deps.json"))
-                        {
-                            File.Delete("Babis-WWRDWrapper.deps.json");
-                        }
-                        if (File.Exists("Babis-WWRDWrapper.dll"))
-                        {
-                            File.Delete("Babis-WWRDWrapper.dll");
-                        }
-                        if (File.Exists("Babis-WWRDWrapper.exe"))
-                        {
-                            File.Delete("Babis-WWRDWrapper.exe");
-                        }
-                        if (File.Exists("Babis-WWRDWrapper.pdb"))
-                        {
-                            File.Delete("Babis-WWRDWrapper.pdb");
-                        }
-                        if (File.Exists("Babis-WWRDWrapper.runtimeconfig.json"))
-                        {
-                            File.Delete("Babis-WWRDWrapper.runtimeconfig.json");
-                        }
-                        if (File.Exists("WRDFakeServer.exe"))
-                        {
-                            File.Delete("WRDFakeServer.exe");
-                        }
-                        Console.WriteLine("Deleted old files");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Attempt to check WRD wrapper version result in error: {ex}");
-            }
-
-
             if (!File.Exists("Babis-WWRDWrapper.deps.json"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.deps.json, please wait...");
@@ -965,64 +915,61 @@ namespace BabisW
 
         private void StatusCheck(Object o)
         {
-            Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
-            if (pname.Length > 0) // If Roblox is running
+            if (Interlocked.Exchange(ref StatusCheckInProgress, 1) == 1)
             {
-                if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+                return;
+            }
+
+            try
+            {
+                Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
+                if (pname.Length > 0)
                 {
-                    Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
-                    if (pname1.Length > 0) // so injection at this point has started
+                    if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
                     {
-                        IsInjected = Execution.ExecutionHandler.IsInjected();
-                        if (IsInjected)
+                        Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
+                        if (pname1.Length > 0)
                         {
-                            ShowWindow(GetConsoleWindow(), 5); // wrd wants to hide it; however we want to show it for debugging
-                            this.Dispatcher.Invoke(() =>
+                            IsInjected = Execution.ExecutionHandler.IsInjected();
+                            if (IsInjected)
                             {
                                 InjectionStatus.Content = "WeAreDevs injected";
                                 InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(0, 192, 140));
-                            });
-                        }
-                        else // presumably injection is occuring
-                        {
-                            ShowWindow(GetConsoleWindow(), 5); // wrd wants to hide it; however we want to show it for debugging
-                            this.Dispatcher.Invoke(() =>
+                            }
+                            else
                             {
                                 InjectionStatus.Content = "WeAreDevs injection in progress";
                                 InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(170, 192, 0));
-                            });
+                            }
                         }
-                    }
-                    else
-                    {
-                        this.Dispatcher.Invoke(() =>
+                        else
                         {
                             InjectionStatus.Content = "Awaiting injection";
                             InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(192, 110, 0));
-                        });
+                        }
                     }
                 }
-            }
-            else
-            {
-                // for WRD
-                try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
-                try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
-
-                this.Dispatcher.Invoke(() =>
+                else
                 {
+                    try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
+                    try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
                     InjectionStatus.Content = "Roblox not opened";
                     InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(192, 0, 0));
                     InjectionInProgress = false;
-                });
+                }
+            }
+            finally
+            {
+                Volatile.Write(ref StatusCheckInProgress, 0);
             }
         }
 
         private System.Threading.Timer StatusCheckTimer; // Create timer
+        private int StatusCheckInProgress;
 
         private void StartStatusCheck(object sender, RoutedEventArgs e) // Actual function
         {
-            StatusCheckTimer = new System.Threading.Timer(StatusCheck, null, 1000, 1000); // Run the check every 10 seconds or so
+            StatusCheckTimer = new System.Threading.Timer(StatusCheck, null, 1000, 10000); // Run the check every 10 seconds
         }
 
 
