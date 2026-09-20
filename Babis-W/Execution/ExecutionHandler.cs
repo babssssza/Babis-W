@@ -17,10 +17,10 @@ namespace BabisW.Execution
             if (SelectedAPI.API == "Selected API: WeAreDevs API")
             {
                 // kill previous wrappers
-                try{ foreach (Process proc in Process.GetProcessesByName("BabisWWRDWrapper")) { proc.Kill();} } catch { }
+                try{ foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill();} } catch { }
                 try{ foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
 
-                Process.Start("BabisWWRDWrapper.exe");
+                Process.Start("Babis-WWRDWrapper.exe");
                 Thread.Sleep(1000);
                 try
                 {
@@ -59,7 +59,7 @@ namespace BabisW.Execution
 
             if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
             {
-                Process[] pname1 = Process.GetProcessesByName("BabisWWRDWrapper");
+                Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
                 if (pname1.Length < 1) 
                 {
                     MessageBox.Show("Please begin WRD injection first before attempting to execute a script");
@@ -106,7 +106,7 @@ namespace BabisW.Execution
             {
                 try
                 {
-                    foreach (Process proc in Process.GetProcessesByName("BabisWWRDWrapper"))
+                    foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper"))
                     {
                         proc.Kill();
                     }

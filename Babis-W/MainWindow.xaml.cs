@@ -6,12 +6,12 @@
  | |  | | (_| | | | | | |__| | (_| | |_) |
  |_|  |_|\__,_|_|_| |_|_____/ \__,_|_.__/ 
                  
- https://github.com/Avaluate/BabisW
+ https://github.com/babssssza/Babis-W
 
  You can join BabisW's Discord server at https://babis-w.org/discord (June 2025)
  or Telegram at https://telegram.me/babis-w (June 2025)
                                           
- BabisW, Main_EX (Avaluate)
+ BabisW, Babis-W (Avaluate)
  Discord: avaluate
  Telegram: t.me/avaluate
 
@@ -52,7 +52,7 @@ namespace BabisW
     public partial class MainWindow : Window
     {
         // VARIABLES //
-        string CurrentVersion = "BabisW 15.2 SP2"; // The version of BabisW for this specific build
+        string CurrentVersion = "Babis-W 15.2 SP2"; // The version of Babis-W for this specific build
 
         // The default text editor text
         string DefaultTextEditorText = "--[[\r\nWelcome to BabisW!\r\nMake sure to join BabisW's Discord at babis-w.org/discord\r\nIf you need help, join our Discord!\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"BabisW Moment\")";
@@ -106,7 +106,7 @@ namespace BabisW
         // WINDOW INITILISATION //
         public MainWindow()
         {
-            Console.WriteLine($"  __  __       _       _____        _     \r\n |  \\/  |     (_)     |  __ \\      | |    \r\n | \\  / | __ _ _ _ __ | |  | | __ _| |__  \r\n | |\\/| |/ _` | | '_ \\| |  | |/ _` | '_ \\ \r\n | |  | | (_| | | | | | |__| | (_| | |_) |\r\n |_|  |_|\\__,_|_|_| |_|_____/ \\__,_|_.__/\n\n${CurrentVersion}, by Avaluate (Main_EX) | babis-w.org/discord\n"); // i love babis-w
+            Console.WriteLine($"  __  __       _       _____        _     \r\n |  \\/  |     (_)     |  __ \\      | |    \r\n | \\  / | __ _ _ _ __ | |  | | __ _| |__  \r\n | |\\/| |/ _` | | '_ \\| |  | |/ _` | '_ \\ \r\n | |  | | (_| | | | | | |__| | (_| | |_) |\r\n |_|  |_|\\__,_|_|_| |_|_____/ \\__,_|_.__/\n\n${CurrentVersion}, Babis-W | babis-w.org/discord\n"); // i love babis-w
 
             InitializeComponent();
             MainWin.WindowStartupLocation = WindowStartupLocation.CenterScreen; // Center BabisW to the middle of the screen
@@ -115,14 +115,14 @@ namespace BabisW
             // First, we want to check and see if the updater is still there
 
 
-            if (File.Exists("BabisWDownloader.exe"))
+            if (File.Exists("Babis-WDownloader.exe"))
             {
                 Console.WriteLine("BabisW Downloader found, deleting");
-                File.Delete("BabisWDownloader.exe"); // If it is, we should delete it
+                File.Delete("Babis-WDownloader.exe"); // If it is, we should delete it
             }
 
             Console.WriteLine("Checking to see if BabisW is up to date");
-            string Version = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/Version");
+            string Version = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/UpdateStuff/Version");
             WebStuff.Dispose(); // Remember to dispose the WebClient! Or someone will scold me for it
 
             // .FirstOrDefault() is nessesary since GitHub always adds an extra line for some reason
@@ -134,14 +134,14 @@ namespace BabisW
                 // Downloading BabisW's Updater
                 Console.WriteLine("BabisW not up to date, downloading new version");
 
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWDownloader.exe", "BabisWDownloader.exe");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WDownloader/bin/Release/Babis-WDownloader.exe", "Babis-WDownloader.exe");
                 WebStuff.Dispose();
 
                 // Downloading BabisW's Updater
 
                 // We have to set it like this since the updater needs the right startup path to run correctly
                 Directory.SetCurrentDirectory(Directory.GetCurrentDirectory());
-                Process.Start("BabisWDownloader.exe"); // Run the updater
+                Process.Start("Babis-WDownloader.exe"); // Run the updater
                 Environment.Exit(0);
                 // Note : The updater automatically deletes BabisW.exe
             }
@@ -185,35 +185,35 @@ namespace BabisW
 
             try
             {
-                RegistryKey SettingReg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\BabisWWRDWrapper");
+                RegistryKey SettingReg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Babis-WWRDWrapper");
                 string WRDVer = SettingReg.GetValue("WrapperVersion").ToString();
 
                 if (WRDVer != null)
                 {
-                    string VersionWRDWrapper = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/VersionWRDWrapper");
+                    string VersionWRDWrapper = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/VersionWRDWrapper");
                     if (WRDVer != VersionWRDWrapper.Split(new[] { '\r', '\n' }).FirstOrDefault())
                     {
                         Console.WriteLine("Wrapper not up to date, downloading new version");
 
-                        if (File.Exists("BabisWWRDWrapper.deps.json"))
+                        if (File.Exists("Babis-WWRDWrapper.deps.json"))
                         {
-                            File.Delete("BabisWWRDWrapper.deps.json");
+                            File.Delete("Babis-WWRDWrapper.deps.json");
                         }
-                        if (File.Exists("BabisWWRDWrapper.dll"))
+                        if (File.Exists("Babis-WWRDWrapper.dll"))
                         {
-                            File.Delete("BabisWWRDWrapper.dll");
+                            File.Delete("Babis-WWRDWrapper.dll");
                         }
-                        if (File.Exists("BabisWWRDWrapper.exe"))
+                        if (File.Exists("Babis-WWRDWrapper.exe"))
                         {
-                            File.Delete("BabisWWRDWrapper.exe");
+                            File.Delete("Babis-WWRDWrapper.exe");
                         }
-                        if (File.Exists("BabisWWRDWrapper.pdb"))
+                        if (File.Exists("Babis-WWRDWrapper.pdb"))
                         {
-                            File.Delete("BabisWWRDWrapper.pdb");
+                            File.Delete("Babis-WWRDWrapper.pdb");
                         }
-                        if (File.Exists("BabisWWRDWrapper.runtimeconfig.json"))
+                        if (File.Exists("Babis-WWRDWrapper.runtimeconfig.json"))
                         {
-                            File.Delete("BabisWWRDWrapper.runtimeconfig.json");
+                            File.Delete("Babis-WWRDWrapper.runtimeconfig.json");
                         }
                         if (File.Exists("WRDFakeServer.exe"))
                         {
@@ -229,35 +229,35 @@ namespace BabisW
             }
 
 
-            if (!File.Exists("BabisWWRDWrapper.deps.json"))
+            if (!File.Exists("Babis-WWRDWrapper.deps.json"))
             {
-                Console.WriteLine("Downloading BabisWWRDWrapper.deps.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.deps.json", "BabisWWRDWrapper.deps.json");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.deps.json, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.deps.json", "Babis-WWRDWrapper.deps.json");
             }
-            if (!File.Exists("BabisWWRDWrapper.dll"))
+            if (!File.Exists("Babis-WWRDWrapper.dll"))
             {
-                Console.WriteLine("Downloading BabisWWRDWrapper.dll, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.dll", "BabisWWRDWrapper.dll");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.dll, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.dll", "Babis-WWRDWrapper.dll");
             }
-            if (!File.Exists("BabisWWRDWrapper.exe"))
+            if (!File.Exists("Babis-WWRDWrapper.exe"))
             {
-                Console.WriteLine("Downloading BabisWWRDWrapper.exe, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.exe", "BabisWWRDWrapper.exe");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.exe, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.exe", "Babis-WWRDWrapper.exe");
             }
-            if (!File.Exists("BabisWWRDWrapper.pdb"))
+            if (!File.Exists("Babis-WWRDWrapper.pdb"))
             {
-                Console.WriteLine("Downloading BabisWWRDWrapper.pdb, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.pdb", "BabisWWRDWrapper.pdb");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.pdb, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.pdb", "Babis-WWRDWrapper.pdb");
             }
-            if (!File.Exists("BabisWWRDWrapper.runtimeconfig.json"))
+            if (!File.Exists("Babis-WWRDWrapper.runtimeconfig.json"))
             {
-                Console.WriteLine("Downloading BabisWWRDWrapper.runtimeconfig.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.runtimeconfig.json", "BabisWWRDWrapper.runtimeconfig.json");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.runtimeconfig.json, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.runtimeconfig.json", "Babis-WWRDWrapper.runtimeconfig.json");
             }
             if (!File.Exists("WRDFakeServer.exe"))
             {
                 Console.WriteLine("Downloading WRDFakeServer.exe, please wait (this will take some time)...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/WRDFakeServer.exe", "WRDFakeServer.exe");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/WRDFakeServer.exe", "WRDFakeServer.exe");
             }
             if (!File.Exists("wearedevs_exploit_api.dll"))
             {
@@ -291,22 +291,22 @@ namespace BabisW
             if (!File.Exists("OpenSSL\\msys-2.0.dll"))
             {
                 Console.WriteLine("Downloading msys-2.0.dll...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
             }
             if (!File.Exists("OpenSSL\\msys-crypto-3.dll"))
             {
                 Console.WriteLine("Downloading msys-crypto-3.dll...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
             }
             if (!File.Exists("OpenSSL\\msys-ssl-3.dll"))
             {
                 Console.WriteLine("Downloading msys-ssl-3.dll...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
             }
             if (!File.Exists("OpenSSL\\openssl.exe"))
             {
                 Console.WriteLine("Downloading openssl.exe...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
             }
 
             // Theme checking for Avalon stuff, etc
@@ -315,7 +315,7 @@ namespace BabisW
             {
                 File.Delete("EditorThemes\\lua_md_default.xshd"); // We want to update default theme regardless lol
             }
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/Themes/lua_md_default.xshd");
+            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/Themes/lua_md_default.xshd");
             File.WriteAllText("EditorThemes\\lua_md_default.xshd", penis);
 
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
@@ -603,7 +603,7 @@ namespace BabisW
                 Buttons = new DiscordRPC.Button[]
                 {
                     new DiscordRPC.Button() { Label = "Join BabisW's Discord", Url = "https://babis-w.org/discord" },
-                    new DiscordRPC.Button() { Label = "Get BabisW (GitHub)", Url = "https://github.com/Avaluate/BabisW" }
+                    new DiscordRPC.Button() { Label = "Get BabisW (GitHub)", Url = "https://github.com/babssssza/Babis-W" }
                 },
 
             });
@@ -752,7 +752,7 @@ namespace BabisW
         {
             CloseCompleted = true;
             // just in case
-            try { foreach (Process proc in Process.GetProcessesByName("BabisWWRDWrapper")) { proc.Kill(); } } catch { }
+            try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
             try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
             Environment.Exit(0);
         }
@@ -769,7 +769,7 @@ namespace BabisW
         // Join Discord button
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            byte[] succ = WebStuff.DownloadData("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/DiscordLink.txt");
+            byte[] succ = WebStuff.DownloadData("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/DiscordLink.txt");
             WebStuff.Dispose();
             string discord = Encoding.UTF8.GetString(succ);
             Process.Start(discord);
@@ -784,14 +784,14 @@ namespace BabisW
         // Set notice board text
         private void Notice(object sender, RoutedEventArgs e)
         {
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/Notice");
+            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/Notice");
             NoticeBoard.Text = penis;
         }
 
         // Set changelog board text
         private void ChangelogBoard(object sender, RoutedEventArgs e)
         {
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/Changelog");
+            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/Changelog");
             Changelog.Text = penis;
         }
 
@@ -934,7 +934,7 @@ namespace BabisW
             {
                 if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
                 {
-                    Process[] pname1 = Process.GetProcessesByName("BabisWWRDWrapper");
+                    Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
                     if (pname1.Length > 0) // so injection at this point has started
                     {
                         IsInjected = Execution.ExecutionHandler.IsInjected();
@@ -970,7 +970,7 @@ namespace BabisW
             else
             {
                 // for WRD
-                try { foreach (Process proc in Process.GetProcessesByName("BabisWWRDWrapper")) { proc.Kill(); } } catch { }
+                try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
                 try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
 
                 this.Dispatcher.Invoke(() =>
@@ -1045,7 +1045,7 @@ namespace BabisW
             {
                 MessageBox.Show("Downloading FPS Unlocker. Click OK to continue.", "BabisW");
                 // Taken from https://github.com/axstin/rbxfpsunlocker
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/blob/master/rbxfpsunlocker.exe?raw=true", "Applications\\rbxfpsunlocker.exe");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/blob/master/rbxfpsunlocker.exe?raw=true", "Applications\\rbxfpsunlocker.exe");
                 WebStuff.Dispose();
                 Process.Start("Applications\\rbxfpsunlocker.exe");
                 MessageBox.Show("FPS unlocker downloaded and started!", "BabisW");
@@ -1327,7 +1327,7 @@ namespace BabisW
             LeftGradient.Text = "#4C464646";
             RightGradient.Text = "#4C464646";
             ImageTransparency.Text = "20";
-            CreatorName.Text = "Main_EX";
+            CreatorName.Text = "Babis-W";
             ImageLink.Text = "https://art.pixilart.com/b7875a3999e9a79.gif";
             var conv = new BrushConverter();
             WindowBorder.BorderBrush = (Brush)conv.ConvertFrom("#4C464646");
@@ -1529,7 +1529,7 @@ namespace BabisW
                     sb.Begin();
 
                 });
-                var json = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/ThemeList.json");
+                var json = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/ThemeList.json");
                 dynamic dsfadfasdf = JsonConvert.DeserializeObject(json);
                 foreach (var item in dsfadfasdf)
                 {
@@ -1993,7 +1993,7 @@ namespace BabisW
 
         private void OpenGitHub(object sender, MouseButtonEventArgs e)
         {
-            Process.Start("https://github.com/Avaluate/BabisW");
+            Process.Start("https://github.com/babssssza/Babis-W");
         }
     }
 }

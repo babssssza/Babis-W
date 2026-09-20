@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("BabisW")]
-[assembly: AssemblyDescription("A keyless Roblox exploit made by Main_EX#3898 @ discord.io/babis-w")]
+[assembly: AssemblyDescription("A keyless Roblox exploit made by Babis-W#3898 @ discord.io/babis-w")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("BabisW")]
 [assembly: AssemblyProduct("BabisW Roblox Exploit")]
