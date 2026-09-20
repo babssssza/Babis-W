@@ -208,6 +208,13 @@ namespace BabisWWRDWrapper
 
                     case "Execute":
                         var ExecuteReq = JsonConvert.DeserializeObject<ExecutionRequest>(request.Data);
+                        if (!WRDAPI.WaitUntilAttached())
+                        {
+                            response.Success = false;
+                            response.ErrorMessage = "The WeAreDevs API is not ready. Wait for Roblox to finish loading before executing a script.";
+                            break;
+                        }
+
                         WRDAPI.Execute(ExecuteReq.Script);
                         response.Data = JsonConvert.SerializeObject(new ExecutionRequest { AdditionalData = "success" });
                         Console.WriteLine("tx execute ok");

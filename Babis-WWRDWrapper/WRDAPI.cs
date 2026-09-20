@@ -108,6 +108,22 @@ namespace BabisWWRDWrapper
             return isAttached();
         }
 
+        public static bool WaitUntilAttached(int timeoutMs = 30000)
+        {
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+            while (DateTime.UtcNow < deadline)
+            {
+                if (IsInjected())
+                {
+                    return true;
+                }
+
+                Thread.Sleep(500);
+            }
+
+            return false;
+        }
+
         private static void ShowConsole()
         {
             try

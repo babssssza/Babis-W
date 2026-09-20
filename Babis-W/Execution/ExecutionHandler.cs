@@ -116,7 +116,7 @@ namespace BabisW.Execution
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"error during execution: {ex.Message}");
+                    MessageBox.Show($"The API is not ready to execute this script.\n\n{ex.Message}", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }
