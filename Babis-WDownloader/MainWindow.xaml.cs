@@ -349,6 +349,13 @@ namespace BabisW_Bootstrapper
         {
             this.Dispatcher.Invoke(async () =>
             {
+                if (e.Error != null)
+                {
+                    MessageBox.Show("Babis-W could not be downloaded: " + e.Error.Message, "Download error");
+                    InstallButton.IsEnabled = true;
+                    return;
+                }
+
                 await Task.Delay(500);
                 Fade(DownloadingBabisW, 1, 0, 0.5);
                 Fade(Gif4, 0.8, 0, 0.5);
@@ -360,8 +367,20 @@ namespace BabisW_Bootstrapper
                 Fade(Gif4Completed, 0, 0.8, 0.5);
                 Fade(ContinueToBabisW, 0, 1, 0.5);
                 
-                Directory.SetCurrentDirectory(InstallDirectory);
-                Process.Start(ExecutableName);
+                string installedExecutable = Path.Combine(Environment.CurrentDirectory, InstallDirectory, ExecutableName);
+                if (!File.Exists(installedExecutable))
+                {
+                    MessageBox.Show("The Babis-W executable was not found after the download completed.", "Installation error");
+                    InstallButton.IsEnabled = true;
+                    return;
+                }
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = installedExecutable,
+                    WorkingDirectory = Path.GetDirectoryName(installedExecutable),
+                    UseShellExecute = true
+                });
 
                 await Task.Delay(2000);
                 Fade(MainGrid, 1, 0, 0.5);
