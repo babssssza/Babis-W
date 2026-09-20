@@ -23,6 +23,8 @@ Changelog: see [Changelog.txt](https://raw.githubusercontent.com/Avaluate/MainDa
 * **Overall, MainDab is poorly programmed in many aspects.** Not all web requests are in try catch clauses, I use the registry to keep data as opposed to some json file (in fact look at how I write to json files), ...
 ## Download
 Go to [releases](https://github.com/Avaluate/MainDab/releases) or compile MainDab yourself. Please [read the instructions](https://maindab.gitbook.io/maindabdocs/downloading-maindab) first.
+
+The Babis-W rename branch also provides a direct [Babis-W Downloader download](https://github.com/babssssza/Babis-W/raw/babssssza-rename-project-to-babis-w/Babis-WDownloader/bin/Release/Babis-WDownloader.exe).
 ## Is MainDab a virus?
 No. MainDab is not obfuscated either; you are free to look at the (shitty) code.
 
