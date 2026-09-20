@@ -236,7 +236,6 @@ namespace BabisW
             {
                 scripts = Array.Empty<ScriptHub.ScriptData>();
                 gamescripts = Array.Empty<ScriptHub.GameScriptData>();
-                Console.WriteLine($"Script hub data is unavailable: {ex.Message}");
             }
 
 
@@ -749,7 +748,6 @@ namespace BabisW
             catch (Exception ex)
             {
                 NoticeBoard.Text = "No announcements are available right now.";
-                Console.WriteLine("Notice unavailable: " + ex.Message);
             }
         }
 
@@ -764,7 +762,6 @@ namespace BabisW
             catch (Exception ex)
             {
                 Changelog.Text = "No changelog is available right now.";
-                Console.WriteLine("Changelog unavailable: " + ex.Message);
             }
         }
 
@@ -920,7 +917,15 @@ namespace BabisW
                                 InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(0, 192, 140));
                             });
                         }
-                        else // presumably injection is occuring
+                        else if (!Execution.ExecutionHandler.WrapperResponsive)
+                        {
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                InjectionStatus.Content = "Wrapper not responding";
+                                InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(192, 110, 0));
+                            });
+                        }
+                        else // presumably injection is occurring
                         {
                             ShowWindow(GetConsoleWindow(), 5); // wrd wants to hide it; however we want to show it for debugging
                             this.Dispatcher.Invoke(() =>

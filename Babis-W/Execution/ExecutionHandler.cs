@@ -12,6 +12,9 @@ namespace BabisW.Execution
 {
     class ExecutionHandler
     {
+        private static DateTime LastPipeWarning = DateTime.MinValue;
+        public static bool WrapperResponsive { get; private set; }
+
         public static bool Inject()
         {
             if (SelectedAPI.API == "Selected API: WeAreDevs API")
@@ -93,11 +96,17 @@ namespace BabisW.Execution
                 {
                     var Response = SelectedAPI.NewPipe.SendRequest<IsInjectedRequest>("IsInjected", new IsInjectedRequest{ AdditionalData = "blank" }); // blank
                     Console.WriteLine($"isinjected result: {Response}");
+                    WrapperResponsive = true;
                     return Response.IsInjected;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error while checking for isinjected res: {ex}");
+                    if ((DateTime.UtcNow - LastPipeWarning).TotalSeconds >= 10)
+                    {
+                        Console.WriteLine("The Babis-W wrapper is not responding. Start injection to reconnect.");
+                        LastPipeWarning = DateTime.UtcNow;
+                    }
+                    WrapperResponsive = false;
                     return false;
                 }
             }
