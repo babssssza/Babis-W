@@ -48,7 +48,7 @@ namespace BabisWWRDWrapper
         {
             Exception lastError = null;
 
-            for (var attempt = 1; attempt <= 3; attempt++)
+            for (var attempt = 1; attempt <= 10; attempt++)
             {
                 try
                 {
@@ -58,15 +58,15 @@ namespace BabisWWRDWrapper
                 catch (Exception ex)
                 {
                     lastError = ex;
-                    if (attempt < 3)
+                    if (attempt < 10)
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(2000);
                     }
                 }
             }
 
             throw new InvalidOperationException(
-                "The WeAreDevs API could not initialize after three attempts.",
+                "The WeAreDevs API could not initialize after 10 attempts. Make sure Roblox is fully loaded.",
                 lastError);
         }
 

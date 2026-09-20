@@ -13,14 +13,18 @@ namespace BabisW.Execution
     class ExecutionHandler
     {
         private static DateTime LastPipeWarning = DateTime.MinValue;
+        private static DateTime InjectionStartedAt = DateTime.MinValue;
         public static bool WrapperResponsive { get; private set; }
         public static bool InjectionInProgress { get; private set; }
+        public static bool InjectionTimedOut { get; private set; }
 
         public static bool Inject()
         {
             if (SelectedAPI.API == "Selected API: WeAreDevs API")
             {
                 InjectionInProgress = true;
+                InjectionTimedOut = false;
+                InjectionStartedAt = DateTime.UtcNow;
 
                 try
                 {
@@ -124,8 +128,13 @@ namespace BabisW.Execution
                 try
                 {
                     var Response = SelectedAPI.NewPipe.SendRequest<IsInjectedRequest>("IsInjected", new IsInjectedRequest{ AdditionalData = "blank" }); // blank
-                    Console.WriteLine($"isinjected result: {Response}");
                     WrapperResponsive = true;
+                    if (!Response.IsInjected &&
+                        InjectionStartedAt != DateTime.MinValue &&
+                        (DateTime.UtcNow - InjectionStartedAt).TotalSeconds >= 60)
+                    {
+                        InjectionTimedOut = true;
+                    }
                     return Response.IsInjected;
                 }
                 catch (Exception ex)

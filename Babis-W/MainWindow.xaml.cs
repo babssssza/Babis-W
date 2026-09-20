@@ -798,7 +798,17 @@ namespace BabisW
                     if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
                     {
                         ShowWindow(GetConsoleWindow(), 5);
-                        ExecutionHandler.Inject();
+                        try
+                        {
+                            if (!ExecutionHandler.Inject())
+                            {
+                                SetInjectionStatus("Injection failed", Color.FromRgb(192, 0, 0));
+                            }
+                        }
+                        finally
+                        {
+                            InjectionInProgress = false;
+                        }
                     }
                 }
             }
@@ -918,6 +928,10 @@ namespace BabisW
                             if (IsInjected)
                             {
                                 SetInjectionStatus("WeAreDevs injected", Color.FromRgb(0, 192, 140));
+                            }
+                            else if (Execution.ExecutionHandler.InjectionTimedOut)
+                            {
+                                SetInjectionStatus("Injection timed out", Color.FromRgb(192, 0, 0));
                             }
                             else if (!Execution.ExecutionHandler.WrapperResponsive)
                             {
