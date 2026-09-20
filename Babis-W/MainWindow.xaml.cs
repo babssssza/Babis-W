@@ -820,15 +820,31 @@ namespace BabisW
         // Set notice board text
         private void Notice(object sender, RoutedEventArgs e)
         {
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/Notice");
-            NoticeBoard.Text = penis;
+            try
+            {
+                NoticeBoard.Text = WebStuff.DownloadString(
+                    "https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Notice");
+            }
+            catch (WebException ex)
+            {
+                NoticeBoard.Text = "No announcements are available right now.";
+                Console.WriteLine("Notice unavailable: " + ex.Message);
+            }
         }
 
         // Set changelog board text
         private void ChangelogBoard(object sender, RoutedEventArgs e)
         {
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/Changelog");
-            Changelog.Text = penis;
+            try
+            {
+                Changelog.Text = WebStuff.DownloadString(
+                    "https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Changelog");
+            }
+            catch (WebException ex)
+            {
+                Changelog.Text = "No changelog is available right now.";
+                Console.WriteLine("Changelog unavailable: " + ex.Message);
+            }
         }
 
         // EXECUTION GRID FUNCTIONS //
