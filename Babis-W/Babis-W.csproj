@@ -347,7 +347,6 @@
     <Resource Include="Untitled drawing %2840%29.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Untitled drawing %2840%29.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ImageResources\WebsiteIcon.png" />
@@ -382,7 +381,6 @@
     <Resource Include="gamepad.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Babis-W-Modern.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Untitled.png" />
