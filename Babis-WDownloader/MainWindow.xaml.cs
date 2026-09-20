@@ -17,7 +17,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Net.Http;
 using System.Diagnostics;
 using System.ComponentModel;
 
@@ -240,17 +239,6 @@ namespace BabisW_Bootstrapper
             Move(DownloadingBabisWLabel, new Thickness(35 ,188, 0, 0), new Thickness(35, 198, 0, 0), 0.8);
             Move(Gif4, new Thickness(246, 196, 0, 0), new Thickness(246, 206, 0, 0), 0.8);
 
-            HttpClient fd = new HttpClient();
-            var GetWebsite = await fd.GetAsync("https://github.com");
-            if (!GetWebsite.IsSuccessStatusCode)
-            {
-                // GitHub not accessable!
-                MessageBox.Show(ProductName + "'s downloader cannot reach GitHub, which is required to download " + ProductName + ". Please check your firewall or router settings.\n\nYou can join the " + ProductName + " community at babis-w.org/discord if you need more help.", "Error connecting to GitHub");
-                Environment.Exit(0);
-            }
-
-            await Task.Delay(2500);
-
             Fade(RequirementCheck, 1, 0, 0.5);
             Fade(Gif1, 0.8, 0, 0.5);
             await Task.Delay(600);
@@ -404,7 +392,9 @@ namespace BabisW_Bootstrapper
                 shortcut.TargetPath = targetPath;
                 shortcut.WorkingDirectory = System.IO.Path.GetDirectoryName(targetPath);
                 shortcut.Description = "Launch Babis-W";
-                shortcut.IconLocation = targetPath + ",0";
+                string iconPath = System.IO.Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory, "Babis-W.ico");
+                shortcut.IconLocation = File.Exists(iconPath) ? iconPath : targetPath + ",0";
                 shortcut.Save();
             }
             catch (Exception ex)
