@@ -12,12 +12,12 @@ namespace BabisWWRDWrapper
         {
             Console.Title = "BabisW WeAreDevs Wrapper";
 
-            RegistryKey SettingReg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\BabisWWRDWrapper"); // From the settings we saved
-            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\BabisWWRDWrapper");
+            RegistryKey SettingReg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Babis-WWRDWrapper"); // From the settings we saved
+            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Babis-WWRDWrapper");
             key.SetValue("WrapperVersion", WrapperVersion);
             key.Close();
 
-            var server = new PipeProcess("BabisWWRDWrapper");
+            var server = new PipeProcess("Babis-WWRDWrapper");
             Console.WriteLine("Starting pipe server, please don't close this window (literally don't)...");
             await server.StartAsync();
         }
