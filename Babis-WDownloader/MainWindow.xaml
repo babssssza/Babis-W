@@ -207,6 +207,7 @@
                     </FlowDocument>
                 </RichTextBox>
                 <ProgressBar x:Name="DownloadBar" HorizontalAlignment="Left" Height="20" Margin="10,79,0,0" VerticalAlignment="Top" Width="222" Background="{x:Null}" Foreground="#7FABABAB" BorderBrush="#FFE5E5E5" BorderThickness="0.5" Value="-1"/>
+                <Label x:Name="DownloadDetails" Content="Preparing download..." HorizontalAlignment="Left" Height="28" Margin="0,101,0,0" VerticalAlignment="Top" Width="242" Foreground="#FFC5C5C5" HorizontalContentAlignment="Center" FontFamily="Calibri Light" FontSize="13"/>
             </Grid>
             <Grid x:Name="ContinueToBabisW" HorizontalAlignment="Left" Height="164" Margin="301,90,0,0" VerticalAlignment="Top" Width="242" Grid.RowSpan="2" Visibility="Hidden">
                 <RichTextBox x:Name="ContinueToBabisWTitle" Style="{DynamicResource RichTextBoxStyle1}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="26" Margin="0,3,0,0" VerticalAlignment="Top" Width="235" Background="{x:Null}" Foreground="#FFEAEAEA" TextChanged="RichTextBox_TextChanged" BorderBrush="{x:Null}" FontSize="19" FontFamily="Calibri" IsReadOnly="True" SelectionBrush="{x:Null}" SelectionTextBrush="{x:Null}" IsEnabled="False">
