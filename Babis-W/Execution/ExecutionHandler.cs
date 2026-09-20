@@ -55,12 +55,28 @@ namespace BabisW.Execution
                     return false;
                 }
 
-                Process.Start(new ProcessStartInfo
+                var wrapperProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = wrapperPath,
                     WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
                     UseShellExecute = false
                 });
+                if (wrapperProcess == null)
+                {
+                    MessageBox.Show("The Babis-W wrapper could not be started.", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                Thread.Sleep(500);
+                if (wrapperProcess.HasExited)
+                {
+                    MessageBox.Show(
+                        $"The Babis-W wrapper exited during startup (code {wrapperProcess.ExitCode}). Check the wrapper console for details.",
+                        "Babis-W",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    return false;
+                }
                 try
                 {
                     var Response = SelectedAPI.NewPipe.SendRequest<InjectionRequest>("Inject", new InjectionRequest{AdditionalData = "blank"}); // blank
