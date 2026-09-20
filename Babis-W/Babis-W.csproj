@@ -327,6 +327,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Babis-W.ico" />
+    <Resource Include="Babis-W-Taskbar.png" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

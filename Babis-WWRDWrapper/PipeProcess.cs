@@ -120,8 +120,10 @@ namespace BabisWWRDWrapper
             {
                 // Read message length
                 var LengthBuffer = new byte[4];
-                await pipeServer.ReadAsync(LengthBuffer, 0, 4);
+                await ReadExactlyAsync(pipeServer, LengthBuffer, 4);
                 var MessageLength = BitConverter.ToInt32(LengthBuffer, 0);
+                if (MessageLength <= 0 || MessageLength > 10 * 1024 * 1024)
+                    return null;
 
                 // Read message
                 var MessageBuffer = new byte[MessageLength];
@@ -133,6 +135,7 @@ namespace BabisWWRDWrapper
                         MessageBuffer,
                         TotalBytesRead,
                         MessageLength - TotalBytesRead);
+                    if (read == 0) return null;
                     TotalBytesRead += read;
                 }
 
@@ -141,6 +144,17 @@ namespace BabisWWRDWrapper
             catch
             {
                 return null;
+            }
+        }
+
+        private static async Task ReadExactlyAsync(Stream stream, byte[] buffer, int count)
+        {
+            var offset = 0;
+            while (offset < count)
+            {
+                var read = await stream.ReadAsync(buffer, offset, count - offset);
+                if (read == 0) throw new IOException("The pipe was closed.");
+                offset += read;
             }
         }
 

@@ -24,7 +24,7 @@ Changelog: see [Changelog.txt](https://raw.githubusercontent.com/babssssza/Babis
 ## Download
 Go to [releases](https://github.com/babssssza/Babis-W/releases) or compile Babis-W yourself. Please [read the instructions](https://babis-w.gitbook.io/babis-wdocs/downloading-babis-w) first.
 
-You can also [download the Babis-W Downloader](https://github.com/babssssza/Babis-W/raw/babssssza-rename-project-to-babis-w/Babis-WDownloader/bin/Release/Babis-WDownloader.exe) directly.
+You can also [download the Babis-W Downloader](https://github.com/babssssza/Babis-W/raw/main/Babis-WDownloader/bin/Release/Babis-WDownloader.exe) directly.
 ## Is Babis-W a virus?
 No. Babis-W is not obfuscated either; you are free to look at the (shitty) code.
 
