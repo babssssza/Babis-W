@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,7 +21,7 @@ using System.Net.Http;
 using System.Diagnostics;
 using System.ComponentModel;
 
-namespace MainDab_Bootstrapper
+namespace BabisW_Bootstrapper
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -30,10 +30,14 @@ namespace MainDab_Bootstrapper
 
     public partial class MainWindow : Window
     {
+        private const string ProductName = "Babis-W";
+        private const string ExecutableName = "Babis-W.exe";
+        private const string InstallDirectory = "Babis-W";
+        private const string GitHubRepository = "babssssza/Babis-W";
+        private const string LatestReleaseDownload = "https://raw.githubusercontent.com/" + GitHubRepository + "/main/Babis-W/bin/Release/" + ExecutableName;
 
         // WebClient Creation
         WebClient WebStuff = new WebClient(); // Create a new generally used WebClient
-        bool IsFirstTime = false;
 
         public MainWindow()
         {
@@ -124,45 +128,36 @@ namespace MainDab_Bootstrapper
         {
             Startup.Visibility = Visibility.Visible;
             Startup.Opacity = 0;
-            MainDabTitle.Opacity = 0;
+            BabisWTitle.Opacity = 0;
 
             Fade(Startup, 0, 1, 0.5);
             await Task.Delay(1000);
  
-            Move(MainDabIcon, MainDabIcon.Margin, new Thickness(127.2, 0, -0.8, 0), 0.5);
-            Move(MainDabTitle, MainDabTitle.Margin, new Thickness(0, 189, 0, 0), 0.6);
-            Scaling(MainDabIcon, 1, 0.79, 0.5);
-            Fade(MainDabTitle, 0, 1, 0.5);
+            Move(BabisWIcon, BabisWIcon.Margin, new Thickness(127.2, 0, -0.8, 0), 0.5);
+            Move(BabisWTitle, BabisWTitle.Margin, new Thickness(0, 189, 0, 0), 0.6);
+            Scaling(BabisWIcon, 1, 0.79, 0.5);
+            Fade(BabisWTitle, 0, 1, 0.5);
 
             await Task.Delay(1500);
 
-            Move(MainDabTitle, MainDabTitle.Margin, new Thickness(0, 203, 0, 0), 0.6);
-            Move(MainDabIcon, MainDabIcon.Margin, new Thickness(127.2, 0, 53.2, 0), 0.5);
-            Fade(MainDabIcon, 1, 0, 0.5);
-            Fade(MainDabTitle, 1, 0, 0.5);
-            Scaling(MainDabIcon, 0.79, 0.89, 0.5);
+            Move(BabisWTitle, BabisWTitle.Margin, new Thickness(0, 203, 0, 0), 0.6);
+            Move(BabisWIcon, BabisWIcon.Margin, new Thickness(127.2, 0, 53.2, 0), 0.5);
+            Fade(BabisWIcon, 1, 0, 0.5);
+            Fade(BabisWTitle, 1, 0, 0.5);
+            Scaling(BabisWIcon, 0.79, 0.89, 0.5);
 
             await Task.Delay(1000);
 
             Startup.Visibility = Visibility.Hidden;
-            DownloadMainDab.Visibility = Visibility.Visible;
+            DownloadBabisW.Visibility = Visibility.Visible;
 
-            string Version = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/MainDabWeb/master/UpdateStuff/Version");
-            WebStuff.Dispose(); // Remember to dispose the WebClient! Or someone will scold me for it
+            WebStuff.Headers[HttpRequestHeader.UserAgent] = ProductName + " Downloader";
+            LatestUpdate.Content = "Latest " + ProductName + " build: main branch";
 
-            // .FirstOrDefault() is nessesary since GitHub always adds an extra line for some reason
-            // If I don't do this, then the string that would return is "MainDab 14.3/n" rather than "MainDab 14.3", so basically an additional unwanted line!
-            string OnlineVersion = Version.Split(new[] { '\r', '\n' }).FirstOrDefault();
-            LatestUpdate.Content = "Latest MainDab Version: " + OnlineVersion;
-
-            if (File.Exists("MainDab.exe"))
+            if (File.Exists(Path.Combine(InstallDirectory, ExecutableName)) || File.Exists(ExecutableName))
             {
-                InstallUpdateText.Content = "MainDab Update Found";
-                InstallButton.Content = "Update MainDab";
-            }
-            else
-            {
-                IsFirstTime = true;
+                InstallUpdateText.Content = ProductName + " update found";
+                InstallButton.Content = "Update " + ProductName;
             }
 
             Move(InstallUpdateText, InstallUpdateText.Margin, new Thickness(0, 111, -2.2, 0), 0.5);
@@ -217,10 +212,10 @@ namespace MainDab_Bootstrapper
 
             await Task.Delay(700);
 
-            DownloadMainDab.Visibility = Visibility.Hidden;
-            InstallMainDab.Visibility = Visibility.Visible;
+            DownloadBabisW.Visibility = Visibility.Hidden;
+            InstallBabisW.Visibility = Visibility.Visible;
 
-            Fade(InstallMainDab, 0, 1, 0.5);
+            Fade(InstallBabisW, 0, 1, 0.5);
             Fade(RequirementCheck, 0, 1, 0.5);
 
 
@@ -239,9 +234,9 @@ namespace MainDab_Bootstrapper
             Move(CreatingFoldersLabel, new Thickness(35, 159, 0, 0), new Thickness(35, 169, 0, 0), 0.7);
             Move(Gif3, new Thickness(246, 167, 0, 0), new Thickness(246, 177, 0, 0), 0.7);
 
-            Fade(DownloadingMainDabLabel, 0, 1, 0.8);
+            Fade(DownloadingBabisWLabel, 0, 1, 0.8);
             Fade(Gif4, 0, 0.8, 0.8);
-            Move(DownloadingMainDabLabel, new Thickness(35 ,188, 0, 0), new Thickness(35, 198, 0, 0), 0.8);
+            Move(DownloadingBabisWLabel, new Thickness(35 ,188, 0, 0), new Thickness(35, 198, 0, 0), 0.8);
             Move(Gif4, new Thickness(246, 196, 0, 0), new Thickness(246, 206, 0, 0), 0.8);
 
             HttpClient fd = new HttpClient();
@@ -249,7 +244,7 @@ namespace MainDab_Bootstrapper
             if (!GetWebsite.IsSuccessStatusCode)
             {
                 // GitHub not accessable!
-                MessageBox.Show("MainDab's Bootstrapper cannot properly reach GitHub, which it needed in order to download MainDab. Please check your firewall or router settings.\n\nYou can join MainDab's Discord at maindab.org/discord if you need more help.", "Error connecting to GitHub");
+                MessageBox.Show(ProductName + "'s downloader cannot reach GitHub, which is required to download " + ProductName + ". Please check your firewall or router settings.\n\nYou can join the " + ProductName + " community at babis-w.org/discord if you need more help.", "Error connecting to GitHub");
                 Environment.Exit(0);
             }
 
@@ -268,10 +263,10 @@ namespace MainDab_Bootstrapper
             Fade(DeletingFiles, 0, 1, 0.5);
             await Task.Delay(500);
 
-            // Delete MainDab file
+            // Delete the existing application file.
             try
             {
-                foreach (Process proc in Process.GetProcessesByName("MainDab")) // Get rid of MainDab
+                foreach (Process proc in Process.GetProcessesByName("Babis-W"))
                 {
                     proc.Kill();
                 }
@@ -280,9 +275,9 @@ namespace MainDab_Bootstrapper
 
             await Task.Delay(2000);
 
-            if (File.Exists("MainDab.exe"))
+            if (File.Exists(ExecutableName))
             {
-                File.Delete("MainDab.exe");
+                File.Delete(ExecutableName);
             }
 
             Fade(DeletingFiles, 1, 0, 0.5);
@@ -299,25 +294,22 @@ namespace MainDab_Bootstrapper
             Fade(CreatingFolders, 0, 1, 0.5);
             await Task.Delay(500);
 
-            // Get rid of MainDab folder
+            // Remove the previous installation folder.
             try
             {
-                DirectoryInfo ruh = new DirectoryInfo("MainDab");
+                DirectoryInfo ruh = new DirectoryInfo(InstallDirectory);
                 foreach (FileInfo file in ruh.GetFiles())
                 {
                     file.Delete();
                 }
-                if (Directory.Exists("MainDab"))
+                if (Directory.Exists(InstallDirectory))
                 {
-                    Directory.Delete("MainDab");
+                    Directory.Delete(InstallDirectory);
                 }
             }
             catch { }
 
-            if (IsFirstTime == true)
-            {
-                Directory.CreateDirectory("MainDab");
-            }
+            Directory.CreateDirectory(InstallDirectory);
 
             await Task.Delay(500);
 
@@ -329,24 +321,15 @@ namespace MainDab_Bootstrapper
             Gif3Completed.Visibility = Visibility.Visible;
 
             CreatingFolders.Visibility = Visibility.Hidden;
-            DownloadingMainDab.Visibility = Visibility.Visible;
+            DownloadingBabisW.Visibility = Visibility.Visible;
 
             Fade(Gif3Completed, 0, 0.8, 0.5);
-            Fade(DownloadingMainDab, 0, 1, 0.5);
+            Fade(DownloadingBabisW, 0, 1, 0.5);
             await Task.Delay(500);
 
-            if (IsFirstTime == true)
-            {
-                WebStuff.DownloadProgressChanged += new DownloadProgressChangedEventHandler(WebStuff_DownloadProgressChanged);
-                WebStuff.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(WebStuff_DownloadCompleted);
-                WebStuff.DownloadFileAsync(new Uri("https://github.com/Avaluate/MainDabWeb/raw/main/MainDab.exe"), "MainDab\\MainDab.exe");
-            }
-            else
-            {
-                WebStuff.DownloadProgressChanged += new DownloadProgressChangedEventHandler(WebStuff_DownloadProgressChanged);
-                WebStuff.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(WebStuff_DownloadCompleted);
-                WebStuff.DownloadFileAsync(new Uri("https://github.com/Avaluate/MainDabWeb/raw/main/MainDab.exe"), "MainDab.exe");
-            }
+            WebStuff.DownloadProgressChanged += new DownloadProgressChangedEventHandler(WebStuff_DownloadProgressChanged);
+            WebStuff.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(WebStuff_DownloadCompleted);
+            WebStuff.DownloadFileAsync(new Uri(LatestReleaseDownload), Path.Combine(InstallDirectory, ExecutableName));
 
             
         }
@@ -367,25 +350,18 @@ namespace MainDab_Bootstrapper
             this.Dispatcher.Invoke(async () =>
             {
                 await Task.Delay(500);
-                Fade(DownloadingMainDab, 1, 0, 0.5);
+                Fade(DownloadingBabisW, 1, 0, 0.5);
                 Fade(Gif4, 0.8, 0, 0.5);
                 await Task.Delay(600);
-                DownloadingMainDab.Visibility = Visibility.Hidden;
+                DownloadingBabisW.Visibility = Visibility.Hidden;
                 Gif4.Visibility = Visibility.Hidden;
                 Gif4Completed.Visibility = Visibility.Visible;
-                ContinueToMainDab.Visibility = Visibility.Visible;
+                ContinueToBabisW.Visibility = Visibility.Visible;
                 Fade(Gif4Completed, 0, 0.8, 0.5);
-                Fade(ContinueToMainDab, 0, 1, 0.5);
+                Fade(ContinueToBabisW, 0, 1, 0.5);
                 
-                if (IsFirstTime == true)
-                {
-                    Directory.SetCurrentDirectory("MainDab");
-                    Process.Start("MainDab.exe");
-                }
-                else
-                {
-                    Process.Start("MainDab.exe");
-                }
+                Directory.SetCurrentDirectory(InstallDirectory);
+                Process.Start(ExecutableName);
 
                 await Task.Delay(2000);
                 Fade(MainGrid, 1, 0, 0.5);

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -7,11 +7,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MainDab's Bootstrapper")]
-[assembly: AssemblyDescription("The downloader/updater for MainDab.")]
+[assembly: AssemblyTitle("Babis-W's Bootstrapper")]
+[assembly: AssemblyDescription("The downloader/updater for Babis-W.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("MainDab")]
-[assembly: AssemblyProduct("MainDab Bootstrapper")]
+[assembly: AssemblyCompany("Babis-W")]
+[assembly: AssemblyProduct("Babis-W Downloader")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
