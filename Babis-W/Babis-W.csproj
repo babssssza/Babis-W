@@ -45,7 +45,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Babis-W-Modern.ico</ApplicationIcon>
+    <ApplicationIcon>Babis-W.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -327,6 +327,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Babis-W.ico" />
+    <Resource Include="Babis-W-Taskbar.png" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

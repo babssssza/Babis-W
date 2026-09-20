@@ -923,6 +923,10 @@ namespace BabisW
             try
             {
                 Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
+                string status;
+                Color statusColor;
+                bool injected = false;
+
                 if (pname.Length > 0)
                 {
                     if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
@@ -930,33 +934,36 @@ namespace BabisW
                         Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
                         if (pname1.Length > 0)
                         {
-                            IsInjected = Execution.ExecutionHandler.IsInjected();
-                            if (IsInjected)
-                            {
-                                InjectionStatus.Content = "WeAreDevs injected";
-                                InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(0, 192, 140));
-                            }
-                            else
-                            {
-                                InjectionStatus.Content = "WeAreDevs injection in progress";
-                                InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(170, 192, 0));
-                            }
+                            injected = Execution.ExecutionHandler.IsInjected();
+                            status = injected ? "WeAreDevs injected" : "WeAreDevs injection in progress";
+                            statusColor = injected ? Color.FromRgb(0, 192, 140) : Color.FromRgb(170, 192, 0);
                         }
                         else
                         {
-                            InjectionStatus.Content = "Awaiting injection";
-                            InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(192, 110, 0));
+                            status = "Awaiting injection";
+                            statusColor = Color.FromRgb(192, 110, 0);
                         }
+                    }
+                    else
+                    {
+                        return;
                     }
                 }
                 else
                 {
                     try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
                     try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
-                    InjectionStatus.Content = "Roblox not opened";
-                    InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(192, 0, 0));
+                    status = "Roblox not opened";
+                    statusColor = Color.FromRgb(192, 0, 0);
                     InjectionInProgress = false;
                 }
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    IsInjected = injected;
+                    InjectionStatus.Content = status;
+                    InjectionStatus.Foreground = new SolidColorBrush(statusColor);
+                }));
             }
             finally
             {
