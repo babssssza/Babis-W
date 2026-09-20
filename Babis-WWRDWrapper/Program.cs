@@ -10,7 +10,13 @@ namespace BabisWWRDWrapper
         static string WrapperVersion = "1.1";
         static async Task Main(string[] args)
         {
-            Console.Title = "Babis-W WeAreDevs Wrapper";
+            try
+            {
+                Console.Title = "Babis-W WeAreDevs Wrapper";
+            }
+            catch (IOException)
+            {
+            }
 
             RegistryKey SettingReg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Babis-WWRDWrapper"); // From the settings we saved
             RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Babis-WWRDWrapper");

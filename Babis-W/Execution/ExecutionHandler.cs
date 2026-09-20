@@ -14,14 +14,35 @@ namespace BabisW.Execution
     {
         private static DateTime LastPipeWarning = DateTime.MinValue;
         public static bool WrapperResponsive { get; private set; }
+        public static bool InjectionInProgress { get; private set; }
 
         public static bool Inject()
         {
             if (SelectedAPI.API == "Selected API: WeAreDevs API")
             {
+                InjectionInProgress = true;
+
+                try
+                {
                 // kill previous wrappers
-                try{ foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill();} } catch { }
-                try{ foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
+                try
+                {
+                    foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper"))
+                    {
+                        proc.Kill();
+                        proc.WaitForExit(5000);
+                    }
+                }
+                catch { }
+                try
+                {
+                    foreach (Process proc in Process.GetProcessesByName("WRDFakeServer"))
+                    {
+                        proc.Kill();
+                        proc.WaitForExit(5000);
+                    }
+                }
+                catch { }
 
                 string wrapperPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Babis-WWRDWrapper.exe");
                 if (!File.Exists(wrapperPath))
@@ -30,8 +51,12 @@ namespace BabisW.Execution
                     return false;
                 }
 
-                Process.Start(wrapperPath);
-                Thread.Sleep(1000);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = wrapperPath,
+                    WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                    UseShellExecute = false
+                });
                 try
                 {
                     var Response = SelectedAPI.NewPipe.SendRequest<InjectionRequest>("Inject", new InjectionRequest{AdditionalData = "blank"}); // blank
@@ -50,6 +75,10 @@ namespace BabisW.Execution
                 {
                     MessageBox.Show($"error during injection: {ex.Message}");
                     return false;
+                }
+                finally
+                {
+                    InjectionInProgress = false;
                 }
             }
             else
@@ -101,6 +130,7 @@ namespace BabisW.Execution
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine($"Error while checking for isinjected res: {ex}");
                     if ((DateTime.UtcNow - LastPipeWarning).TotalSeconds >= 10)
                     {
                         Console.WriteLine("The Babis-W wrapper is not responding. Start injection to reconnect.");

@@ -44,6 +44,32 @@ namespace BabisWWRDWrapper
 
         public static string WRDLink = "https://wrdcdn.net/r/2/exploit%20api/wearedevs_exploit_api.dll";
 
+        public static void InitializeWithRetry()
+        {
+            Exception lastError = null;
+
+            for (var attempt = 1; attempt <= 3; attempt++)
+            {
+                try
+                {
+                    initialize();
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    lastError = ex;
+                    if (attempt < 3)
+                    {
+                        Thread.Sleep(1000);
+                    }
+                }
+            }
+
+            throw new InvalidOperationException(
+                "The WeAreDevs API could not initialize after three attempts.",
+                lastError);
+        }
+
         public static Thread WRDInit()
         {
             if (!File.Exists("wearedevs_exploit_api.dll"))
@@ -63,8 +89,7 @@ namespace BabisWWRDWrapper
             Thread initthread = new Thread(delegate ()
             {
                 initialize();
-                ShowWindow(GetConsoleWindow(), 5);
-                Console.Title = "Babis-W WeAreDevs Wrapper";
+                ShowConsole();
             });
             initthread.Start();
             return initthread;
@@ -74,16 +99,34 @@ namespace BabisWWRDWrapper
         public static void Execute(String Script)
         {
             execute(Script);
-            ShowWindow(GetConsoleWindow(), 5);
-            Console.Title = "Babis-W WeAreDevs Wrapper";
+            ShowConsole();
         }
 
         public static bool IsInjected()
         {
-            ShowWindow(GetConsoleWindow(), 5);
-            Console.Title = "Babis-W WeAreDevs Wrapper";
-            if (isAttached()) { Console.WriteLine("attached");  return true; }
-            else { Console.WriteLine("not attached"); return false; }
+            ShowConsole();
+            return isAttached();
+        }
+
+        private static void ShowConsole()
+        {
+            try
+            {
+                var consoleWindow = GetConsoleWindow();
+                if (consoleWindow != IntPtr.Zero)
+                {
+                    ShowWindow(consoleWindow, 5);
+                    Console.Title = "Babis-W WeAreDevs Wrapper";
+                }
+            }
+            catch (IOException)
+            {
+                // The wrapper may be running without a valid console handle.
+            }
+            catch (InvalidOperationException)
+            {
+                // Console output is unavailable; execution itself can continue.
+            }
         }
     }
 }

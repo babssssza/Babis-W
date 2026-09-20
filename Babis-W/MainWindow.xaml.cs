@@ -912,7 +912,7 @@ namespace BabisW
                     if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
                     {
                         Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
-                        if (pname1.Length > 0)
+                        if (pname1.Length > 0 && !Execution.ExecutionHandler.InjectionInProgress)
                         {
                             IsInjected = Execution.ExecutionHandler.IsInjected();
                             if (IsInjected)

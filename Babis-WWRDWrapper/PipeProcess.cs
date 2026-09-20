@@ -201,7 +201,7 @@ namespace BabisWWRDWrapper
                             break;
                         }
 
-                        WRDAPI.initialize();
+                        WRDAPI.InitializeWithRetry();
                         response.Data = JsonConvert.SerializeObject(new InjectionRequest { InjectionSuccessful = true });
                         Console.WriteLine("tx inject ok");
                         break;
@@ -228,7 +228,8 @@ namespace BabisWWRDWrapper
             catch (Exception ex)
             {
                 response.Success = false;
-                response.ErrorMessage = ex.Message;
+                response.ErrorMessage = $"{ex.GetType().Name}: {ex.Message}";
+                Console.WriteLine($"Request {request.MessageType} failed: {ex}");
             }
 
             return response;
