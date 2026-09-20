@@ -1,0 +1,5 @@
+C:\Users\Imad\source\repos\copilot-worktrees\Babis-W\babssssza-probable-invention\Babis-WDownloader\obj\Debug\Babis-WDownloader.csproj.AssemblyReference.cache
+C:\Users\Imad\source\repos\copilot-worktrees\Babis-W\babssssza-probable-invention\Babis-WDownloader\obj\Debug\BabisWDownloader.Properties.Resources.resources
+C:\Users\Imad\source\repos\copilot-worktrees\Babis-W\babssssza-probable-invention\Babis-WDownloader\obj\Debug\Babis-WDownloader.csproj.GenerateResource.cache
+C:\Users\Imad\source\repos\copilot-worktrees\Babis-W\babssssza-probable-invention\Babis-WDownloader\obj\Debug\Babis-WDownloader.csproj.CoreCompileInputs.cache
+C:\Users\Imad\source\repos\copilot-worktrees\Babis-W\babssssza-probable-invention\Babis-WDownloader\obj\Debug\Babis-WDownloader.sourcelink.json
