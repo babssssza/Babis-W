@@ -95,6 +95,7 @@ namespace BabisW
 
         // WebClient Creation
         WebClient WebStuff = new WebClient(); // Create a new generally used WebClient
+        private const string RepositoryRawBase = "https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W";
 
         // Console handle - https://stackoverflow.com/questions/3571627/show-hide-the-console-window-of-a-c-sharp-console-application
         [DllImport("kernel32.dll")]
@@ -102,6 +103,32 @@ namespace BabisW
 
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow); // show = 5, hide = 0
+
+        private bool DownloadRuntimeFile(string url, string destination)
+        {
+            try
+            {
+                WebStuff.DownloadFile(url, destination);
+                return File.Exists(destination);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to download runtime file '{destination}': {ex.Message}");
+                try
+                {
+                    if (File.Exists(destination))
+                    {
+                        File.Delete(destination);
+                    }
+                }
+                catch (IOException cleanupError)
+                {
+                    Console.WriteLine($"Unable to remove incomplete runtime file '{destination}': {cleanupError.Message}");
+                }
+
+                return false;
+            }
+        }
 
         // WINDOW INITILISATION //
         public MainWindow()
@@ -123,7 +150,6 @@ namespace BabisW
 
             Console.WriteLine("Checking to see if BabisW is up to date");
             string Version = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/UpdateStuff/Version");
-            WebStuff.Dispose(); // Remember to dispose the WebClient! Or someone will scold me for it
 
             // .FirstOrDefault() is nessesary since GitHub always adds an extra line for some reason
             // If I don't do this, then the string that would return is "BabisW 14.3/n" rather than "BabisW 14.3", so basically an additional unwanted line!
@@ -134,8 +160,7 @@ namespace BabisW
                 // Downloading BabisW's Updater
                 Console.WriteLine("BabisW not up to date, downloading new version");
 
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WDownloader/bin/Release/Babis-WDownloader.exe", "Babis-WDownloader.exe");
-                WebStuff.Dispose();
+                DownloadRuntimeFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WDownloader/bin/Release/Babis-WDownloader.exe", "Babis-WDownloader.exe");
 
                 // Downloading BabisW's Updater
 
@@ -186,11 +211,12 @@ namespace BabisW
             try
             {
                 RegistryKey SettingReg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Babis-WWRDWrapper");
-                string WRDVer = SettingReg.GetValue("WrapperVersion").ToString();
+                object wrapperVersionValue = SettingReg?.GetValue("WrapperVersion");
+                string WRDVer = wrapperVersionValue?.ToString();
 
-                if (WRDVer != null)
+                if (!string.IsNullOrWhiteSpace(WRDVer))
                 {
-                    string VersionWRDWrapper = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/VersionWRDWrapper");
+                    string VersionWRDWrapper = WebStuff.DownloadString(RepositoryRawBase + "/UpdateStuff/VersionWRDWrapper");
                     if (WRDVer != VersionWRDWrapper.Split(new[] { '\r', '\n' }).FirstOrDefault())
                     {
                         Console.WriteLine("Wrapper not up to date, downloading new version");
@@ -232,32 +258,32 @@ namespace BabisW
             if (!File.Exists("Babis-WWRDWrapper.deps.json"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.deps.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.deps.json", "Babis-WWRDWrapper.deps.json");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.deps.json", "Babis-WWRDWrapper.deps.json");
             }
             if (!File.Exists("Babis-WWRDWrapper.dll"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.dll, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.dll", "Babis-WWRDWrapper.dll");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.dll", "Babis-WWRDWrapper.dll");
             }
             if (!File.Exists("Babis-WWRDWrapper.exe"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.exe, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.exe", "Babis-WWRDWrapper.exe");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.exe", "Babis-WWRDWrapper.exe");
             }
             if (!File.Exists("Babis-WWRDWrapper.pdb"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.pdb, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.pdb", "Babis-WWRDWrapper.pdb");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.pdb", "Babis-WWRDWrapper.pdb");
             }
             if (!File.Exists("Babis-WWRDWrapper.runtimeconfig.json"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.runtimeconfig.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/Babis-WWRDWrapper.runtimeconfig.json", "Babis-WWRDWrapper.runtimeconfig.json");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.runtimeconfig.json", "Babis-WWRDWrapper.runtimeconfig.json");
             }
             if (!File.Exists("WRDFakeServer.exe"))
             {
                 Console.WriteLine("Downloading WRDFakeServer.exe, please wait (this will take some time)...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-WWRDWrapper/WRDFakeServer.exe", "WRDFakeServer.exe");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/WRDFakeServer.exe", "WRDFakeServer.exe");
             }
             if (!File.Exists("wearedevs_exploit_api.dll"))
             {
@@ -291,22 +317,22 @@ namespace BabisW
             if (!File.Exists("OpenSSL\\msys-2.0.dll"))
             {
                 Console.WriteLine("Downloading msys-2.0.dll...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
             }
             if (!File.Exists("OpenSSL\\msys-crypto-3.dll"))
             {
                 Console.WriteLine("Downloading msys-crypto-3.dll...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
             }
             if (!File.Exists("OpenSSL\\msys-ssl-3.dll"))
             {
                 Console.WriteLine("Downloading msys-ssl-3.dll...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
             }
             if (!File.Exists("OpenSSL\\openssl.exe"))
             {
                 Console.WriteLine("Downloading openssl.exe...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
+                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
             }
 
             // Theme checking for Avalon stuff, etc
@@ -315,7 +341,7 @@ namespace BabisW
             {
                 File.Delete("EditorThemes\\lua_md_default.xshd"); // We want to update default theme regardless lol
             }
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/Themes/lua_md_default.xshd");
+            string penis = WebStuff.DownloadString(RepositoryRawBase + "/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
             File.WriteAllText("EditorThemes\\lua_md_default.xshd", penis);
 
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
