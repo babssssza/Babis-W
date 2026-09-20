@@ -277,13 +277,20 @@ namespace BabisW
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
             IsAvalonLoaded = true;
 
-            // Finally, load scripthub data
-            this.Dispatcher.Invoke(async () => // Prevent error from this being done on "another thread"
+            // Finally, load optional script hub data. A missing or unavailable feed
+            // must not prevent the main application from opening.
+            Console.WriteLine("Loading script hub data...");
+            try
             {
-                Console.WriteLine("Loading script hub data...");
-                scripts = await ScriptHub.BabisWSC.GetSCData(); // Extract data from json file
-                gamescripts = await ScriptHub.BabisWGSC.GetGSCData(); // Extract data from json file
-            });
+                scripts = ScriptHub.BabisWSC.GetSCData().GetAwaiter().GetResult();
+                gamescripts = ScriptHub.BabisWGSC.GetGSCData().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                scripts = Array.Empty<ScriptHub.ScriptData>();
+                gamescripts = Array.Empty<ScriptHub.GameScriptData>();
+                Console.WriteLine($"Script hub data is unavailable: {ex.Message}");
+            }
 
 
             Console.Title = "Babis-W";
@@ -758,16 +765,29 @@ namespace BabisW
         // Join Discord button
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            byte[] succ = WebStuff.DownloadData("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/DiscordLink.txt");
-            WebStuff.Dispose();
-            string discord = Encoding.UTF8.GetString(succ);
-            Process.Start(discord);
+            OpenExternalUrl("https://babis-w.org/discord");
         }
 
         // Get help button
         private void Help(object sender, MouseButtonEventArgs e)
         {
-            Process.Start("https://babis-w.gitbook.io/babis-wdocs/"); // BabisW help website
+            OpenExternalUrl("https://github.com/babssssza/Babis-W"); // Babis-W website/repository
+        }
+
+        private static void OpenExternalUrl(string url)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to open the web page.\n\n{ex.Message}", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         // Set notice board text

@@ -29,7 +29,7 @@ namespace BabisW.ScriptHub
         
         {
             // Now we parse the json, making use of Newtonsoft
-            var json = Web.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/Scripts.json");
+            var json = Web.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Scripts.json");
             var arrays = JArray.Parse(json);
 
             // Then we return each of it
