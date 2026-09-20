@@ -245,7 +245,6 @@ namespace BabisWWRDWrapper
                 else
                 {
                     Console.WriteLine($"Entry for '{Domain}' already present in hosts file.");
-                    return true;
                 }
 
                 // Check and add api.mboost.me entry
@@ -328,11 +327,12 @@ namespace BabisWWRDWrapper
                 foreach (Process proc in Process.GetProcessesByName("WRDFakeServer"))
                 {
                     proc.Kill();
+                    proc.WaitForExit(5000);
                 }
             }
             catch { }
 
-            Task.Delay(1000); // if any other fake sevrers are running
+            Thread.Sleep(1000); // allow the old listener to release port 443
 
             string nodeServerPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NodeServerExeName);
             if (!File.Exists(nodeServerPath))
@@ -358,7 +358,9 @@ namespace BabisWWRDWrapper
                 WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
                 FileName = nodeServerPath,
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
             };
 
             Process process = Process.Start(processinfo);
@@ -370,6 +372,31 @@ namespace BabisWWRDWrapper
             }
             else
             {
+                process.OutputDataReceived += (_, e) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        Console.WriteLine($"WRDFakeServer: {e.Data}");
+                    }
+                };
+                process.ErrorDataReceived += (_, e) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        Console.WriteLine($"WRDFakeServer error: {e.Data}");
+                    }
+                };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                Thread.Sleep(500);
+                if (process.HasExited)
+                {
+                    Console.WriteLine($"WRDFakeServer exited during startup with code {process.ExitCode}.");
+                    process.Dispose();
+                    return null;
+                }
+
                 return process;
             }
 

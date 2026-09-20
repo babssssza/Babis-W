@@ -30,20 +30,16 @@ catch (exception) {
     return;
 }
 
-try {
-    server.listen(443, '127.0.0.1', () => {
-        console.log('BabisW WeAreDevs API Bypass\nHTTPS server running on https://127.0.0.1:443 and listening for requests from WRD');
-        console.log(`Press Ctrl+C to stop the server and exit (though you probably don't want to do this)`);
-    });
-} 
-catch (exception) {
-    console.error(`There was an error attempting to listen on port 443: ${exception}`);
-    console.log('You should probably report this error to BabisW staff. Press any key to exit...');
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
-    process.stdin.on('data', process.exit.bind(process, 0));
-    return;
-}
+server.on('error', (exception) => {
+    console.error(`There was an error attempting to listen on port 443: ${exception.message}`);
+    process.exitCode = 1;
+    process.exit();
+});
+
+server.listen(443, '127.0.0.1', () => {
+    console.log('BabisW WeAreDevs API Bypass\nHTTPS server running on https://127.0.0.1:443 and listening for requests from WRD');
+    console.log(`Press Ctrl+C to stop the server and exit (though you probably don't want to do this)`);
+});
 
 process.on('uncaughtException', function (exception) {
     console.error(`An uncaught exception occurred: ${exception}`);
