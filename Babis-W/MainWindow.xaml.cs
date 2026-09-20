@@ -95,7 +95,7 @@ namespace BabisW
 
         // WebClient Creation
         WebClient WebStuff = new WebClient(); // Create a new generally used WebClient
-        private const string RepositoryRawBase = "https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W";
+        private const string RepositoryRawBase = "https://raw.githubusercontent.com/babssssza/Babis-W/main";
 
         // Console handle - https://stackoverflow.com/questions/3571627/show-hide-the-console-window-of-a-c-sharp-console-application
         [DllImport("kernel32.dll")]
@@ -216,7 +216,7 @@ namespace BabisW
 
                 if (!string.IsNullOrWhiteSpace(WRDVer))
                 {
-                    string VersionWRDWrapper = WebStuff.DownloadString(RepositoryRawBase + "/UpdateStuff/VersionWRDWrapper");
+                    string VersionWRDWrapper = WebStuff.DownloadString(RepositoryRawBase + "/Babis-W/UpdateStuff/VersionWRDWrapper");
                     if (WRDVer != VersionWRDWrapper.Split(new[] { '\r', '\n' }).FirstOrDefault())
                     {
                         Console.WriteLine("Wrapper not up to date, downloading new version");
@@ -258,32 +258,32 @@ namespace BabisW
             if (!File.Exists("Babis-WWRDWrapper.deps.json"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.deps.json, please wait...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.deps.json", "Babis-WWRDWrapper.deps.json");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.deps.json", "Babis-WWRDWrapper.deps.json");
             }
             if (!File.Exists("Babis-WWRDWrapper.dll"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.dll, please wait...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.dll", "Babis-WWRDWrapper.dll");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.dll", "Babis-WWRDWrapper.dll");
             }
             if (!File.Exists("Babis-WWRDWrapper.exe"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.exe, please wait...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.exe", "Babis-WWRDWrapper.exe");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.exe", "Babis-WWRDWrapper.exe");
             }
             if (!File.Exists("Babis-WWRDWrapper.pdb"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.pdb, please wait...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.pdb", "Babis-WWRDWrapper.pdb");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.pdb", "Babis-WWRDWrapper.pdb");
             }
             if (!File.Exists("Babis-WWRDWrapper.runtimeconfig.json"))
             {
                 Console.WriteLine("Downloading Babis-WWRDWrapper.runtimeconfig.json, please wait...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/Babis-WWRDWrapper.runtimeconfig.json", "Babis-WWRDWrapper.runtimeconfig.json");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.runtimeconfig.json", "Babis-WWRDWrapper.runtimeconfig.json");
             }
             if (!File.Exists("WRDFakeServer.exe"))
             {
                 Console.WriteLine("Downloading WRDFakeServer.exe, please wait (this will take some time)...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/WRDFakeServer.exe", "WRDFakeServer.exe");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/WRDFakeServer.exe", "WRDFakeServer.exe");
             }
             if (!File.Exists("wearedevs_exploit_api.dll"))
             {
@@ -317,22 +317,22 @@ namespace BabisW
             if (!File.Exists("OpenSSL\\msys-2.0.dll"))
             {
                 Console.WriteLine("Downloading msys-2.0.dll...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
             }
             if (!File.Exists("OpenSSL\\msys-crypto-3.dll"))
             {
                 Console.WriteLine("Downloading msys-crypto-3.dll...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
             }
             if (!File.Exists("OpenSSL\\msys-ssl-3.dll"))
             {
                 Console.WriteLine("Downloading msys-ssl-3.dll...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
             }
             if (!File.Exists("OpenSSL\\openssl.exe"))
             {
                 Console.WriteLine("Downloading openssl.exe...");
-                DownloadRuntimeFile(RepositoryRawBase + "/bin/x64/Debug/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
+                DownloadRuntimeFile(RepositoryRawBase + "/Babis-W/bin/x64/Debug/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
             }
 
             // Theme checking for Avalon stuff, etc
@@ -341,7 +341,7 @@ namespace BabisW
             {
                 File.Delete("EditorThemes\\lua_md_default.xshd"); // We want to update default theme regardless lol
             }
-            string penis = WebStuff.DownloadString(RepositoryRawBase + "/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
+            string penis = WebStuff.DownloadString(RepositoryRawBase + "/Babis-W/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
             File.WriteAllText("EditorThemes\\lua_md_default.xshd", penis);
 
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
