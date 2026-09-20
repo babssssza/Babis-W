@@ -115,12 +115,12 @@
                     </TransformGroup>
                 </Image.RenderTransform>
             </Image>
-            <Label x:Name="BabisWTitle" HorizontalContentAlignment="Center" Content="Welcome to BabisW" HorizontalAlignment="Left" Height="42" Margin="0,203,0,0" VerticalAlignment="Top" Width="565" Foreground="#FFC5C5C5" FontFamily="/BabisW Bootstrapper;component/#Chakra Petch Light" FontSize="25"/>
+            <Label x:Name="BabisWTitle" HorizontalContentAlignment="Center" Content="Welcome to Babis-W" HorizontalAlignment="Left" Height="42" Margin="0,203,0,0" VerticalAlignment="Top" Width="565" Foreground="#FFC5C5C5" FontFamily="/Babis-WDownloader;component/#Chakra Petch Light" FontSize="25"/>
         </Grid>
         <Grid x:Name="DownloadBabisW" Margin="1,1,1,0" Visibility="Hidden">
-            <Label x:Name="InstallUpdateText" HorizontalContentAlignment="Center" Content="BabisW Downloader" HorizontalAlignment="Left" Height="42" Margin="0,139,-2.2,0" VerticalAlignment="Top" Width="565" Foreground="#FFC5C5C5" FontFamily="/BabisW Bootstrapper;component/#Chakra Petch Light" FontSize="25" RenderTransformOrigin="0.5,1"/>
-            <Label x:Name="LatestUpdate" HorizontalContentAlignment="Center" Content="BabisW version here" HorizontalAlignment="Left" Height="44" Margin="-2,218,-0.2,0" VerticalAlignment="Top" Width="565" Foreground="#FF918F8F" FontFamily="Calibri Light" FontSize="15" RenderTransformOrigin="0.5,1"/>
-            <Button x:Name="InstallButton" Template ="{DynamicResource NoHighlightBut}" Content="Install BabisW" HorizontalAlignment="Left" Margin="216,182,0,0" VerticalAlignment="Top" Width="132" Background="#03FFFFFF" Foreground="White" Opacity="0.75" Height="34" RenderTransformOrigin="0.5,1" Click="InstallButton_MouseDown" Loaded="InstallButton_Loaded"/>
+            <Label x:Name="InstallUpdateText" HorizontalContentAlignment="Center" Content="Babis-W Downloader" HorizontalAlignment="Left" Height="42" Margin="0,139,-2.2,0" VerticalAlignment="Top" Width="565" Foreground="#FFC5C5C5" FontFamily="/Babis-WDownloader;component/#Chakra Petch Light" FontSize="25" RenderTransformOrigin="0.5,1"/>
+            <Label x:Name="LatestUpdate" HorizontalContentAlignment="Center" Content="Babis-W version here" HorizontalAlignment="Left" Height="44" Margin="-2,218,-0.2,0" VerticalAlignment="Top" Width="565" Foreground="#FF918F8F" FontFamily="Calibri Light" FontSize="15" RenderTransformOrigin="0.5,1"/>
+            <Button x:Name="InstallButton" Template ="{DynamicResource NoHighlightBut}" Content="Install Babis-W" HorizontalAlignment="Left" Margin="216,182,0,0" VerticalAlignment="Top" Width="132" Background="#03FFFFFF" Foreground="White" Opacity="0.75" Height="34" RenderTransformOrigin="0.5,1" Click="InstallButton_MouseDown" Loaded="InstallButton_Loaded"/>
         </Grid>
         <Grid x:Name="InstallBabisW" HorizontalAlignment="Left" Height="324" Margin="1,1,0,0" VerticalAlignment="Top" Width="563" Visibility="Hidden">
             <Grid.RowDefinitions>
@@ -137,7 +137,7 @@
             <Image x:Name="Gif3" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Aliased" HorizontalAlignment="Left" Height="20" Margin="246,177,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="21" gif:ImageBehavior.AnimatedSource="Rolling-1s-800px.gif" RenderTransformOrigin="0.316,-0.333" Opacity="0.8"/>
             <Label x:Name="CreatingFoldersLabel" Content="Creating folders" HorizontalAlignment="Left" Height="42" Margin="35,169,0,0" VerticalAlignment="Top" Width="138" Foreground="#FFC5C5C5" FontFamily="Calibri Light" FontSize="20" RenderTransformOrigin="0.5,1" Grid.RowSpan="2"/>
             <Image x:Name="Gif4" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Aliased" HorizontalAlignment="Left" Height="20" Margin="246,206,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="21" gif:ImageBehavior.AnimatedSource="Rolling-1s-800px.gif" RenderTransformOrigin="0.316,-0.333" Opacity="0.8"/>
-            <Label x:Name="DownloadingBabisWLabel" Content="Downloading BabisW" HorizontalAlignment="Left" Height="42" Margin="35,198,0,0" VerticalAlignment="Top" Width="195" Foreground="#FFC5C5C5" FontFamily="Calibri Light" FontSize="20" RenderTransformOrigin="0.5,1" Grid.RowSpan="2"/>
+            <Label x:Name="DownloadingBabisWLabel" Content="Downloading Babis-W" HorizontalAlignment="Left" Height="42" Margin="35,198,0,0" VerticalAlignment="Top" Width="195" Foreground="#FFC5C5C5" FontFamily="Calibri Light" FontSize="20" RenderTransformOrigin="0.5,1" Grid.RowSpan="2"/>
             <Image x:Name="Gif1" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Aliased" HorizontalAlignment="Left" Height="20" Margin="246,119,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="21" gif:ImageBehavior.AnimatedSource="Rolling-1s-800px.gif" RenderTransformOrigin="0.316,-0.333" Opacity="0.8"/>
             <Label x:Name="CheckingRequirementsLabel" Content="Checking requirements" HorizontalAlignment="Left" Height="42" Margin="35,111,0,0" VerticalAlignment="Top" Width="202" Foreground="#FFC5C5C5" FontFamily="Calibri Light" FontSize="20" RenderTransformOrigin="0.5,1" Grid.RowSpan="2"/>
             <Grid x:Name="RequirementCheck" HorizontalAlignment="Left" Height="159" Margin="301,95,0,0" VerticalAlignment="Top" Width="242" Grid.RowSpan="2">
@@ -151,7 +151,7 @@
                 <RichTextBox x:Name="CheckRequireText" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Style="{DynamicResource RichTextBoxStyle1}" Height="46" Margin="0,29,0,0" VerticalAlignment="Top" Width="235" Background="{x:Null}" Foreground="#FFC5C5C5" TextChanged="RichTextBox_TextChanged" BorderBrush="{x:Null}" FontSize="16" FontFamily="Calibri Light" IsReadOnly="True" SelectionBrush="{x:Null}" SelectionTextBrush="{x:Null}" IsEnabled="False">
                     <FlowDocument TextAlignment="Center">
                         <Paragraph>
-                            <Run Text="BabisW needs to check whether BabisW can be downloaded."/>
+                            <Run Text="Babis-W needs to check whether Babis-W can be downloaded."/>
                         </Paragraph>
                     </FlowDocument>
                 </RichTextBox>
@@ -185,7 +185,7 @@
                 <RichTextBox x:Name="CreatingFilesText" Style="{DynamicResource RichTextBoxStyle1}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="64" Margin="0,29,0,0" VerticalAlignment="Top" Width="235" Background="{x:Null}" Foreground="#FFC5C5C5" TextChanged="RichTextBox_TextChanged" BorderBrush="{x:Null}" FontSize="16" FontFamily="Calibri Light" IsReadOnly="True" SelectionBrush="{x:Null}" SelectionTextBrush="{x:Null}" IsEnabled="False">
                     <FlowDocument TextAlignment="Center">
                         <Paragraph>
-                            <Run Text="If this is your first time using BabisW, a folder called BabisW will be made."/>
+                            <Run Text="If this is your first time using Babis-W, a folder called Babis-W will be made."/>
                         </Paragraph>
                     </FlowDocument>
                 </RichTextBox>
@@ -195,14 +195,14 @@
                 <RichTextBox x:Name="DownloadingTitle" Style="{DynamicResource RichTextBoxStyle1}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="26" Margin="0,3,0,0" VerticalAlignment="Top" Width="235" Background="{x:Null}" Foreground="#FFEAEAEA" TextChanged="RichTextBox_TextChanged" BorderBrush="{x:Null}" FontSize="19" FontFamily="Calibri" IsReadOnly="True" SelectionBrush="{x:Null}" SelectionTextBrush="{x:Null}" IsEnabled="False">
                     <FlowDocument TextAlignment="Center">
                         <Paragraph>
-                            <Run Text="Downloading BabisW"/>
+                            <Run Text="Downloading Babis-W"/>
                         </Paragraph>
                     </FlowDocument>
                 </RichTextBox>
                 <RichTextBox x:Name="DownloadingText" Style="{DynamicResource RichTextBoxStyle1}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="64" Margin="0,29,0,0" VerticalAlignment="Top" Width="235" Background="{x:Null}" Foreground="#FFC5C5C5" TextChanged="RichTextBox_TextChanged" BorderBrush="{x:Null}" FontSize="16" FontFamily="Calibri Light" IsReadOnly="True" SelectionBrush="{x:Null}" SelectionTextBrush="{x:Null}" IsEnabled="False">
                     <FlowDocument TextAlignment="Center">
                         <Paragraph>
-                            <Run Text="It shouldn't take long to download BabisW, as it's a single .exe file."/>
+                            <Run Text="It shouldn't take long to download Babis-W, as it's a single .exe file."/>
                         </Paragraph>
                     </FlowDocument>
                 </RichTextBox>
@@ -219,7 +219,7 @@
                 <RichTextBox x:Name="ContinueToBabisWText" Style="{DynamicResource RichTextBoxStyle1}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="47" Margin="0,29,0,0" VerticalAlignment="Top" Width="235" Background="{x:Null}" Foreground="#FFC5C5C5" TextChanged="RichTextBox_TextChanged" BorderBrush="{x:Null}" FontSize="16" FontFamily="Calibri Light" IsReadOnly="True" SelectionBrush="{x:Null}" SelectionTextBrush="{x:Null}" IsEnabled="False">
                     <FlowDocument TextAlignment="Center">
                         <Paragraph>
-                            <Run Text="BabisW has been successfully downloaded. Feel free to use it."/>
+                            <Run Text="Babis-W has been successfully downloaded. Feel free to use it."/>
                         </Paragraph>
                     </FlowDocument>
                 </RichTextBox>
@@ -227,6 +227,6 @@
             </Grid>
         </Grid>
         <Image x:Name="JoinDiscord" RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Left" Height="16" Margin="7,306,0,0" VerticalAlignment="Top" Width="20" Source="5761437_discord_logo_icon.png" Opacity="0.5" Visibility="Hidden"/>
-        <Label x:Name="JoinOurDiscord"  Content="babis-w.org/discord" HorizontalAlignment="Left" Height="24" Margin="22,302,0,0" VerticalAlignment="Top" Width="166" Foreground="#FF938E8E" FontFamily="Calibri Light" RenderTransformOrigin="0.5,1" FontStyle="Italic" Visibility="Hidden"/>
+        <Label x:Name="JoinOurDiscord"  Content="maindab.org/discord" HorizontalAlignment="Left" Height="24" Margin="22,302,0,0" VerticalAlignment="Top" Width="166" Foreground="#FF938E8E" FontFamily="Calibri Light" RenderTransformOrigin="0.5,1" FontStyle="Italic" Visibility="Hidden"/>
     </Grid>
 </Window>

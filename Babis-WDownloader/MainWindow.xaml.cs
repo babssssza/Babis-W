@@ -30,10 +30,14 @@ namespace BabisW_Bootstrapper
 
     public partial class MainWindow : Window
     {
+        private const string ProductName = "Babis-W";
+        private const string ExecutableName = "Babis-W.exe";
+        private const string InstallDirectory = "Babis-W";
+        private const string GitHubRepository = "babssssza/Babis-W";
+        private const string LatestReleaseDownload = "https://raw.githubusercontent.com/" + GitHubRepository + "/main/Babis-W/bin/Release/" + ExecutableName;
 
         // WebClient Creation
         WebClient WebStuff = new WebClient(); // Create a new generally used WebClient
-        bool IsFirstTime = false;
 
         public MainWindow()
         {
@@ -147,22 +151,13 @@ namespace BabisW_Bootstrapper
             Startup.Visibility = Visibility.Hidden;
             DownloadBabisW.Visibility = Visibility.Visible;
 
-            string Version = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/Version");
-            WebStuff.Dispose(); // Remember to dispose the WebClient! Or someone will scold me for it
+            WebStuff.Headers[HttpRequestHeader.UserAgent] = ProductName + " Downloader";
+            LatestUpdate.Content = "Latest " + ProductName + " build: main branch";
 
-            // .FirstOrDefault() is nessesary since GitHub always adds an extra line for some reason
-            // If I don't do this, then the string that would return is "BabisW 14.3/n" rather than "BabisW 14.3", so basically an additional unwanted line!
-            string OnlineVersion = Version.Split(new[] { '\r', '\n' }).FirstOrDefault();
-            LatestUpdate.Content = "Latest BabisW Version: " + OnlineVersion;
-
-            if (File.Exists("BabisW.exe"))
+            if (File.Exists(Path.Combine(InstallDirectory, ExecutableName)) || File.Exists(ExecutableName))
             {
-                InstallUpdateText.Content = "BabisW Update Found";
-                InstallButton.Content = "Update BabisW";
-            }
-            else
-            {
-                IsFirstTime = true;
+                InstallUpdateText.Content = ProductName + " update found";
+                InstallButton.Content = "Update " + ProductName;
             }
 
             Move(InstallUpdateText, InstallUpdateText.Margin, new Thickness(0, 111, -2.2, 0), 0.5);
@@ -249,7 +244,7 @@ namespace BabisW_Bootstrapper
             if (!GetWebsite.IsSuccessStatusCode)
             {
                 // GitHub not accessable!
-                MessageBox.Show("BabisW's Bootstrapper cannot properly reach GitHub, which it needed in order to download BabisW. Please check your firewall or router settings.\n\nYou can join BabisW's Discord at babis-w.org/discord if you need more help.", "Error connecting to GitHub");
+                MessageBox.Show(ProductName + "'s downloader cannot reach GitHub, which is required to download " + ProductName + ". Please check your firewall or router settings.\n\nYou can join the " + ProductName + " community at babis-w.org/discord if you need more help.", "Error connecting to GitHub");
                 Environment.Exit(0);
             }
 
@@ -268,10 +263,10 @@ namespace BabisW_Bootstrapper
             Fade(DeletingFiles, 0, 1, 0.5);
             await Task.Delay(500);
 
-            // Delete BabisW file
+            // Delete the existing application file.
             try
             {
-                foreach (Process proc in Process.GetProcessesByName("BabisW")) // Get rid of BabisW
+                foreach (Process proc in Process.GetProcessesByName("Babis-W"))
                 {
                     proc.Kill();
                 }
@@ -280,9 +275,9 @@ namespace BabisW_Bootstrapper
 
             await Task.Delay(2000);
 
-            if (File.Exists("BabisW.exe"))
+            if (File.Exists(ExecutableName))
             {
-                File.Delete("BabisW.exe");
+                File.Delete(ExecutableName);
             }
 
             Fade(DeletingFiles, 1, 0, 0.5);
@@ -299,25 +294,22 @@ namespace BabisW_Bootstrapper
             Fade(CreatingFolders, 0, 1, 0.5);
             await Task.Delay(500);
 
-            // Get rid of BabisW folder
+            // Remove the previous installation folder.
             try
             {
-                DirectoryInfo ruh = new DirectoryInfo("BabisW");
+                DirectoryInfo ruh = new DirectoryInfo(InstallDirectory);
                 foreach (FileInfo file in ruh.GetFiles())
                 {
                     file.Delete();
                 }
-                if (Directory.Exists("BabisW"))
+                if (Directory.Exists(InstallDirectory))
                 {
-                    Directory.Delete("BabisW");
+                    Directory.Delete(InstallDirectory);
                 }
             }
             catch { }
 
-            if (IsFirstTime == true)
-            {
-                Directory.CreateDirectory("BabisW");
-            }
+            Directory.CreateDirectory(InstallDirectory);
 
             await Task.Delay(500);
 
@@ -335,18 +327,9 @@ namespace BabisW_Bootstrapper
             Fade(DownloadingBabisW, 0, 1, 0.5);
             await Task.Delay(500);
 
-            if (IsFirstTime == true)
-            {
-                WebStuff.DownloadProgressChanged += new DownloadProgressChangedEventHandler(WebStuff_DownloadProgressChanged);
-                WebStuff.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(WebStuff_DownloadCompleted);
-                WebStuff.DownloadFileAsync(new Uri("https://github.com/Avaluate/BabisWWeb/raw/main/BabisW.exe"), "BabisW\\BabisW.exe");
-            }
-            else
-            {
-                WebStuff.DownloadProgressChanged += new DownloadProgressChangedEventHandler(WebStuff_DownloadProgressChanged);
-                WebStuff.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(WebStuff_DownloadCompleted);
-                WebStuff.DownloadFileAsync(new Uri("https://github.com/Avaluate/BabisWWeb/raw/main/BabisW.exe"), "BabisW.exe");
-            }
+            WebStuff.DownloadProgressChanged += new DownloadProgressChangedEventHandler(WebStuff_DownloadProgressChanged);
+            WebStuff.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(WebStuff_DownloadCompleted);
+            WebStuff.DownloadFileAsync(new Uri(LatestReleaseDownload), Path.Combine(InstallDirectory, ExecutableName));
 
             
         }
@@ -377,15 +360,8 @@ namespace BabisW_Bootstrapper
                 Fade(Gif4Completed, 0, 0.8, 0.5);
                 Fade(ContinueToBabisW, 0, 1, 0.5);
                 
-                if (IsFirstTime == true)
-                {
-                    Directory.SetCurrentDirectory("BabisW");
-                    Process.Start("BabisW.exe");
-                }
-                else
-                {
-                    Process.Start("BabisW.exe");
-                }
+                Directory.SetCurrentDirectory(InstallDirectory);
+                Process.Start(ExecutableName);
 
                 await Task.Delay(2000);
                 Fade(MainGrid, 1, 0, 0.5);
