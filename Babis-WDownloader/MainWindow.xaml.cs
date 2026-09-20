@@ -150,11 +150,12 @@ namespace BabisW_Bootstrapper
 
             Startup.Visibility = Visibility.Hidden;
             DownloadBabisW.Visibility = Visibility.Visible;
+            EnsureDesktopShortcut();
 
             WebStuff.Headers[HttpRequestHeader.UserAgent] = ProductName + " Downloader";
             LatestUpdate.Content = "Latest " + ProductName + " build: main branch";
 
-            if (File.Exists(Path.Combine(InstallDirectory, ExecutableName)) || File.Exists(ExecutableName))
+            if (File.Exists(System.IO.Path.Combine(InstallDirectory, ExecutableName)) || File.Exists(ExecutableName))
             {
                 InstallUpdateText.Content = ProductName + " update found";
                 InstallButton.Content = "Update " + ProductName;
@@ -275,7 +276,7 @@ namespace BabisW_Bootstrapper
 
             await Task.Delay(2000);
 
-            if (File.Exists(ExecutableName))
+            if (File.Exists(System.IO.Path.Combine(InstallDirectory, ExecutableName)) || File.Exists(ExecutableName))
             {
                 File.Delete(ExecutableName);
             }
@@ -329,7 +330,7 @@ namespace BabisW_Bootstrapper
 
             WebStuff.DownloadProgressChanged += new DownloadProgressChangedEventHandler(WebStuff_DownloadProgressChanged);
             WebStuff.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(WebStuff_DownloadCompleted);
-            WebStuff.DownloadFileAsync(new Uri(LatestReleaseDownload), Path.Combine(InstallDirectory, ExecutableName));
+            WebStuff.DownloadFileAsync(new Uri(LatestReleaseDownload), System.IO.Path.Combine(InstallDirectory, ExecutableName));
 
             
         }
@@ -360,14 +361,56 @@ namespace BabisW_Bootstrapper
                 Fade(Gif4Completed, 0, 0.8, 0.5);
                 Fade(ContinueToBabisW, 0, 1, 0.5);
                 
-                Directory.SetCurrentDirectory(InstallDirectory);
-                Process.Start(ExecutableName);
+                string installPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(InstallDirectory, ExecutableName));
+                CreateDesktopShortcut(installPath);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = installPath,
+                    WorkingDirectory = System.IO.Path.GetDirectoryName(installPath),
+                    UseShellExecute = true
+                });
 
                 await Task.Delay(2000);
                 Fade(MainGrid, 1, 0, 0.5);
                 await Task.Delay(501);
                 Environment.Exit(0);
             });
+        }
+
+        private void EnsureDesktopShortcut()
+        {
+            string installedPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(InstallDirectory, ExecutableName));
+            if (File.Exists(installedPath))
+            {
+                CreateDesktopShortcut(installedPath);
+            }
+        }
+
+        private static void CreateDesktopShortcut(string targetPath)
+        {
+            try
+            {
+                Type shellType = Type.GetTypeFromProgID("WScript.Shell");
+                if (shellType == null)
+                {
+                    return;
+                }
+
+                string shortcutPath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    "Babis V-M.lnk");
+                dynamic shell = Activator.CreateInstance(shellType);
+                dynamic shortcut = shell.CreateShortcut(shortcutPath);
+                shortcut.TargetPath = targetPath;
+                shortcut.WorkingDirectory = System.IO.Path.GetDirectoryName(targetPath);
+                shortcut.Description = "Launch Babis-W";
+                shortcut.IconLocation = targetPath + ",0";
+                shortcut.Save();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to create the desktop shortcut: {ex.Message}");
+            }
         }
 
         private void RichTextBox_TextChanged(object sender, TextChangedEventArgs e)

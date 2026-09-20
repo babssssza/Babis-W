@@ -106,23 +106,25 @@ namespace BabisW
         // WINDOW INITILISATION //
         public MainWindow()
         {
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
             Console.WriteLine($"  __  __       _       _____        _     \r\n |  \\/  |     (_)     |  __ \\      | |    \r\n | \\  / | __ _ _ _ __ | |  | | __ _| |__  \r\n | |\\/| |/ _` | | '_ \\| |  | |/ _` | '_ \\ \r\n | |  | | (_| | | | | | |__| | (_| | |_) |\r\n |_|  |_|\\__,_|_|_| |_|_____/ \\__,_|_.__/\n\n${CurrentVersion}, by Avaluate (Main_EX) | babis-w.org/discord\n"); // i love babis-w
 
             InitializeComponent();
             MainWin.WindowStartupLocation = WindowStartupLocation.CenterScreen; // Center BabisW to the middle of the screen
+            EnsureDesktopShortcut();
                                                                                 // UPDATE SYSTEM //
 
             // First, we want to check and see if the updater is still there
 
 
-            if (File.Exists("BabisWDownloader.exe"))
+            if (File.Exists("Babis-WDownloader.exe"))
             {
-                Console.WriteLine("BabisW Downloader found, deleting");
-                File.Delete("BabisWDownloader.exe"); // If it is, we should delete it
+                Console.WriteLine("Babis-W Downloader found, deleting");
+                File.Delete("Babis-WDownloader.exe");
             }
 
             Console.WriteLine("Checking to see if BabisW is up to date");
-            string Version = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/Version");
+            string Version = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Version");
             WebStuff.Dispose(); // Remember to dispose the WebClient! Or someone will scold me for it
 
             // .FirstOrDefault() is nessesary since GitHub always adds an extra line for some reason
@@ -134,14 +136,14 @@ namespace BabisW
                 // Downloading BabisW's Updater
                 Console.WriteLine("BabisW not up to date, downloading new version");
 
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWDownloader.exe", "BabisWDownloader.exe");
+                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-WDownloader/bin/Release/Babis-WDownloader.exe", "Babis-WDownloader.exe");
                 WebStuff.Dispose();
 
                 // Downloading BabisW's Updater
 
                 // We have to set it like this since the updater needs the right startup path to run correctly
                 Directory.SetCurrentDirectory(Directory.GetCurrentDirectory());
-                Process.Start("BabisWDownloader.exe"); // Run the updater
+                Process.Start("Babis-WDownloader.exe"); // Run the updater
                 Environment.Exit(0);
                 // Note : The updater automatically deletes BabisW.exe
             }
@@ -180,84 +182,38 @@ namespace BabisW
                 Directory.CreateDirectory("Workspace");
             }
 
-            // check the WRD wrapper version first & update if req
-            Console.WriteLine("Checking to see if WeAreDevs API wrapper is up to date");
+            // Keep an existing wrapper installation. Missing files are downloaded below.
+            Console.WriteLine("Checking to see if the Babis-W wrapper is installed");
 
-            try
+            if (!File.Exists("Babis-WWRDWrapper.deps.json"))
             {
-                RegistryKey SettingReg = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\BabisWWRDWrapper");
-                string WRDVer = SettingReg.GetValue("WrapperVersion").ToString();
-
-                if (WRDVer != null)
-                {
-                    string VersionWRDWrapper = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/VersionWRDWrapper");
-                    if (WRDVer != VersionWRDWrapper.Split(new[] { '\r', '\n' }).FirstOrDefault())
-                    {
-                        Console.WriteLine("Wrapper not up to date, downloading new version");
-
-                        if (File.Exists("BabisWWRDWrapper.deps.json"))
-                        {
-                            File.Delete("BabisWWRDWrapper.deps.json");
-                        }
-                        if (File.Exists("BabisWWRDWrapper.dll"))
-                        {
-                            File.Delete("BabisWWRDWrapper.dll");
-                        }
-                        if (File.Exists("BabisWWRDWrapper.exe"))
-                        {
-                            File.Delete("BabisWWRDWrapper.exe");
-                        }
-                        if (File.Exists("BabisWWRDWrapper.pdb"))
-                        {
-                            File.Delete("BabisWWRDWrapper.pdb");
-                        }
-                        if (File.Exists("BabisWWRDWrapper.runtimeconfig.json"))
-                        {
-                            File.Delete("BabisWWRDWrapper.runtimeconfig.json");
-                        }
-                        if (File.Exists("WRDFakeServer.exe"))
-                        {
-                            File.Delete("WRDFakeServer.exe");
-                        }
-                        Console.WriteLine("Deleted old files");
-                    }
-                }
+                Console.WriteLine("Downloading Babis-WWRDWrapper.deps.json, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.deps.json", "Babis-WWRDWrapper.deps.json");
             }
-            catch (Exception ex)
+            if (!File.Exists("Babis-WWRDWrapper.dll"))
             {
-                Console.WriteLine($"Attempt to check WRD wrapper version result in error: {ex}");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.dll, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.dll", "Babis-WWRDWrapper.dll");
             }
-
-
-            if (!File.Exists("BabisWWRDWrapper.deps.json"))
+            if (!File.Exists("Babis-WWRDWrapper.exe"))
             {
-                Console.WriteLine("Downloading BabisWWRDWrapper.deps.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.deps.json", "BabisWWRDWrapper.deps.json");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.exe, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.exe", "Babis-WWRDWrapper.exe");
             }
-            if (!File.Exists("BabisWWRDWrapper.dll"))
+            if (!File.Exists("Babis-WWRDWrapper.pdb"))
             {
-                Console.WriteLine("Downloading BabisWWRDWrapper.dll, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.dll", "BabisWWRDWrapper.dll");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.pdb, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.pdb", "Babis-WWRDWrapper.pdb");
             }
-            if (!File.Exists("BabisWWRDWrapper.exe"))
+            if (!File.Exists("Babis-WWRDWrapper.runtimeconfig.json"))
             {
-                Console.WriteLine("Downloading BabisWWRDWrapper.exe, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.exe", "BabisWWRDWrapper.exe");
-            }
-            if (!File.Exists("BabisWWRDWrapper.pdb"))
-            {
-                Console.WriteLine("Downloading BabisWWRDWrapper.pdb, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.pdb", "BabisWWRDWrapper.pdb");
-            }
-            if (!File.Exists("BabisWWRDWrapper.runtimeconfig.json"))
-            {
-                Console.WriteLine("Downloading BabisWWRDWrapper.runtimeconfig.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/BabisWWRDWrapper.runtimeconfig.json", "BabisWWRDWrapper.runtimeconfig.json");
+                Console.WriteLine("Downloading Babis-WWRDWrapper.runtimeconfig.json, please wait...");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.runtimeconfig.json", "Babis-WWRDWrapper.runtimeconfig.json");
             }
             if (!File.Exists("WRDFakeServer.exe"))
             {
                 Console.WriteLine("Downloading WRDFakeServer.exe, please wait (this will take some time)...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/BabisWWRDWrapper/WRDFakeServer.exe", "WRDFakeServer.exe");
+                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/WRDFakeServer.exe", "WRDFakeServer.exe");
             }
             if (!File.Exists("wearedevs_exploit_api.dll"))
             {
@@ -291,22 +247,22 @@ namespace BabisW
             if (!File.Exists("OpenSSL\\msys-2.0.dll"))
             {
                 Console.WriteLine("Downloading msys-2.0.dll...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
+                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
             }
             if (!File.Exists("OpenSSL\\msys-crypto-3.dll"))
             {
                 Console.WriteLine("Downloading msys-crypto-3.dll...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
+                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
             }
             if (!File.Exists("OpenSSL\\msys-ssl-3.dll"))
             {
                 Console.WriteLine("Downloading msys-ssl-3.dll...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
+                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
             }
             if (!File.Exists("OpenSSL\\openssl.exe"))
             {
                 Console.WriteLine("Downloading openssl.exe...");
-                WebStuff.DownloadFile("https://github.com/Avaluate/BabisWWeb/raw/main/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
+                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
             }
 
             // Theme checking for Avalon stuff, etc
@@ -315,7 +271,7 @@ namespace BabisW
             {
                 File.Delete("EditorThemes\\lua_md_default.xshd"); // We want to update default theme regardless lol
             }
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/Themes/lua_md_default.xshd");
+            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
             File.WriteAllText("EditorThemes\\lua_md_default.xshd", penis);
 
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
@@ -330,8 +286,41 @@ namespace BabisW
             });
 
 
-            Console.Title = "BabisW";
+            Console.Title = "Babis-W";
             Console.WriteLine("All done!\n");
+        }
+
+        private static void EnsureDesktopShortcut()
+        {
+            try
+            {
+                string targetPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Babis-W.exe");
+                if (!File.Exists(targetPath))
+                {
+                    return;
+                }
+
+                Type shellType = Type.GetTypeFromProgID("WScript.Shell");
+                if (shellType == null)
+                {
+                    return;
+                }
+
+                string shortcutPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    "Babis V-M.lnk");
+                dynamic shell = Activator.CreateInstance(shellType);
+                dynamic shortcut = shell.CreateShortcut(shortcutPath);
+                shortcut.TargetPath = targetPath;
+                shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                shortcut.Description = "Launch Babis-W";
+                shortcut.IconLocation = targetPath + ",0";
+                shortcut.Save();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to create the desktop shortcut: {ex.Message}");
+            }
         }
 
         // Make BabisW actually draggable
@@ -752,7 +741,7 @@ namespace BabisW
         {
             CloseCompleted = true;
             // just in case
-            try { foreach (Process proc in Process.GetProcessesByName("BabisWWRDWrapper")) { proc.Kill(); } } catch { }
+            try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
             try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
             Environment.Exit(0);
         }
@@ -934,7 +923,7 @@ namespace BabisW
             {
                 if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
                 {
-                    Process[] pname1 = Process.GetProcessesByName("BabisWWRDWrapper");
+                    Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
                     if (pname1.Length > 0) // so injection at this point has started
                     {
                         IsInjected = Execution.ExecutionHandler.IsInjected();
@@ -970,7 +959,7 @@ namespace BabisW
             else
             {
                 // for WRD
-                try { foreach (Process proc in Process.GetProcessesByName("BabisWWRDWrapper")) { proc.Kill(); } } catch { }
+                try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
                 try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
 
                 this.Dispatcher.Invoke(() =>

@@ -30,7 +30,7 @@ namespace BabisW.Execution
             {
                 if (Pipe == null || !Pipe.IsConnected)
                 {
-                   // Pipe.Dispose();
+                   Pipe?.Dispose();
                     Pipe = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut);
                     Pipe.Connect(Timeout);
                     Console.WriteLine("connected");
@@ -64,12 +64,12 @@ namespace BabisW.Execution
 
                     return JsonConvert.DeserializeObject<T>(Res.Data);
                 }
-                catch (IOException)
+                catch (Exception ex) when (ex is IOException || ex is TimeoutException || ex is EndOfStreamException)
                 {
                     // will reconnect on next call
-                    Pipe.Dispose();
+                    Pipe?.Dispose();
                     Pipe = null;
-                    throw new Exception("connection lost");
+                    throw new Exception("The Babis-W wrapper connection was lost.", ex);
                 }
             }
         }
@@ -90,24 +90,34 @@ namespace BabisW.Execution
         {
             // Read message length
             var LenBuffer = new byte[4]; // sufficient
-            Me.Read(LenBuffer, 0, 4);
+            ReadExactly(Me, LenBuffer, 4);
             var MessageLength = BitConverter.ToInt32(LenBuffer, 0);
+            if (MessageLength <= 0 || MessageLength > 16 * 1024 * 1024)
+            {
+                throw new InvalidDataException("The wrapper returned an invalid message length.");
+            }
 
             // Read message
             var MessageBuffer = new byte[MessageLength];
-            var TotalBytesRead = 0;
-
-            while (TotalBytesRead < MessageLength)
-            {
-                var BytesRead = Me.Read(
-                    MessageBuffer,
-                    TotalBytesRead,
-                    MessageLength - TotalBytesRead);
-                TotalBytesRead += BytesRead;
-            }
+            ReadExactly(Me, MessageBuffer, MessageLength);
 
             var messageJson = Encoding.UTF8.GetString(MessageBuffer);
             return JsonConvert.DeserializeObject<ResponseMessage>(messageJson);
+        }
+
+        private static void ReadExactly(Stream stream, byte[] buffer, int count)
+        {
+            var offset = 0;
+            while (offset < count)
+            {
+                var bytesRead = stream.Read(buffer, offset, count - offset);
+                if (bytesRead == 0)
+                {
+                    throw new EndOfStreamException("The wrapper closed the pipe.");
+                }
+
+                offset += bytesRead;
+            }
         }
 
         public void Dispose()
@@ -116,7 +126,7 @@ namespace BabisW.Execution
             {
                 if (!Disposed)
                 {
-                    Pipe.Dispose();
+                    Pipe?.Dispose();
                     Disposed = true;
                 }
             }

@@ -9,7 +9,7 @@
         xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit" x:Name="MainWin" x:Class="BabisW.MainWindow"
     
         mc:Ignorable="d"
-        Title="BabisW" ResizeMode="NoResize" Height="416.65" Width="699.896" Background="{x:Null}" Foreground="#FF939292" Closing="MainWin_Closing" AllowsTransparency="True" WindowStyle="None" Icon="Untitled drawing (40).png" KeyDown="MainWin_KeyDown">
+        Title="Babis-W" ResizeMode="NoResize" Height="416.65" Width="699.896" Background="{x:Null}" Foreground="#FF939292" Closing="MainWin_Closing" AllowsTransparency="True" WindowStyle="None" Icon="Babis-W.ico" KeyDown="MainWin_KeyDown">
 
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Unloaded">
