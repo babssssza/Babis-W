@@ -810,7 +810,7 @@ namespace BabisW
             {
                 NoticeBoard.Text = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Notice");
             }
-            catch (WebException ex)
+            catch (Exception ex)
             {
                 NoticeBoard.Text = "Babis-W is ready. Join the community at babis-w.org/discord.";
                 Console.WriteLine($"Unable to load the notice: {ex.Message}");
@@ -824,7 +824,7 @@ namespace BabisW
             {
                 Changelog.Text = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Changelog.txt");
             }
-            catch (WebException ex)
+            catch (Exception ex)
             {
                 Changelog.Text = "No changelog is available right now.";
                 Console.WriteLine($"Unable to load the changelog: {ex.Message}");
