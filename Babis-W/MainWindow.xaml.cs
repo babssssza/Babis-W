@@ -1,19 +1,18 @@
 /*
-  __  __       _       _____        _     
- |  \/  |     (_)     |  __ \      | |    
- | \  / | __ _ _ _ __ | |  | | __ _| |__  
- | |\/| |/ _` | | '_ \| |  | |/ _` | '_ \ 
- | |  | | (_| | | | | | |__| | (_| | |_) |
- |_|  |_|\__,_|_|_| |_|_____/ \__,_|_.__/ 
+  ____        _        __        __
+ | __ )      / \       \ \      / /
+ |  _ \     / _ \       \ \ /\ / /
+ | |_) |   / ___ \       \ V  V /
+ |____/   /_/   \_\       \_/\_/
                  
  https://github.com/babssssza/Babis-W
 
  You can join BabisW's Discord server at https://babis-w.org/discord (June 2025)
  or Telegram at https://telegram.me/babis-w (June 2025)
                                           
- BabisW, Babis-W (Avaluate)
- Discord: avaluate
- Telegram: t.me/avaluate
+ B-W, Babis-W
+ Discord: babis-w.org/discord
+ Telegram: t.me/babis-w
 
  WeAreDevs API obtained from https://wearedevs.net/d/Exploit%20API
 */
@@ -795,10 +794,7 @@ namespace BabisW
         // Join Discord button
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            byte[] succ = WebStuff.DownloadData("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/DiscordLink.txt");
-            WebStuff.Dispose();
-            string discord = Encoding.UTF8.GetString(succ);
-            Process.Start(discord);
+            Process.Start("https://babis-w.org/discord");
         }
 
         // Get help button
@@ -810,15 +806,29 @@ namespace BabisW
         // Set notice board text
         private void Notice(object sender, RoutedEventArgs e)
         {
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/Notice");
-            NoticeBoard.Text = penis;
+            try
+            {
+                NoticeBoard.Text = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Notice");
+            }
+            catch (WebException ex)
+            {
+                NoticeBoard.Text = "Babis-W is ready. Join the community at babis-w.org/discord.";
+                Console.WriteLine($"Unable to load the notice: {ex.Message}");
+            }
         }
 
         // Set changelog board text
         private void ChangelogBoard(object sender, RoutedEventArgs e)
         {
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/master/UpdateStuff/Changelog");
-            Changelog.Text = penis;
+            try
+            {
+                Changelog.Text = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Changelog.txt");
+            }
+            catch (WebException ex)
+            {
+                Changelog.Text = "No changelog is available right now.";
+                Console.WriteLine($"Unable to load the changelog: {ex.Message}");
+            }
         }
 
         // EXECUTION GRID FUNCTIONS //
