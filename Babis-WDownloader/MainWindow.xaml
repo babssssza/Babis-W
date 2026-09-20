@@ -6,7 +6,7 @@
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         xmlns:local="clr-namespace:BabisW_Bootstrapper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="326.533" Width="564.8" ResizeMode="NoResize" WindowStyle="None" Background="{x:Null}" Foreground="{x:Null}" AllowsTransparency="True" WindowStartupLocation="CenterScreen" MouseDown="Window_MouseDown">
+        Title="Babis-W Downloader" Height="326.533" Width="564.8" ResizeMode="NoResize" WindowStyle="None" Background="{x:Null}" Foreground="{x:Null}" AllowsTransparency="True" WindowStartupLocation="CenterScreen" Icon="Babis-W.ico" MouseDown="Window_MouseDown">
 
     <Window.Resources>
         <ControlTemplate x:Key="NoHighlightBut" TargetType="{x:Type ButtonBase}">

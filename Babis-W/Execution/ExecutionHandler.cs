@@ -20,7 +20,14 @@ namespace BabisW.Execution
                 try{ foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill();} } catch { }
                 try{ foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
 
-                Process.Start("Babis-WWRDWrapper.exe");
+                string wrapperPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Babis-WWRDWrapper.exe");
+                if (!File.Exists(wrapperPath))
+                {
+                    MessageBox.Show($"The Babis-W wrapper is missing: {wrapperPath}", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                Process.Start(wrapperPath);
                 Thread.Sleep(1000);
                 try
                 {

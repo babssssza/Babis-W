@@ -9,7 +9,7 @@
         xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit" x:Name="MainWin" x:Class="BabisW.MainWindow"
     
         mc:Ignorable="d"
-        Title="Babis-W" ResizeMode="NoResize" Height="416.65" Width="699.896" Background="{x:Null}" Foreground="#FF939292" Closing="MainWin_Closing" AllowsTransparency="True" WindowStyle="None" Icon="Babis-W-Taskbar.png" KeyDown="MainWin_KeyDown">
+        Title="Babis-W" ResizeMode="NoResize" Height="416.65" Width="699.896" Background="{x:Null}" Foreground="#FF939292" Closing="MainWin_Closing" AllowsTransparency="True" WindowStyle="None" Icon="Babis-W.ico" KeyDown="MainWin_KeyDown">
 
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Unloaded">
@@ -1300,7 +1300,7 @@
                     </Grid>
                 </Viewbox>
                 <TextBlock HorizontalAlignment="Left" Height="55" TextWrapping="Wrap" VerticalAlignment="Top" Width="309" Foreground="#FFD0CFCF" FontFamily="Calibri Light" FontSize="20" Margin="219,42,0,0" RenderTransformOrigin="1.338,2.769" Grid.Column="2" Text="Announcements"/>
-                <TextBlock HorizontalAlignment="Left" Height="29" TextWrapping="Wrap" Text="Welcome to Babis-W!" VerticalAlignment="Top" Width="188" Foreground="#FFD0CFCF" FontFamily="Calibri" FontSize="20" Margin="22,99,0,0" RenderTransformOrigin="1.338,2.769" Grid.ColumnSpan="3">
+                <TextBlock HorizontalAlignment="Left" Height="29" TextWrapping="Wrap" Text="Welcome to BabisW!" VerticalAlignment="Top" Width="188" Foreground="#FFD0CFCF" FontFamily="Calibri" FontSize="20" Margin="22,99,0,0" RenderTransformOrigin="1.338,2.769" Grid.ColumnSpan="3">
                     <TextBlock.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -1436,7 +1436,7 @@
                     </Grid>
                 </Viewbox>
             </Grid>
-            <TextBlock ToolTip="Made by Babis-W @ discord.io/babis-w" Height="30" TextWrapping="Wrap" Text="Babis-W" VerticalAlignment="Top" Foreground="Silver" FontFamily="Calibri Light" FontSize="20" Margin="6,4,25.2,0" MouseDown="TextBlock_MouseDown"/>
+            <TextBlock ToolTip="Made by Main_EX @ discord.io/babis-w" Height="30" TextWrapping="Wrap" Text="BabisW" VerticalAlignment="Top" Foreground="Silver" FontFamily="Calibri Light" FontSize="20" Margin="6,4,25.2,0" MouseDown="TextBlock_MouseDown"/>
 
             <Image x:Name="HomePage" HorizontalAlignment="Left" Height="21" Margin="-35,38,0,0" VerticalAlignment="Top" Width="20" Source="/ImageResources/HomePageIcon.png" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Aliased" MouseDown="HomePage_MouseDown" Opacity="0.295">
                 <Image.Style>
@@ -1562,7 +1562,7 @@
                     Background="Transparent"
                     Style="{StaticResource Tab2}" BorderBrush="Transparent" Height="24" Foreground="#FFB7B7B7">
 
-                        <avalonEdit:TextEditor xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit" x:Name="TextEditor" Margin="-3,0,0.2,0.6" Grid.Row="1" Style="{DynamicResource TextEditorStyle1}" ShowLineNumbers="True" Foreground="#FFDDDDDD" FontFamily="Consolas" Text="-- Babis-W @ discord.io/babis-w" Grid.RowSpan="3" LineNumbersForeground="#FFC7C5C5"
+                        <avalonEdit:TextEditor xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit" x:Name="TextEditor" Margin="-3,0,0.2,0.6" Grid.Row="1" Style="{DynamicResource TextEditorStyle1}" ShowLineNumbers="True" Foreground="#FFDDDDDD" FontFamily="Consolas" Text="-- BabisW @ discord.io/babis-w" Grid.RowSpan="3" LineNumbersForeground="#FFC7C5C5"
                         VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" RenderTransformOrigin="0,0" MaxHeight="999999999" HorizontalContentAlignment="Stretch" Loaded="TextEditor_Loaded" Background="#0F312F2F" WordWrap="True">
                             <avalonEdit:TextEditor.RenderTransform>
                                 <TransformGroup>
@@ -1905,7 +1905,7 @@
                 <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Tools" VerticalAlignment="Top" Width="140" Foreground="#FFA9A1A1" FontFamily="Calibri" FontSize="18" Margin="15,6,0,0"/>
                 <Border BorderThickness="1" HorizontalAlignment="Left" Height="138" Margin="16,34,0,0" CornerRadius="5 5 5 5" VerticalAlignment="Top" Width="147" Background="#0F000000" BorderBrush="#19A5A5A5"/>
                 <TextBlock HorizontalAlignment="Left" Height="35" TextWrapping="Wrap" Text="Multiple Roblox" VerticalAlignment="Top" Width="131" Foreground="#FFC2C2C2" FontFamily="Calibri" FontSize="16" Margin="23,38,0,0" FontWeight="Bold"/>
-                <TextBlock HorizontalAlignment="Left" Height="35" TextWrapping="Wrap" VerticalAlignment="Top" Width="131" Foreground="#FF868585" FontFamily="Calibri Light" Margin="23,58,0,0" FontSize="10"><Run Text="by "/><Run Language="en-hk" Text="Babis-W"/></TextBlock>
+                <TextBlock HorizontalAlignment="Left" Height="35" TextWrapping="Wrap" VerticalAlignment="Top" Width="131" Foreground="#FF868585" FontFamily="Calibri Light" Margin="23,58,0,0" FontSize="10"><Run Text="by "/><Run Language="en-hk" Text="Avaluate (Main_EX)"/></TextBlock>
                 <TextBlock HorizontalAlignment="Left" Height="80" TextWrapping="Wrap" VerticalAlignment="Top" Width="130" Foreground="#FFC5BDBD" FontFamily="Calibri Light" Margin="23,73,0,0"><Run Text="Allows for"/><Run Language="en-hk" Text=" multiple "/><Run Text="Roblox window"/><Run Language="en-hk" Text="s"/><Run Text=" to be opened on different accounts."/><Run Language="en-hk" Text=" Run before opening Roblox."/></TextBlock>
                 <Button Template ="{DynamicResource NoHighlightBut}" Content="Run" Margin="36,141,510,215" Background="#03FFFFFF" Foreground="White" BorderBrush="#19DADADA" Click="Button_Click_3" Opacity="0.75">
                     <Button.Style>
@@ -1957,8 +1957,8 @@
                 </Button>
             </Grid>
             <Grid x:Name="CustomisationGrid" HorizontalAlignment="Left" Height="375" Margin="44,35,0,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="650" Grid.ColumnSpan="11" Visibility="Hidden">
-                <TextBlock x:Name="Title" ToolTip="Made by Babis-W @ discord.io/babis-w" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FFEEEEEE" FontFamily="Calibri Light" FontSize="20" MouseDown="TextBlock_MouseDown" HorizontalAlignment="Center" Margin="233,0,235,0"><Run Text="Customisation Options"/><LineBreak/><Run/></TextBlock>
-                <TextBlock x:Name="Title_Copy" ToolTip="Made by Babis-W @ discord.io/babis-w" Height="11" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FFB0B0B0" FontFamily="Calibri Light" FontSize="10" MouseDown="TextBlock_MouseDown" HorizontalAlignment="Center" Margin="275,25,276,0" Width="99"><Run Text="(still a work in progress!)"/><LineBreak/><Run/></TextBlock>
+                <TextBlock x:Name="Title" ToolTip="Made by Main_EX @ discord.io/babis-w" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FFEEEEEE" FontFamily="Calibri Light" FontSize="20" MouseDown="TextBlock_MouseDown" HorizontalAlignment="Center" Margin="233,0,235,0"><Run Text="Customisation Options"/><LineBreak/><Run/></TextBlock>
+                <TextBlock x:Name="Title_Copy" ToolTip="Made by Main_EX @ discord.io/babis-w" Height="11" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FFB0B0B0" FontFamily="Calibri Light" FontSize="10" MouseDown="TextBlock_MouseDown" HorizontalAlignment="Center" Margin="275,25,276,0" Width="99"><Run Text="(still a work in progress!)"/><LineBreak/><Run/></TextBlock>
                 <TextBox x:Name="RightGradient_Copy" HorizontalAlignment="Left" Height="19" Margin="331,131,0,0" TextWrapping="Wrap" Text="Right hex code" VerticalAlignment="Top" Width="109" FontFamily="Consolas" FontSize="13" Foreground="#FFD1D1D1" Background="#19000000" BorderBrush="{x:Null}" TextAlignment="Center" RenderTransformOrigin="0.507,0.526"/>
                 <TextBlock HorizontalAlignment="Center" Height="27" TextWrapping="Wrap" VerticalAlignment="Center" Width="257" Foreground="#FFABABAB" FontFamily="Calibri Light" FontSize="15" Margin="207,155,186,193" Text="Background image url" TextAlignment="Center"/>
                 <TextBox x:Name="ImageLink_Copy" HorizontalAlignment="Left" Height="19" Margin="222,208,0,0" Text="(input valid url)" VerticalAlignment="Top" Width="257" FontFamily="Consolas" FontSize="13" Foreground="#FFD1D1D1" Background="#19000000" BorderBrush="{x:Null}" TextAlignment="Center"/>
@@ -2129,7 +2129,7 @@
                     <TextBlock x:Name="lol" HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="484" Foreground="#FFC7C7C7" FontFamily="Calibri Light" FontSize="19" Text="Notes on API selection" Margin="5,109,0,0" TextAlignment="Center"/>
                     <Border BorderThickness="1" HorizontalAlignment="Left" Height="94" Margin="13,140,0,0" CornerRadius="9 9 9 9" VerticalAlignment="Top" Width="228" Background="#19000000" BorderBrush="#19A5A5A5"/>
                     <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FFC2C1C1" FontFamily="Calibri Light" FontSize="14" Margin="20,146,0,0" TextAlignment="Center"><Run Text="All the APIs listed above have their key systems effectively bypassed"/><Run Language="en-hk" Text="."/></TextBlock>
-                    <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FF918F8F" FontFamily="Calibri Light" Margin="20,183,0,0" TextAlignment="Center"><Run Language="en-hk" Text="The key system is automatically bypassed before injection. Check the Babis-W Docs (home page) for more information."/></TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FF918F8F" FontFamily="Calibri Light" Margin="20,183,0,0" TextAlignment="Center"><Run Language="en-hk" Text="The key system is automatically bypassed before injection. Check the BabisW Docs (home page) for more information."/></TextBlock>
                     <Border BorderThickness="1" HorizontalAlignment="Left" Height="94" Margin="246,140,0,0" CornerRadius="9 9 9 9" VerticalAlignment="Top" Width="233" Background="#19000000" BorderBrush="#19A5A5A5"/>
                     <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FFC2C1C1" FontFamily="Calibri Light" FontSize="14" Margin="255,146,0,0" Text="Roblox updates every Wednesday, leaving exploits patched!" TextAlignment="Center"/>
                     <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FF918F8F" FontFamily="Calibri Light" Margin="255,183,0,0" Text="If none of the API works, then please wait for a few hours for the APIs to update. It takes time." TextAlignment="Center"/>
@@ -2137,8 +2137,8 @@
                     <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FFC2C1C1" FontFamily="Calibri Light" FontSize="14" Margin="20,248,0,0" TextAlignment="Center"><Run Language="en-hk" Text="All Roblox exploits are effectively detected by Roblox."/></TextBlock>
                     <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FF918F8F" FontFamily="Calibri Light" Margin="20,285,0,0" TextAlignment="Center"><Run Language="en-hk" Text="You are exploiting at your own risk of being sanctioned by Roblox. However, exploiting in your own game is allowed by Roblox."/></TextBlock>
                     <Border BorderThickness="1" HorizontalAlignment="Left" Height="94" Margin="247,242,0,0" CornerRadius="9 9 9 9" VerticalAlignment="Top" Width="228" Background="#19000000" BorderBrush="#19A5A5A5"/>
-                    <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FFC2C1C1" FontFamily="Calibri Light" FontSize="14" Margin="254,248,0,0" TextAlignment="Center"><Run Text="I still need help with Babis-W"/><Run Language="en-hk" Text="/I have a suggestion!"/></TextBlock>
-                    <Button Content="Babis-W's Discord Server" Margin="255,305,25,29.4" Background="#1E696969" Template ="{DynamicResource NoHighlightBut}" Foreground="#FFC3C3C3" BorderBrush="{x:Null}" Click="DiscordLinkie" FontFamily="Calibri Light" Opacity="0.75">
+                    <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FFC2C1C1" FontFamily="Calibri Light" FontSize="14" Margin="254,248,0,0" TextAlignment="Center"><Run Text="I still need help with BabisW"/><Run Language="en-hk" Text="/I have a suggestion!"/></TextBlock>
+                    <Button Content="BabisW's Discord Server" Margin="255,305,25,29.4" Background="#1E696969" Template ="{DynamicResource NoHighlightBut}" Foreground="#FFC3C3C3" BorderBrush="{x:Null}" Click="DiscordLinkie" FontFamily="Calibri Light" Opacity="0.75">
                         <Button.Style>
                             <Style TargetType="{x:Type Button}">
                                 <Style.Triggers>
@@ -2171,15 +2171,15 @@
                     <Border CornerRadius = "3,3,3,3" BorderBrush="#19A5A5A5" BorderThickness="1" HorizontalAlignment="Left" Height="62" Margin="7,34,0,0" VerticalAlignment="Top" Width="234" Background="#33212121"/>
                     <TextBlock HorizontalAlignment="Right" Height="31" TextWrapping="Wrap" VerticalAlignment="Center" Width="489" Foreground="#FFD1CFCF" FontFamily="Calibri Light" FontSize="19" Margin="-0.2,3.2,0.2,347.8" TextAlignment="Center" Text="General Options"/>
                     <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Topmost" VerticalAlignment="Top" Width="125" Foreground="#FFB9B9B9" FontFamily="Calibri Light" FontSize="18" Margin="12,37,0,0"/>
-                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="221" Foreground="#FF8C8C8C" FontFamily="Calibri Light" Margin="13,59,0,0"><Run Text="Basically to keep Babis-W &quot;on top&quot; of"/><LineBreak/><Run Text="other windows, such as Roblox."/></TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="221" Foreground="#FF8C8C8C" FontFamily="Calibri Light" Margin="13,59,0,0"><Run Text="Basically to keep BabisW &quot;on top&quot; of"/><LineBreak/><Run Text="other windows, such as Roblox."/></TextBlock>
                     <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Discord RPC" VerticalAlignment="Top" Width="125" Foreground="#FFB9B9B9" FontFamily="Calibri Light" FontSize="18" Margin="257,37,0,0"/>
-                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="221" Foreground="#FF8C8C8C" FontFamily="Calibri Light" Margin="258,59,0,0"><Run Text="The thing that shows you playing Babis-W"/><LineBreak/><Run Text="on your Discord status."/></TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="221" Foreground="#FF8C8C8C" FontFamily="Calibri Light" Margin="258,59,0,0"><Run Text="The thing that shows you playing BabisW"/><LineBreak/><Run Text="on your Discord status."/></TextBlock>
                     <Border CornerRadius = "3,3,3,3" BorderBrush="#19A5A5A5" BorderThickness="1" HorizontalAlignment="Left" Height="62" Margin="7,103,0,0" VerticalAlignment="Top" Width="234" Background="#33212121"/>
                     <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Use custom theme" VerticalAlignment="Top" Width="189" Foreground="#FFB9B9B9" FontFamily="Calibri Light" FontSize="18" Margin="12,106,0,0"/>
-                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="221" Foreground="#FF8C8C8C" FontFamily="Calibri Light" Margin="13,128,0,0"><Run Text="Use the current theme as Babis-W's"/><LineBreak/><Run Text="default theme on startup."/></TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="221" Foreground="#FF8C8C8C" FontFamily="Calibri Light" Margin="13,128,0,0"><Run Text="Use the current theme as BabisW's"/><LineBreak/><Run Text="default theme on startup."/></TextBlock>
                     <Border CornerRadius = "3,3,3,3" BorderBrush="#19A5A5A5" BorderThickness="1" HorizontalAlignment="Left" Height="62" Margin="249,103,0,0" VerticalAlignment="Top" Width="234" Background="#33212121"/>
                     <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Reset theme" VerticalAlignment="Top" Width="189" Foreground="#FFB9B9B9" FontFamily="Calibri Light" FontSize="18" Margin="252,106,0,0"/>
-                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="221" Foreground="#FF8C8C8C" FontFamily="Calibri Light" Margin="253,128,0,0"><Run Text="Use Babis-W's default theme instead"/><LineBreak/><Run Text="of a custom theme."/></TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="221" Foreground="#FF8C8C8C" FontFamily="Calibri Light" Margin="253,128,0,0"><Run Text="Use BabisW's default theme instead"/><LineBreak/><Run Text="of a custom theme."/></TextBlock>
                     <Button x:Name="DiscordRPCButton" Content="Disabled" Margin="436,77,6,286" Background="#33212121" Foreground="#FF969595" Template ="{DynamicResource NoHighlightBut}" BorderBrush="{x:Null}" Click="DiscordRPCFunc" Loaded="DiscordRPCSetting" FontSize="8" FontFamily="Consolas"/>
                     <Button x:Name="TopMostButton" Content="Disabled" Margin="194,77,248,286" Background="#33212121" Foreground="#FF969595" Template ="{DynamicResource NoHighlightBut}" BorderBrush="{x:Null}" Click="TopmostFunc" Loaded="TopmostFuncSetting" FontSize="8" FontFamily="Consolas"/>
                     <Button x:Name="TopMostButton_Copy" Content="Use" Margin="194,145,248,217" Background="#33212121" Foreground="#FF969595" Template ="{DynamicResource NoHighlightBut}" BorderBrush="{x:Null}" FontSize="8" FontFamily="Consolas" Click="UseCustomTheme"/>
@@ -2431,7 +2431,7 @@
                 <Grid x:Name="BG" HorizontalAlignment="Left" Height="417" VerticalAlignment="Top" Width="700" Background="#FF0C0C0C" Opacity="0.845"/>
                 <ProgressBar x:Name="LoadingScreenBar" Height="23" Margin="164,243,157,0" VerticalAlignment="Top" BorderBrush="#FF565656" Background="#26000000" BorderThickness="1" Style="{DynamicResource ProgressBarStyle1}" Foreground="#19717171" Loaded="LoadingScreenLoaded"/>
                 <Image x:Name="BabisW" HorizontalAlignment="Left" Height="150" Margin="277,102,0,0" VerticalAlignment="Top" Width="195" Source="BabisWIcon.png" Opacity="0.8"/>
-                <Label x:Name="LoadingScreenStatus" HorizontalContentAlignment="Center" Content="Loading Babis-W..." HorizontalAlignment="Left" Margin="164,213,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" Width="379"/>
+                <Label x:Name="LoadingScreenStatus" HorizontalContentAlignment="Center" Content="Loading BabisW..." HorizontalAlignment="Left" Margin="164,213,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" Width="379"/>
             </Grid>
             <Rectangle x:Name="Topbar_Copy" Fill="#46131517" HorizontalAlignment="Left" Height="380" Stroke="Transparent" VerticalAlignment="Top" Width="39" StrokeThickness="0" MouseDown="Rectangle_MouseDown" Margin="0,30,0,0" RenderTransformOrigin="0.5,0.5" Grid.RowSpan="12"/>
             <RadioButton x:Name="HomeRadioButton" HorizontalAlignment="Left" Height="32" Margin="3,32,0,0" VerticalAlignment="Top" Width="36.4" Style="{DynamicResource CringeRadioButtonStyling}" Cursor="Hand" Click="HomeRadioButtonClick" Loaded="HomeRadioButtonLoaded">

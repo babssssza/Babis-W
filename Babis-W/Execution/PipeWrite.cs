@@ -30,7 +30,7 @@ namespace BabisW.Execution
             {
                 if (Pipe == null || !Pipe.IsConnected)
                 {
-                   // Pipe.Dispose();
+                   Pipe?.Dispose();
                     Pipe = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut);
                     Pipe.Connect(Timeout);
                     Console.WriteLine("connected");
@@ -44,40 +44,33 @@ namespace BabisW.Execution
             {
                 if (Disposed) throw new ObjectDisposedException(nameof(PipeWrite)); // unlikely case
 
-                for (int attempt = 0; attempt < 2; attempt++)
+                EnsureConnected(); 
+
+                try
                 {
-                    try
+                    var Req = new RequestMessage
                     {
-                        EnsureConnected();
-                        var Req = new RequestMessage
-                        {
-                            MessageType = messageType,
-                            Data = JsonConvert.SerializeObject(data)
-                        };
+                        MessageType = messageType,
+                        Data = JsonConvert.SerializeObject(data)
+                    };
 
-                        WriteMessage(Pipe, Req);
-                        var Res = ReadMessage(Pipe);
+                    WriteMessage(Pipe, Req);
+                    var Res = ReadMessage(Pipe);
 
-                        if (!Res.Success)
-                        {
-                            throw new Exception($"error: {Res.ErrorMessage}");
-                        }
-
-                        return JsonConvert.DeserializeObject<T>(Res.Data);
-                    }
-                    catch (IOException)
+                    if (!Res.Success)
                     {
-                        Disconnect();
-                        if (attempt == 1) throw new Exception("The WRD wrapper connection was lost.");
+                        throw new Exception($"error: {Res.ErrorMessage}");
                     }
-                    catch (TimeoutException)
-                    {
-                        Disconnect();
-                        if (attempt == 1) throw new Exception("The WRD wrapper did not respond in time.");
-                    }
+
+                    return JsonConvert.DeserializeObject<T>(Res.Data);
                 }
-
-                throw new Exception("The WRD wrapper connection failed.");
+                catch (Exception ex) when (ex is IOException || ex is TimeoutException || ex is EndOfStreamException)
+                {
+                    // will reconnect on next call
+                    Pipe?.Dispose();
+                    Pipe = null;
+                    throw new Exception("The Babis-W wrapper connection was lost.", ex);
+                }
             }
         }
 
@@ -99,8 +92,10 @@ namespace BabisW.Execution
             var LenBuffer = new byte[4]; // sufficient
             ReadExactly(Me, LenBuffer, 4);
             var MessageLength = BitConverter.ToInt32(LenBuffer, 0);
-            if (MessageLength <= 0 || MessageLength > 10 * 1024 * 1024)
-                throw new IOException("Invalid pipe response length.");
+            if (MessageLength <= 0 || MessageLength > 16 * 1024 * 1024)
+            {
+                throw new InvalidDataException("The wrapper returned an invalid message length.");
+            }
 
             // Read message
             var MessageBuffer = new byte[MessageLength];
@@ -115,16 +110,14 @@ namespace BabisW.Execution
             var offset = 0;
             while (offset < count)
             {
-                var read = stream.Read(buffer, offset, count - offset);
-                if (read == 0) throw new IOException("The pipe was closed.");
-                offset += read;
-            }
-        }
+                var bytesRead = stream.Read(buffer, offset, count - offset);
+                if (bytesRead == 0)
+                {
+                    throw new EndOfStreamException("The wrapper closed the pipe.");
+                }
 
-        private void Disconnect()
-        {
-            Pipe?.Dispose();
-            Pipe = null;
+                offset += bytesRead;
+            }
         }
 
         public void Dispose()
@@ -133,7 +126,7 @@ namespace BabisW.Execution
             {
                 if (!Disposed)
                 {
-                    Disconnect();
+                    Pipe?.Dispose();
                     Disposed = true;
                 }
             }

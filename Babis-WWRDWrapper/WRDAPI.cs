@@ -64,7 +64,7 @@ namespace BabisWWRDWrapper
             {
                 initialize();
                 ShowWindow(GetConsoleWindow(), 5);
-                Console.Title = "BabisW WeAreDevs Wrapper";
+                Console.Title = "Babis-W WeAreDevs Wrapper";
             });
             initthread.Start();
             return initthread;
@@ -75,13 +75,13 @@ namespace BabisWWRDWrapper
         {
             execute(Script);
             ShowWindow(GetConsoleWindow(), 5);
-            Console.Title = "BabisW WeAreDevs Wrapper";
+            Console.Title = "Babis-W WeAreDevs Wrapper";
         }
 
         public static bool IsInjected()
         {
             ShowWindow(GetConsoleWindow(), 5);
-            Console.Title = "BabisW WeAreDevs Wrapper";
+            Console.Title = "Babis-W WeAreDevs Wrapper";
             if (isAttached()) { Console.WriteLine("attached");  return true; }
             else { Console.WriteLine("not attached"); return false; }
         }
