@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using System.Globalization;
 using System.ComponentModel;
 
 namespace BabisW_Bootstrapper
@@ -37,6 +38,7 @@ namespace BabisW_Bootstrapper
 
         // WebClient Creation
         WebClient WebStuff = new WebClient(); // Create a new generally used WebClient
+        private readonly Stopwatch DownloadStopwatch = new Stopwatch();
 
         public MainWindow()
         {
@@ -318,6 +320,7 @@ namespace BabisW_Bootstrapper
 
             WebStuff.DownloadProgressChanged += new DownloadProgressChangedEventHandler(WebStuff_DownloadProgressChanged);
             WebStuff.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(WebStuff_DownloadCompleted);
+            DownloadStopwatch.Restart();
             WebStuff.DownloadFileAsync(new Uri(LatestReleaseDownload), System.IO.Path.Combine(InstallDirectory, ExecutableName));
 
             
@@ -327,10 +330,25 @@ namespace BabisW_Bootstrapper
         {
             this.Dispatcher.Invoke(() =>
             {
-                double bytesIn = double.Parse(e.BytesReceived.ToString());
-                double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
-                double percentage = bytesIn / totalBytes * 100;
-                DownloadBar.Value = int.Parse(Math.Truncate(percentage).ToString());
+                double bytesIn = e.BytesReceived;
+                double totalBytes = e.TotalBytesToReceive;
+                DownloadBar.Value = totalBytes > 0 ? bytesIn / totalBytes * 100 : 0;
+
+                double seconds = Math.Max(DownloadStopwatch.Elapsed.TotalSeconds, 0.1);
+                double bytesPerSecond = bytesIn / seconds;
+                string received = FormatBytes(bytesIn);
+                string total = totalBytes > 0 ? FormatBytes(totalBytes) : "unknown";
+                string speed = FormatBytes(bytesPerSecond) + "/s";
+                string remaining = "calculating";
+                if (totalBytes > bytesIn && bytesPerSecond > 0)
+                {
+                    remaining = FormatDuration(TimeSpan.FromSeconds((totalBytes - bytesIn) / bytesPerSecond));
+                }
+
+                DownloadDetails.Content = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} / {1}  |  {2}  |  {3} remaining",
+                    received, total, speed, remaining);
             });
         }
 
@@ -338,6 +356,20 @@ namespace BabisW_Bootstrapper
         {
             this.Dispatcher.Invoke(async () =>
             {
+                DownloadStopwatch.Stop();
+                if (e.Error != null || e.Cancelled)
+                {
+                    DownloadDetails.Content = "Download failed. Please try again.";
+                    MessageBox.Show(
+                        e.Error == null ? "The download was cancelled." : e.Error.Message,
+                        ProductName + " Downloader",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    InstallButton.IsEnabled = true;
+                    return;
+                }
+
+                DownloadDetails.Content = "Download complete";
                 await Task.Delay(500);
                 Fade(DownloadingBabisW, 1, 0, 0.5);
                 Fade(Gif4, 0.8, 0, 0.5);
@@ -363,6 +395,29 @@ namespace BabisW_Bootstrapper
                 await Task.Delay(501);
                 Environment.Exit(0);
             });
+        }
+
+        private static string FormatBytes(double bytes)
+        {
+            string[] units = { "B", "KB", "MB", "GB" };
+            int unit = 0;
+            while (bytes >= 1024 && unit < units.Length - 1)
+            {
+                bytes /= 1024;
+                unit++;
+            }
+
+            return bytes.ToString(bytes >= 100 ? "0" : "0.0", CultureInfo.InvariantCulture) + " " + units[unit];
+        }
+
+        private static string FormatDuration(TimeSpan duration)
+        {
+            if (duration.TotalHours >= 1)
+            {
+                return duration.ToString(@"h\:mm\:ss", CultureInfo.InvariantCulture);
+            }
+
+            return duration.ToString(@"m\:ss", CultureInfo.InvariantCulture);
         }
 
         private void EnsureDesktopShortcut()
