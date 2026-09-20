@@ -899,72 +899,71 @@ namespace BabisW
 
         private void StatusCheck(Object o)
         {
-            Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
-            if (pname.Length > 0) // If Roblox is running
+            if (Interlocked.Exchange(ref StatusCheckInProgress, 1) == 1)
             {
-                if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+                return;
+            }
+
+            try
+            {
+                Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
+                if (pname.Length > 0)
                 {
-                    Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
-                    if (pname1.Length > 0) // so injection at this point has started
+                    if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
                     {
-                        IsInjected = Execution.ExecutionHandler.IsInjected();
-                        if (IsInjected)
+                        Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
+                        if (pname1.Length > 0)
                         {
-                            ShowWindow(GetConsoleWindow(), 5); // wrd wants to hide it; however we want to show it for debugging
-                            this.Dispatcher.Invoke(() =>
+                            IsInjected = Execution.ExecutionHandler.IsInjected();
+                            if (IsInjected)
                             {
-                                InjectionStatus.Content = "WeAreDevs injected";
-                                InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(0, 192, 140));
-                            });
-                        }
-                        else if (!Execution.ExecutionHandler.WrapperResponsive)
-                        {
-                            this.Dispatcher.Invoke(() =>
+                                SetInjectionStatus("WeAreDevs injected", Color.FromRgb(0, 192, 140));
+                            }
+                            else if (!Execution.ExecutionHandler.WrapperResponsive)
                             {
-                                InjectionStatus.Content = "Wrapper not responding";
-                                InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(192, 110, 0));
-                            });
-                        }
-                        else // presumably injection is occurring
-                        {
-                            ShowWindow(GetConsoleWindow(), 5); // wrd wants to hide it; however we want to show it for debugging
-                            this.Dispatcher.Invoke(() =>
+                                SetInjectionStatus("Wrapper not responding", Color.FromRgb(192, 110, 0));
+                            }
+                            else
                             {
-                                InjectionStatus.Content = "WeAreDevs injection in progress";
-                                InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(170, 192, 0));
-                            });
+                                ShowWindow(GetConsoleWindow(), 5);
+                                SetInjectionStatus("WeAreDevs injection in progress", Color.FromRgb(170, 192, 0));
+                            }
                         }
-                    }
-                    else
-                    {
-                        this.Dispatcher.Invoke(() =>
+                        else
                         {
-                            InjectionStatus.Content = "Awaiting injection";
-                            InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(192, 110, 0));
-                        });
+                            SetInjectionStatus("Awaiting injection", Color.FromRgb(192, 110, 0));
+                        }
                     }
                 }
-            }
-            else
-            {
-                // for WRD
-                try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
-                try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
-
-                this.Dispatcher.Invoke(() =>
+                else
                 {
-                    InjectionStatus.Content = "Roblox not opened";
-                    InjectionStatus.Foreground = new SolidColorBrush(Color.FromRgb(192, 0, 0));
+                    try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
+                    try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
+                    SetInjectionStatus("Roblox not opened", Color.FromRgb(192, 0, 0));
                     InjectionInProgress = false;
-                });
+                }
+            }
+            finally
+            {
+                Volatile.Write(ref StatusCheckInProgress, 0);
             }
         }
 
+        private void SetInjectionStatus(string text, Color color)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                InjectionStatus.Content = text;
+                InjectionStatus.Foreground = new SolidColorBrush(color);
+            });
+        }
+
         private System.Threading.Timer StatusCheckTimer; // Create timer
+        private int StatusCheckInProgress;
 
         private void StartStatusCheck(object sender, RoutedEventArgs e) // Actual function
         {
-            StatusCheckTimer = new System.Threading.Timer(StatusCheck, null, 1000, 1000); // Run the check every 10 seconds or so
+            StatusCheckTimer = new System.Threading.Timer(StatusCheck, null, 1000, 10000); // Run the check every 10 seconds
         }
 
 
