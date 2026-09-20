@@ -52,7 +52,9 @@ namespace BabisW
     public partial class MainWindow : Window
     {
         // VARIABLES //
-        string CurrentVersion = "BabisW 15.2 SP2"; // The version of BabisW for this specific build
+        private const string CurrentVersion = "Babis-W 15.2 SP3";
+        private const string ExecutableName = "Babis-W.exe";
+        private const string MainExecutableUrl = "https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/Release/Babis-W.exe";
 
         // The default text editor text
         string DefaultTextEditorText = "--[[\r\nWelcome to BabisW!\r\nMake sure to join BabisW's Discord at babis-w.org/discord\r\nIf you need help, join our Discord!\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"BabisW Moment\")";
@@ -90,8 +92,8 @@ namespace BabisW
         bool IsInjected = false;
 
         // Variables for custom icons (to be implemented in the future)
-        Array scripts = null;
-        Array gamescripts = null;
+        Array scripts = Array.Empty<ScriptHub.ScriptData>();
+        Array gamescripts = Array.Empty<ScriptHub.GameScriptData>();
 
         // WebClient Creation
         WebClient WebStuff = new WebClient(); // Create a new generally used WebClient
@@ -114,39 +116,7 @@ namespace BabisW
             EnsureDesktopShortcut();
                                                                                 // UPDATE SYSTEM //
 
-            // First, we want to check and see if the updater is still there
-
-
-            if (File.Exists("Babis-WDownloader.exe"))
-            {
-                Console.WriteLine("Babis-W Downloader found, deleting");
-                File.Delete("Babis-WDownloader.exe");
-            }
-
-            Console.WriteLine("Checking to see if BabisW is up to date");
-            string Version = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Version");
-            WebStuff.Dispose(); // Remember to dispose the WebClient! Or someone will scold me for it
-
-            // .FirstOrDefault() is nessesary since GitHub always adds an extra line for some reason
-            // If I don't do this, then the string that would return is "BabisW 14.3/n" rather than "BabisW 14.3", so basically an additional unwanted line!
-            string OnlineVersion = Version.Split(new[] { '\r', '\n' }).FirstOrDefault();
-
-            if (CurrentVersion != OnlineVersion) // If the current version is not equal to the value online
-            {
-                // Downloading BabisW's Updater
-                Console.WriteLine("BabisW not up to date, downloading new version");
-
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-WDownloader/bin/Release/Babis-WDownloader.exe", "Babis-WDownloader.exe");
-                WebStuff.Dispose();
-
-                // Downloading BabisW's Updater
-
-                // We have to set it like this since the updater needs the right startup path to run correctly
-                Directory.SetCurrentDirectory(Directory.GetCurrentDirectory());
-                Process.Start("Babis-WDownloader.exe"); // Run the updater
-                Environment.Exit(0);
-                // Note : The updater automatically deletes BabisW.exe
-            }
+            CheckForApplicationUpdate();
 
             // SETUP //
 
@@ -297,6 +267,62 @@ namespace BabisW
             Console.WriteLine("All done!\n");
         }
 
+        private void CheckForApplicationUpdate()
+        {
+            try
+            {
+                Console.WriteLine("Checking to see if Babis-W is up to date");
+                string onlineVersion = WebStuff
+                    .DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Version")
+                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .FirstOrDefault();
+
+                if (string.IsNullOrWhiteSpace(onlineVersion) ||
+                    string.Equals(CurrentVersion, onlineVersion.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                string installDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                string executablePath = Path.Combine(installDirectory, ExecutableName);
+                string pendingPath = executablePath + ".update";
+                string scriptPath = Path.Combine(Path.GetTempPath(), "Babis-W-update-" + Guid.NewGuid().ToString("N") + ".cmd");
+
+                Console.WriteLine("Babis-W update found, downloading...");
+                WebStuff.DownloadFile(MainExecutableUrl, pendingPath);
+
+                string escapedDirectory = installDirectory.TrimEnd('\\').Replace("%", "%%");
+                string escapedExecutable = executablePath.Replace("%", "%%");
+                string escapedPending = pendingPath.Replace("%", "%%");
+                string escapedScript = scriptPath.Replace("%", "%%");
+                File.WriteAllText(scriptPath,
+                    "@echo off\r\n" +
+                    "timeout /t 2 /nobreak >nul\r\n" +
+                    ":retry\r\n" +
+                    "move /y \"" + escapedPending + "\" \"" + escapedExecutable + "\" >nul 2>&1\r\n" +
+                    "if not exist \"" + escapedPending + "\" goto launch\r\n" +
+                    "timeout /t 1 /nobreak >nul\r\n" +
+                    "goto retry\r\n" +
+                    ":launch\r\n" +
+                    "start \"\" /d \"" + escapedDirectory + "\" \"" + escapedExecutable + "\"\r\n" +
+                    "del /q \"" + escapedScript + "\"\r\n");
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = Environment.GetEnvironmentVariable("ComSpec"),
+                    Arguments = "/c \"" + scriptPath + "\"",
+                    WorkingDirectory = installDirectory,
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                });
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Automatic update unavailable: " + ex.Message);
+            }
+        }
+
         private static void EnsureDesktopShortcut()
         {
             try
@@ -321,7 +347,8 @@ namespace BabisW
                 shortcut.TargetPath = targetPath;
                 shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 shortcut.Description = "Launch Babis-W";
-                shortcut.IconLocation = targetPath + ",0";
+                string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Babis-W.ico");
+                shortcut.IconLocation = File.Exists(iconPath) ? iconPath : targetPath + ",0";
                 shortcut.Save();
             }
             catch (Exception ex)
@@ -1607,7 +1634,7 @@ namespace BabisW
                     {
                         WP.Children.Clear();
 
-                        foreach (var scriptData in scripts)
+                        foreach (var scriptData in scripts ?? Array.Empty<ScriptHub.ScriptData>())
                         {
                             var obj = new TabThingy
                             {
@@ -1803,7 +1830,7 @@ namespace BabisW
             {
                 IsGameHubOpened = true;
                 WP1.Children.Clear();
-                foreach (var scriptData in gamescripts)
+                foreach (var scriptData in gamescripts ?? Array.Empty<ScriptHub.GameScriptData>())
                 {
                     var obj = new GameTab()
                     {

@@ -36,11 +36,11 @@ namespace BabisW.ScriptHub
             return arrays.Values<JObject>()
                 .Select(wow => new ScriptData
                 {
-                    Title = wow.GetValue("title").ToObject<string>(),
-                    Credits = wow.GetValue("credits").ToObject<string>(),
-                    Desc = wow.GetValue("desc").ToObject<string>(),
-                    Script = wow.GetValue("script").ToObject<string>(),
-                    ImageURL = wow.GetValue("imgurl").ToObject<string>()
+                    Title = wow.Value<string>("title") ?? string.Empty,
+                    Credits = wow.Value<string>("credits") ?? string.Empty,
+                    Desc = wow.Value<string>("desc") ?? string.Empty,
+                    Script = wow.Value<string>("script") ?? string.Empty,
+                    ImageURL = wow.Value<string>("imgurl") ?? string.Empty
                 }).ToArray();
         }
     }
