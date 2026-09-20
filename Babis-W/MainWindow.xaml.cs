@@ -1,23 +1,3 @@
-/*
-  __  __       _       _____        _     
- |  \/  |     (_)     |  __ \      | |    
- | \  / | __ _ _ _ __ | |  | | __ _| |__  
- | |\/| |/ _` | | '_ \| |  | |/ _` | '_ \ 
- | |  | | (_| | | | | | |__| | (_| | |_) |
- |_|  |_|\__,_|_|_| |_|_____/ \__,_|_.__/ 
-                 
- https://github.com/Avaluate/BabisW
-
- You can join BabisW's Discord server at https://babis-w.org/discord (June 2025)
- or Telegram at https://telegram.me/babis-w (June 2025)
-                                          
- BabisW, Main_EX (Avaluate)
- Discord: avaluate
- Telegram: t.me/avaluate
-
- WeAreDevs API obtained from https://wearedevs.net/d/Exploit%20API
-*/
-
 // References
 using DiscordRPC;
 using DiscordRPC.Logging;
@@ -52,10 +32,11 @@ namespace BabisW
     public partial class MainWindow : Window
     {
         // VARIABLES //
+        private const string DiscordInviteUrl = "https://discord.gg/75auNNfmhS";
         private const string CurrentVersion = "Babis-W 15.2 SP3";
 
         // The default text editor text
-        string DefaultTextEditorText = "--[[\r\nWelcome to BabisW!\r\nMake sure to join BabisW's Discord at babis-w.org/discord\r\nIf you need help, join our Discord!\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"BabisW Moment\")";
+        string DefaultTextEditorText = "--[[\r\nWelcome to Babis-W!\r\nJoin Team Babis on Discord: https://discord.gg/75auNNfmhS\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"Babis-W\")";
 
         // Variables relating to injection
         bool InjectionInProgress = false; // When injection is in progress, self explanatory
@@ -107,7 +88,7 @@ namespace BabisW
         public MainWindow()
         {
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-            Console.WriteLine($"  __  __       _       _____        _     \r\n |  \\/  |     (_)     |  __ \\      | |    \r\n | \\  / | __ _ _ _ __ | |  | | __ _| |__  \r\n | |\\/| |/ _` | | '_ \\| |  | |/ _` | '_ \\ \r\n | |  | | (_| | | | | | |__| | (_| | |_) |\r\n |_|  |_|\\__,_|_|_| |_|_____/ \\__,_|_.__/\n\n${CurrentVersion}, by Avaluate (Main_EX) | babis-w.org/discord\n"); // i love babis-w
+            Console.WriteLine($"{CurrentVersion}, by Team Babis");
 
             InitializeComponent();
             MainWin.WindowStartupLocation = WindowStartupLocation.CenterScreen; // Center BabisW to the middle of the screen
@@ -232,13 +213,13 @@ namespace BabisW
             }
 
             // Theme checking for Avalon stuff, etc
-            Console.WriteLine("Updating Avalon theme definitions (text editor syntax highlighting)");
-            if (File.Exists("EditorThemes\\lua_md_default.xshd"))
+            Console.WriteLine("Checking Avalon theme definitions (text editor syntax highlighting)");
+            if (!File.Exists("EditorThemes\\lua_md_default.xshd"))
             {
-                File.Delete("EditorThemes\\lua_md_default.xshd"); // We want to update default theme regardless lol
+                Console.WriteLine("Downloading Avalon theme definitions...");
+                string themeData = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
+                File.WriteAllText("EditorThemes\\lua_md_default.xshd", themeData);
             }
-            string penis = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
-            File.WriteAllText("EditorThemes\\lua_md_default.xshd", penis);
 
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
             IsAvalonLoaded = true;
@@ -565,8 +546,8 @@ namespace BabisW
 
                 Buttons = new DiscordRPC.Button[]
                 {
-                    new DiscordRPC.Button() { Label = "Join BabisW's Discord", Url = "https://babis-w.org/discord" },
-                    new DiscordRPC.Button() { Label = "Get BabisW (GitHub)", Url = "https://github.com/Avaluate/BabisW" }
+                    new DiscordRPC.Button() { Label = "Join Team Babis on Discord", Url = DiscordInviteUrl },
+                    new DiscordRPC.Button() { Label = "Get Babis-W (GitHub)", Url = "https://github.com/babssssza/Babis-W" }
                 },
 
             });
@@ -732,7 +713,7 @@ namespace BabisW
         // Join Discord button
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            OpenExternalUrl("https://babis-w.org/discord");
+            OpenExternalUrl(DiscordInviteUrl);
         }
 
         // Get help button
@@ -1061,7 +1042,7 @@ namespace BabisW
         // Join Discord for help button
         private void DiscordLinkie(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://babis-w.org/discord");
+            OpenExternalUrl(DiscordInviteUrl);
         }
 
         // General options //
@@ -1319,7 +1300,7 @@ namespace BabisW
             LeftGradient.Text = "#4C464646";
             RightGradient.Text = "#4C464646";
             ImageTransparency.Text = "20";
-            CreatorName.Text = "Main_EX";
+            CreatorName.Text = "Team Babis";
             ImageLink.Text = "https://art.pixilart.com/b7875a3999e9a79.gif";
             var conv = new BrushConverter();
             WindowBorder.BorderBrush = (Brush)conv.ConvertFrom("#4C464646");

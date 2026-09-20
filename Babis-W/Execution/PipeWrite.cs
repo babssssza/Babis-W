@@ -54,15 +54,33 @@ namespace BabisW.Execution
                         Data = JsonConvert.SerializeObject(data)
                     };
 
-                    WriteMessage(Pipe, Req);
-                    var Res = ReadMessage(Pipe);
-
-                    if (!Res.Success)
+                    try
                     {
-                        throw new Exception($"error: {Res.ErrorMessage}");
-                    }
+                        WriteMessage(Pipe, Req);
+                        var Res = ReadMessage(Pipe);
 
-                    return JsonConvert.DeserializeObject<T>(Res.Data);
+                        if (!Res.Success)
+                        {
+                            throw new Exception($"error: {Res.ErrorMessage}");
+                        }
+
+                        return JsonConvert.DeserializeObject<T>(Res.Data);
+                    }
+                    catch (Exception ex) when (ex is IOException || ex is TimeoutException || ex is EndOfStreamException)
+                    {
+                        Pipe?.Dispose();
+                        Pipe = null;
+                        EnsureConnected();
+                        WriteMessage(Pipe, Req);
+                        var Res = ReadMessage(Pipe);
+
+                        if (!Res.Success)
+                        {
+                            throw new Exception($"error: {Res.ErrorMessage}");
+                        }
+
+                        return JsonConvert.DeserializeObject<T>(Res.Data);
+                    }
                 }
                 catch (Exception ex) when (ex is IOException || ex is TimeoutException || ex is EndOfStreamException)
                 {
