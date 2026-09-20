@@ -334,12 +334,32 @@ namespace BabisWWRDWrapper
 
             Task.Delay(1000); // if any other fake sevrers are running
 
-            Console.WriteLine($"Launching Node.js bypass server: {NodeServerExeName}");
-            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
-            var processinfo = new ProcessStartInfo();
-            processinfo.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            processinfo.FileName         = NodeServerExeName;
-            processinfo.UseShellExecute  = true;
+            string nodeServerPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NodeServerExeName);
+            if (!File.Exists(nodeServerPath))
+            {
+                Console.WriteLine($"Node.js server executable is missing: {nodeServerPath}");
+                return null;
+            }
+
+            using (FileStream executableStream = File.OpenRead(nodeServerPath))
+            {
+                if (executableStream.Length < 2 ||
+                    executableStream.ReadByte() != 'M' ||
+                    executableStream.ReadByte() != 'Z')
+                {
+                    Console.WriteLine($"Node.js server executable is invalid: {nodeServerPath}");
+                    return null;
+                }
+            }
+
+            Console.WriteLine($"Launching Node.js server: {nodeServerPath}");
+            var processinfo = new ProcessStartInfo
+            {
+                WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                FileName = nodeServerPath,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
             Process process = Process.Start(processinfo);
 
