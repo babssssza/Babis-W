@@ -60,9 +60,33 @@ namespace BabisW.ScriptHub
             ScriptBloxFetchOptions options = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            options = options ?? new ScriptBloxFetchOptions();
-            var query = BuildQuery(options);
-            using (var response = await Client.GetAsync(Endpoint + query, cancellationToken).ConfigureAwait(false))
+            return await FetchAsync(Endpoint, BuildQuery(options ?? new ScriptBloxFetchOptions()), cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        public static async Task<ScriptData[]> SearchSCData(
+            string query,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return await GetSCData(cancellationToken: cancellationToken).ConfigureAwait(false);
+            }
+
+            var options = new ScriptBloxFetchOptions { Max = 20, SortBy = "accuracy", Order = "desc" };
+            var searchQuery = "q=" + Uri.EscapeDataString(query.Trim())
+                + "&page=1&max=" + options.Max.ToString(CultureInfo.InvariantCulture)
+                + "&sortBy=accuracy&order=desc&strict=false";
+            return await FetchAsync(Endpoint.Replace("/fetch", "/search"), "?" + searchQuery, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        private static async Task<ScriptData[]> FetchAsync(
+            string endpoint,
+            string query,
+            CancellationToken cancellationToken)
+        {
+            using (var response = await Client.GetAsync(endpoint + query, cancellationToken).ConfigureAwait(false))
             {
                 var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)

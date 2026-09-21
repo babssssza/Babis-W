@@ -1917,49 +1917,28 @@ namespace BabisW
             }
         }
 
-        private void SearchScriptHub(object sender, RoutedEventArgs e)
+        private async void SearchScriptHub(object sender, RoutedEventArgs e)
         {
-            // This is likely a very inefficient method of searching, if there are better ways, I would like to know
-            // The CPU usage rises while searching
-            if (IsScriptHubOpened == true)
+            if (!IsScriptHubOpened)
             {
-                new Thread(() =>
-                {
-                    this.Dispatcher.Invoke(() => // Prevent error from this being done on "another thread"
-                    {
-                        WP.Children.Clear();
+                return;
+            }
 
-                        foreach (var scriptData in scripts)
-                        {
-                            var obj = new TabThingy
-                            {
-                                Script = (ScriptHub.ScriptData)scriptData
-                            };
+            var query = GeneralScriptSearch.Text;
+            if (query == "Search for a script here")
+            {
+                query = string.Empty;
+            }
 
-                            if (GeneralScriptSearch.Text == "" | GeneralScriptSearch.Text == "Search for a script here" | string.IsNullOrEmpty(GeneralScriptSearch.Text))
-                            {
-                                // Functions for buttons
-                                obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
-                                obj.CopyScript += (_, _) => Clipboard.SetText(obj.Script.Script);
-                                WP.Children.Add(obj); // Add objects into scripthub panel
-                            }
-
-                            else if (obj.ScriptTitle.Content.ToString().ToLower().Contains(GeneralScriptSearch.Text.ToLower()) == true || obj.Description.Text.ToString().ToLower().Contains(GeneralScriptSearch.Text.ToLower()) == true || obj.Credit.Content.ToString().ToLower().Contains(GeneralScriptSearch.Text.ToLower()) == true)
-                            {
-                                // Functions for buttons
-                                obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
-                                obj.CopyScript += (_, _) => Clipboard.SetText(obj.Script.Script);
-                                WP.Children.Add(obj); // Add objects into scripthub panel
-                            }
-
-                        }
-                        GC.Collect();
-
-                    });
-
-                })
-
-                { }.Start();
+            try
+            {
+                var results = await ScriptHub.BabisWSC.SearchSCData(query).ConfigureAwait(true);
+                scripts = results;
+                RenderScriptHub(results);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to search ScriptBlox: {ex.Message}");
             }
         }
 
