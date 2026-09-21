@@ -17,6 +17,8 @@ namespace BabisW.Execution
         public static bool WrapperResponsive { get; private set; }
         public static bool InjectionInProgress { get; private set; }
         public static bool InjectionTimedOut { get; private set; }
+        public static bool NativeExecutionStarted { get; private set; }
+        public static bool NativeHealthFailed { get; private set; }
 
         public static bool Inject()
         {
@@ -24,6 +26,8 @@ namespace BabisW.Execution
             {
                 InjectionInProgress = true;
                 InjectionTimedOut = false;
+                NativeExecutionStarted = false;
+                NativeHealthFailed = false;
                 InjectionStartedAt = DateTime.UtcNow;
 
                 try
@@ -129,9 +133,11 @@ namespace BabisW.Execution
                 {
                     var Response = SelectedAPI.NewPipe.SendRequest<ExecutionRequest>("Execute", new ExecutionRequest { Script = script });
                     Console.WriteLine($"execution result: {Response}");
+                    NativeExecutionStarted = true;
                 }
                 catch (Exception ex)
                 {
+                    NativeHealthFailed = true;
                     MessageBox.Show($"The API is not ready to execute this script.\n\n{ex.Message}", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
@@ -141,6 +147,11 @@ namespace BabisW.Execution
         {   
             if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
             {
+                if (NativeExecutionStarted)
+                {
+                    return true;
+                }
+
                 try
                 {
                     var Response = SelectedAPI.NewPipe.SendRequest<IsInjectedRequest>("IsInjected", new IsInjectedRequest{ AdditionalData = "blank" }); // blank
@@ -155,6 +166,7 @@ namespace BabisW.Execution
                 }
                 catch (Exception ex)
                 {
+                    NativeHealthFailed = true;
                     Console.WriteLine($"Error while checking for isinjected res: {ex}");
                     if ((DateTime.UtcNow - LastPipeWarning).TotalSeconds >= 10)
                     {

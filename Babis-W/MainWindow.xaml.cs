@@ -778,7 +778,11 @@ namespace BabisW
         private void Inject(object sender, MouseButtonEventArgs e)
         {
             Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
-            if (IsInjected)
+            if (Execution.ExecutionHandler.NativeHealthFailed)
+            {
+                SetInjectionStatus("Native API stopped responding", Color.FromRgb(192, 0, 0));
+            }
+            else if (IsInjected)
             {
                 MessageBox.Show("The API has already been injected. Attempting to inject twice will result in a crash");
             }
