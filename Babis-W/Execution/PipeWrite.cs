@@ -46,7 +46,8 @@ namespace BabisW.Execution
             {
                 if (Disposed) throw new ObjectDisposedException(nameof(PipeWrite)); // unlikely case
 
-                for (var attempt = 0; attempt < 2; attempt++)
+                Exception lastError = null;
+                for (var attempt = 0; attempt < 3; attempt++)
                 {
                     try
                     {
@@ -60,26 +61,37 @@ namespace BabisW.Execution
                         WriteMessage(Pipe, Req);
                         var Res = ReadMessage(Pipe);
 
+                        if (Res == null)
+                        {
+                            throw new InvalidDataException("The wrapper returned an empty response.");
+                        }
+
                         if (!Res.Success)
                         {
-                            throw new Exception($"error: {Res.ErrorMessage}");
+                            throw new Exception($"The wrapper rejected the request: {Res.ErrorMessage}");
                         }
 
                         return JsonConvert.DeserializeObject<T>(Res.Data);
                     }
-                    catch (IOException)
+                    catch (Exception ex) when (
+                        ex is IOException ||
+                        ex is TimeoutException ||
+                        ex is InvalidDataException ||
+                        ex is EndOfStreamException ||
+                        ex is JsonException)
                     {
+                        lastError = ex;
                         Disconnect();
-                        if (attempt == 1) throw;
-                    }
-                    catch (TimeoutException)
-                    {
-                        Disconnect();
-                        if (attempt == 1) throw;
+                        if (attempt < 2)
+                        {
+                            Thread.Sleep(250);
+                        }
                     }
                 }
 
-                throw new InvalidOperationException("The Babis-W wrapper connection failed.");
+                throw new InvalidOperationException(
+                    "The Babis-W wrapper connection was lost. Restart injection and try again.",
+                    lastError);
             }
         }
 

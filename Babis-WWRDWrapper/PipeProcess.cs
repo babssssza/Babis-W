@@ -141,8 +141,9 @@ namespace BabisWWRDWrapper
 
                 return JsonConvert.DeserializeObject<RequestMessage>(Encoding.UTF8.GetString(MessageBuffer));
             }
-            catch
+            catch (JsonException ex)
             {
+                Console.WriteLine($"Invalid request payload: {ex.Message}");
                 return null;
             }
         }
@@ -181,6 +182,13 @@ namespace BabisWWRDWrapper
 
             try
             {
+                if (request == null || string.IsNullOrWhiteSpace(request.MessageType))
+                {
+                    response.Success = false;
+                    response.ErrorMessage = "The request was empty or missing its message type.";
+                    return response;
+                }
+
                 // would be wise
                 switch (request.MessageType)
                 {

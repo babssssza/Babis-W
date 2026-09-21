@@ -71,7 +71,14 @@ namespace BabisW.Execution
                     return false;
                 }
 
-                Thread.Sleep(500);
+                var startupDeadline = DateTime.UtcNow.AddSeconds(10);
+                while (!wrapperProcess.HasExited &&
+                       DateTime.UtcNow < startupDeadline &&
+                       !TryConnectToWrapper())
+                {
+                    Thread.Sleep(250);
+                }
+
                 if (wrapperProcess.HasExited)
                 {
                     MessageBox.Show(
@@ -106,6 +113,21 @@ namespace BabisW.Execution
                 }
             }
             else
+            {
+                return false;
+            }
+        }
+
+        private static bool TryConnectToWrapper()
+        {
+            try
+            {
+                var response = SelectedAPI.NewPipe.SendRequest<IsInjectedRequest>(
+                    "IsInjected",
+                    new IsInjectedRequest { AdditionalData = "startup-check" });
+                return response != null;
+            }
+            catch
             {
                 return false;
             }

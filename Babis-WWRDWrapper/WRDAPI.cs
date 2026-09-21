@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,10 +45,13 @@ namespace BabisWWRDWrapper
         public static extern void execute([MarshalAs(UnmanagedType.LPStr)] string script);
 
 
-        public static string WRDLink = "https://wrdcdn.net/r/2/exploit%20api/wearedevs_exploit_api.dll";
+        private const string NativeLibraryName = "wearedevs_exploit_api.dll";
+        private const string WRDLink = "https://wrdcdn.net/r/2/exploit%20api/wearedevs_exploit_api.dll";
+        private const string ExpectedSha256 = "567C197658CB3FE2B1D5936B20D0DA5CCA7A5B505A9DA10D4003F5AF8B8D0705";
 
         public static void InitializeWithRetry()
         {
+            EnsureNativeLibrary();
             Exception lastError = null;
 
             for (var attempt = 1; attempt <= 10; attempt++)
@@ -81,19 +85,6 @@ namespace BabisWWRDWrapper
 
         public static Thread WRDInit()
         {
-            if (!File.Exists("wearedevs_exploit_api.dll"))
-            {
-                WebClient WC = new WebClient();
-                try
-                {
-                    WC.DownloadFile(WRDLink, "wearedevs_exploit_api.dll");
-                    WC.Dispose();
-                }
-                catch
-                {
-                    return null;
-                }
-            }
             AllocConsole();
             Thread initthread = new Thread(delegate ()
             {
@@ -110,6 +101,54 @@ namespace BabisWWRDWrapper
             initthread.Start();
             return initthread;
 
+        }
+
+        private static void EnsureNativeLibrary()
+        {
+            var nativeLibraryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NativeLibraryName);
+            if (IsTrustedNativeLibrary(nativeLibraryPath))
+            {
+                return;
+            }
+
+            try
+            {
+                using (var wc = new WebClient())
+                {
+                    var temporaryPath = nativeLibraryPath + ".download";
+                    wc.DownloadFile(WRDLink, temporaryPath);
+                    if (!IsTrustedNativeLibrary(temporaryPath))
+                    {
+                        File.Delete(temporaryPath);
+                        throw new InvalidDataException("The downloaded WeAreDevs API failed integrity validation.");
+                    }
+
+                    if (File.Exists(nativeLibraryPath))
+                    {
+                        File.Delete(nativeLibraryPath);
+                    }
+                    File.Move(temporaryPath, nativeLibraryPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("A trusted WeAreDevs API library is not available.", ex);
+            }
+        }
+
+        private static bool IsTrustedNativeLibrary(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return false;
+            }
+
+            using (var stream = File.OpenRead(path))
+            using (var sha256 = SHA256.Create())
+            {
+                var hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty);
+                return string.Equals(hash, ExpectedSha256, StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         public static void Execute(String Script)

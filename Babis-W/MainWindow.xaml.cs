@@ -15,6 +15,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -34,6 +35,9 @@ namespace BabisW
         // VARIABLES //
         private const string DiscordInviteUrl = "https://discord.gg/75auNNfmhS";
         private const string CurrentVersion = "Babis-W 15.2 SP3";
+        private const string GitHubRepository = "babssssza/Babis-W";
+        private const string GitHubRawBase = "https://raw.githubusercontent.com/" + GitHubRepository + "/main/";
+        private const string NativeApiSha256 = "567C197658CB3FE2B1D5936B20D0DA5CCA7A5B505A9DA10D4003F5AF8B8D0705";
 
         // The default text editor text
         string DefaultTextEditorText = "--[[\r\nWelcome to Babis-W!\r\nJoin Team Babis on Discord: https://discord.gg/75auNNfmhS\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"Babis-W\")";
@@ -132,55 +136,31 @@ namespace BabisW
             // Keep an existing wrapper installation. Missing files are downloaded below.
             Console.WriteLine("Checking to see if the Babis-W wrapper is installed");
 
-            if (!File.Exists("Babis-WWRDWrapper.deps.json"))
+            var wrapperFiles = new[]
             {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.deps.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.deps.json", "Babis-WWRDWrapper.deps.json");
-            }
-            if (!File.Exists("Babis-WWRDWrapper.dll"))
+                "Babis-WWRDWrapper.deps.json",
+                "Babis-WWRDWrapper.dll",
+                "Babis-WWRDWrapper.exe",
+                "Babis-WWRDWrapper.pdb",
+                "Babis-WWRDWrapper.runtimeconfig.json",
+                "WRDFakeServer.exe"
+            };
+            foreach (var fileName in wrapperFiles)
             {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.dll, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.dll", "Babis-WWRDWrapper.dll");
-            }
-            if (!File.Exists("Babis-WWRDWrapper.exe"))
-            {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.exe, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.exe", "Babis-WWRDWrapper.exe");
-            }
-            if (!File.Exists("Babis-WWRDWrapper.pdb"))
-            {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.pdb, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.pdb", "Babis-WWRDWrapper.pdb");
-            }
-            if (!File.Exists("Babis-WWRDWrapper.runtimeconfig.json"))
-            {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.runtimeconfig.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.runtimeconfig.json", "Babis-WWRDWrapper.runtimeconfig.json");
-            }
-            if (!File.Exists("WRDFakeServer.exe"))
-            {
-                Console.WriteLine("Downloading WRDFakeServer.exe, please wait (this will take some time)...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/WRDFakeServer.exe", "WRDFakeServer.exe");
+                var destination = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+                if (!File.Exists(destination))
+                {
+                    Console.WriteLine($"Downloading {fileName}, please wait...");
+                    TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/" + fileName, destination);
+                }
             }
             if (!File.Exists("wearedevs_exploit_api.dll"))
             {
-                try
-                {
-                    Console.WriteLine("Downloading wearedevs_exploit_api.dll, please wait...");
-                    WebStuff.DownloadFile("https://wrdcdn.net/r/2/exploit%20api/wearedevs_exploit_api.dll", "wearedevs_exploit_api.dll");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Failed to download original wearedevs_exploit_api.dll: " + ex + ", so now will try GitHub mirror");
-                    try
-                    {
-                        WebStuff.DownloadFile("https://github.com/wcrddn/wcrddn.github.io/raw/main/wearedevs_exploit_api.dll", "wearedevs_exploit_api.dll");
-                    }
-                    catch (Exception ex1)
-                    {
-                        Console.WriteLine("Failed to download wearedevs_exploit_api.dll even from mirror: " + ex1 + "\nBabisW DEPENDS on the existence of this file, so BabisW cannot be ran. Please contact BabisW staff for help...");
-                    }
-                }
+                Console.WriteLine("Downloading wearedevs_exploit_api.dll, please wait...");
+                TryDownloadFile(
+                    "https://wrdcdn.net/r/2/exploit%20api/wearedevs_exploit_api.dll",
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wearedevs_exploit_api.dll"),
+                    NativeApiSha256);
             }
 
             // OpenSSL req for cert signing
@@ -194,22 +174,22 @@ namespace BabisW
             if (!File.Exists("OpenSSL\\msys-2.0.dll"))
             {
                 Console.WriteLine("Downloading msys-2.0.dll...");
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
+                TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
             }
             if (!File.Exists("OpenSSL\\msys-crypto-3.dll"))
             {
                 Console.WriteLine("Downloading msys-crypto-3.dll...");
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
+                TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
             }
             if (!File.Exists("OpenSSL\\msys-ssl-3.dll"))
             {
                 Console.WriteLine("Downloading msys-ssl-3.dll...");
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
+                TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
             }
             if (!File.Exists("OpenSSL\\openssl.exe"))
             {
                 Console.WriteLine("Downloading openssl.exe...");
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
+                TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
             }
 
             // Theme checking for Avalon stuff, etc
@@ -217,8 +197,15 @@ namespace BabisW
             if (!File.Exists("EditorThemes\\lua_md_default.xshd"))
             {
                 Console.WriteLine("Downloading Avalon theme definitions...");
-                string themeData = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
-                File.WriteAllText("EditorThemes\\lua_md_default.xshd", themeData);
+                try
+                {
+                    string themeData = WebStuff.DownloadString(GitHubRawBase + "Babis-W/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
+                    File.WriteAllText("EditorThemes\\lua_md_default.xshd", themeData);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unable to download the default editor theme: {ex.Message}");
+                }
             }
 
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
@@ -1524,17 +1511,27 @@ namespace BabisW
                     sb.Begin();
 
                 });
-                var json = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/ThemeList.json");
+                var json = WebStuff.DownloadString(GitHubRawBase + "UpdateStuff/ThemeList.json");
                 dynamic dsfadfasdf = JsonConvert.DeserializeObject(json);
                 foreach (var item in dsfadfasdf)
                 {
                     string FileName = item.filename;
-                    string URL = item.themeurl;
-                    if (File.Exists("Themes\\" + FileName))
+                    if (string.IsNullOrWhiteSpace(FileName) ||
+                        FileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+                        FileName.Contains("..") ||
+                        !Uri.TryCreate((string)item.themeurl, UriKind.Absolute, out var themeUri) ||
+                        themeUri.Scheme != Uri.UriSchemeHttps ||
+                        !string.Equals(themeUri.Host, "raw.githubusercontent.com", StringComparison.OrdinalIgnoreCase))
                     {
-                        File.Delete("Themes\\" + FileName); // Update themes
+                        continue;
                     }
-                    WebStuff.DownloadFile(URL, "Themes\\" + FileName);
+
+                    string themePath = Path.Combine(Path.GetFullPath("Themes"), FileName);
+                    if (File.Exists(themePath))
+                    {
+                        File.Delete(themePath); // Update themes
+                    }
+                    WebStuff.DownloadFile(themeUri, themePath);
                     this.Dispatcher.Invoke(() =>
                     {
                         if (ThemeListBox.Items.Contains(FileName))
@@ -1986,9 +1983,65 @@ namespace BabisW
             Process.Start("https://t.me/babis-wnow");
         }
 
+        private static bool TryDownloadFile(string url, string destination, string expectedSha256 = null)
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+                uri.Scheme != Uri.UriSchemeHttps ||
+                !(string.Equals(uri.Host, "raw.githubusercontent.com", StringComparison.OrdinalIgnoreCase) ||
+                  string.Equals(uri.Host, "wrdcdn.net", StringComparison.OrdinalIgnoreCase)))
+            {
+                Console.WriteLine($"Blocked download from an untrusted host: {url}");
+                return false;
+            }
+
+            var temporaryPath = destination + ".download";
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile(uri, temporaryPath);
+                }
+
+                if (!string.IsNullOrWhiteSpace(expectedSha256))
+                {
+                    using (var stream = File.OpenRead(temporaryPath))
+                    using (var sha256 = SHA256.Create())
+                    {
+                        var hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty);
+                        if (!string.Equals(hash, expectedSha256, StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw new InvalidDataException("Downloaded file integrity validation failed.");
+                        }
+                    }
+                }
+
+                var directory = Path.GetDirectoryName(Path.GetFullPath(destination));
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                if (File.Exists(destination))
+                {
+                    File.Delete(destination);
+                }
+                File.Move(temporaryPath, destination);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Download failed for {destination}: {ex.Message}");
+                if (File.Exists(temporaryPath))
+                {
+                    File.Delete(temporaryPath);
+                }
+                return false;
+            }
+        }
+
         private void OpenGitHub(object sender, MouseButtonEventArgs e)
         {
-            Process.Start("https://github.com/Avaluate/BabisW");
+            Process.Start("https://github.com/" + GitHubRepository);
         }
     }
 }
