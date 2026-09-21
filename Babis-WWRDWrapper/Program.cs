@@ -2,6 +2,7 @@ using BabisWWRDWrapper;
 using Microsoft.Win32;
 using System;
 using System.Drawing;
+using System.IO;
 
 namespace BabisWWRDWrapper
 {
@@ -10,6 +11,11 @@ namespace BabisWWRDWrapper
         static string WrapperVersion = "1.1";
         static async Task Main(string[] args)
         {
+            // The desktop host starts this process without a console. Discarding
+            // inherited output handles prevents logging from terminating the pipe server.
+            Console.SetOut(TextWriter.Null);
+            Console.SetError(TextWriter.Null);
+
             try
             {
                 Console.Title = "Babis-W WeAreDevs Wrapper";
