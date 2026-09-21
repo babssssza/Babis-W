@@ -230,7 +230,7 @@ namespace BabisW
 
         private async Task LoadScriptHubDataAsync()
         {
-            Console.WriteLine("Loading ScriptBlox script hub data...");
+            Console.WriteLine("Loading RScripts script hub data...");
             try
             {
                 scripts = await ScriptHub.BabisWSC.GetSCData().ConfigureAwait(true);
@@ -242,7 +242,7 @@ namespace BabisW
             catch (Exception ex)
             {
                 scripts = Array.Empty<ScriptHub.ScriptData>();
-                Console.WriteLine($"Unable to load script hub data: {ex.Message}");
+                Console.WriteLine($"Unable to load RScripts data: {ex.Message}");
             }
 
             try
@@ -1944,7 +1944,7 @@ namespace BabisW
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unable to search ScriptBlox: {ex.Message}");
+                Console.WriteLine($"Unable to search RScripts: {ex.Message}");
             }
         }
 

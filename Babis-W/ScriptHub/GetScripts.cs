@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,26 +29,18 @@ namespace BabisW.ScriptHub
         public string CreatedAt;
     }
 
-    public sealed class ScriptBloxFetchOptions
+    public sealed class ScriptHubFetchOptions
     {
         public int Page { get; set; } = 1;
-        public int Max { get; set; } = 20;
-        public string Exclude { get; set; }
-        public string Mode { get; set; }
-        public bool? Patched { get; set; }
-        public bool? Key { get; set; }
-        public bool? Universal { get; set; }
-        public bool? Verified { get; set; }
-        public string SortBy { get; set; } = "updatedAt";
-        public string Order { get; set; } = "desc";
-        public string Owner { get; set; }
-        public long? PlaceId { get; set; }
+        public string Query { get; set; }
+        public string OrderBy { get; set; } = "date";
+        public string Sort { get; set; } = "desc";
     }
 
     public static class BabisWSC
     {
-        private const string Endpoint = "https://scriptblox.com/api/script/fetch";
-        private const string ScriptBloxBaseUrl = "https://scriptblox.com";
+        private const string Endpoint = "https://rscripts.net/api/v2/scripts";
+        private const string BaseUrl = "https://rscripts.net";
         private static readonly HttpClient Client = CreateClient();
 
         static BabisWSC()
@@ -56,43 +48,46 @@ namespace BabisW.ScriptHub
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
         }
 
-        public static async Task<ScriptData[]> GetSCData(
-            ScriptBloxFetchOptions options = null,
+        public static Task<ScriptData[]> GetSCData(
+            ScriptHubFetchOptions options = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await FetchAsync(Endpoint, BuildQuery(options ?? new ScriptBloxFetchOptions()), cancellationToken)
-                .ConfigureAwait(false);
+            return FetchAsync(options ?? new ScriptHubFetchOptions(), cancellationToken);
         }
 
-        public static async Task<ScriptData[]> SearchSCData(
+        public static Task<ScriptData[]> SearchSCData(
             string query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (string.IsNullOrWhiteSpace(query))
+            return FetchAsync(new ScriptHubFetchOptions
             {
-                return await GetSCData(cancellationToken: cancellationToken).ConfigureAwait(false);
-            }
-
-            var options = new ScriptBloxFetchOptions { Max = 20, SortBy = "accuracy", Order = "desc" };
-            var searchQuery = "q=" + Uri.EscapeDataString(query.Trim())
-                + "&page=1&max=" + options.Max.ToString(CultureInfo.InvariantCulture)
-                + "&sortBy=accuracy&order=desc&strict=false";
-            return await FetchAsync(Endpoint.Replace("/fetch", "/search"), "?" + searchQuery, cancellationToken)
-                .ConfigureAwait(false);
+                Query = string.IsNullOrWhiteSpace(query) ? null : query.Trim()
+            }, cancellationToken);
         }
 
         private static async Task<ScriptData[]> FetchAsync(
-            string endpoint,
-            string query,
+            ScriptHubFetchOptions options,
             CancellationToken cancellationToken)
         {
-            using (var response = await Client.GetAsync(endpoint + query, cancellationToken).ConfigureAwait(false))
+            var values = new List<string>
+            {
+                "page=" + Math.Max(1, options.Page).ToString(CultureInfo.InvariantCulture),
+                "orderBy=" + Uri.EscapeDataString(options.OrderBy ?? "date"),
+                "sort=" + Uri.EscapeDataString(options.Sort ?? "desc")
+            };
+            if (!string.IsNullOrWhiteSpace(options.Query))
+            {
+                values.Add("q=" + Uri.EscapeDataString(options.Query));
+            }
+
+            using (var response = await Client.GetAsync(
+                Endpoint + "?" + string.Join("&", values), cancellationToken).ConfigureAwait(false))
             {
                 var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new HttpRequestException(
-                        $"ScriptBlox returned {(int)response.StatusCode} ({response.ReasonPhrase}): {body}");
+                        $"RScripts returned {(int)response.StatusCode} ({response.ReasonPhrase}): {body}");
                 }
 
                 JObject payload;
@@ -102,103 +97,84 @@ namespace BabisW.ScriptHub
                 }
                 catch (Exception ex)
                 {
-                    throw new InvalidOperationException("ScriptBlox returned invalid JSON.", ex);
+                    throw new InvalidOperationException("RScripts returned invalid JSON.", ex);
                 }
 
-                var message = payload.Value<string>("message");
-                var result = payload["result"] as JObject;
-                if (result == null)
-                {
-                    throw new InvalidOperationException(
-                        string.IsNullOrWhiteSpace(message)
-                            ? "ScriptBlox response did not contain a result."
-                            : "ScriptBlox error: " + message);
-                }
-
-                var scripts = result["scripts"] as JArray;
+                var scripts = payload["scripts"] as JArray;
                 if (scripts == null)
                 {
-                    throw new InvalidOperationException("ScriptBlox response did not contain a scripts list.");
+                    throw new InvalidOperationException("RScripts response did not contain a scripts list.");
                 }
 
-                return scripts.OfType<JObject>().Select(ParseScript).ToArray();
+                var parsed = scripts.OfType<JObject>().Select(ParseScript).ToArray();
+                await PopulateScriptBodiesAsync(parsed, cancellationToken).ConfigureAwait(false);
+                return parsed;
+            }
+        }
+
+        private static async Task PopulateScriptBodiesAsync(
+            ScriptData[] scripts,
+            CancellationToken cancellationToken)
+        {
+            var tasks = scripts.Select(async script =>
+            {
+                if (string.IsNullOrWhiteSpace(script.Script))
+                {
+                    return script;
+                }
+
+                try
+                {
+                    using (var response = await Client.GetAsync(script.Script, cancellationToken).ConfigureAwait(false))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        script.Script = body;
+                    }
+                }
+                catch
+                {
+                    script.Script = string.Empty;
+                }
+
+                return script;
+            });
+
+            var completed = await Task.WhenAll(tasks).ConfigureAwait(false);
+            for (var index = 0; index < scripts.Length; index++)
+            {
+                scripts[index] = completed[index];
             }
         }
 
         private static HttpClient CreateClient()
         {
-            var client = new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(20)
-            };
+            var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
             client.DefaultRequestHeaders.UserAgent.ParseAdd("Babis-W Script Hub");
             return client;
-        }
-
-        private static string BuildQuery(ScriptBloxFetchOptions options)
-        {
-            var values = new List<string>
-            {
-                "page=" + Math.Max(1, options.Page).ToString(CultureInfo.InvariantCulture),
-                "max=" + Math.Min(20, Math.Max(1, options.Max)).ToString(CultureInfo.InvariantCulture),
-                "sortBy=" + Uri.EscapeDataString(string.IsNullOrWhiteSpace(options.SortBy) ? "updatedAt" : options.SortBy),
-                "order=" + Uri.EscapeDataString(string.IsNullOrWhiteSpace(options.Order) ? "desc" : options.Order)
-            };
-
-            Add(values, "exclude", options.Exclude);
-            Add(values, "mode", options.Mode);
-            Add(values, "patched", options.Patched);
-            Add(values, "key", options.Key);
-            Add(values, "universal", options.Universal);
-            Add(values, "verified", options.Verified);
-            Add(values, "owner", options.Owner);
-            Add(values, "placeId", options.PlaceId);
-            return "?" + string.Join("&", values);
-        }
-
-        private static void Add(List<string> values, string name, string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                values.Add(name + "=" + Uri.EscapeDataString(value));
-            }
-        }
-
-        private static void Add(List<string> values, string name, bool? value)
-        {
-            if (value.HasValue)
-            {
-                values.Add(name + "=" + (value.Value ? "1" : "0"));
-            }
-        }
-
-        private static void Add(List<string> values, string name, long? value)
-        {
-            if (value.HasValue)
-            {
-                values.Add(name + "=" + value.Value.ToString(CultureInfo.InvariantCulture));
-            }
         }
 
         private static ScriptData ParseScript(JObject script)
         {
             var game = script["game"] as JObject;
+            var user = script["user"] as JObject;
+            var rawScript = script.Value<string>("rawScript");
             return new ScriptData
             {
                 Id = script.Value<string>("_id") ?? string.Empty,
                 Title = script.Value<string>("title") ?? "Untitled script",
-                Script = script.Value<string>("script") ?? string.Empty,
-                Desc = game?.Value<string>("name") ?? "Universal script",
-                Credits = "ScriptBlox" + (script.Value<bool?>("verified") == true ? " - Verified" : string.Empty),
-                ImageURL = NormalizeUrl(script.Value<string>("image")),
+                Script = NormalizeUrl(rawScript),
+                Desc = script.Value<string>("description") ?? game?.Value<string>("title") ?? "Roblox script",
+                Credits = user?.Value<string>("username") ?? "RScripts",
+                ImageURL = NormalizeUrl(script.Value<string>("image") ?? game?.Value<string>("imgurl")),
                 Slug = script.Value<string>("slug") ?? string.Empty,
-                GameName = game?.Value<string>("name") ?? string.Empty,
-                Verified = script.Value<bool?>("verified") == true,
-                HasKey = script.Value<bool?>("key") == true,
-                IsUniversal = script.Value<bool?>("isUniversal") == true,
-                IsPatched = script.Value<bool?>("isPatched") == true,
+                GameName = game?.Value<string>("title") ?? string.Empty,
+                Verified = user?.Value<bool?>("verified") == true,
+                HasKey = script.Value<bool?>("keySystem") == true,
+                IsUniversal = string.IsNullOrWhiteSpace(game?.Value<string>("placeId")),
+                IsPatched = false,
                 Views = script.Value<int?>("views") ?? 0,
-                ScriptType = script.Value<string>("scriptType") ?? string.Empty,
+                ScriptType = script.Value<bool?>("paid") == true ? "paid" : "free",
                 CreatedAt = script.Value<string>("createdAt") ?? string.Empty
             };
         }
@@ -212,7 +188,7 @@ namespace BabisW.ScriptHub
 
             return Uri.TryCreate(url, UriKind.Absolute, out Uri absolute)
                 ? absolute.ToString()
-                : ScriptBloxBaseUrl + (url.StartsWith("/") ? url : "/" + url);
+                : BaseUrl + (url.StartsWith("/") ? url : "/" + url);
         }
     }
 }
