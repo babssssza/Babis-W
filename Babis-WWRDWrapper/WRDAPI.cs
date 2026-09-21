@@ -162,6 +162,13 @@ namespace BabisWWRDWrapper
 
         public static bool IsInjected()
         {
+            // The desktop polls this endpoint before injection. Native calls are
+            // unsafe until InitializeWithRetry has completed successfully.
+            if (!NativeInitialized)
+            {
+                return false;
+            }
+
             ShowConsole();
             lock (NativeCallLock)
             {
