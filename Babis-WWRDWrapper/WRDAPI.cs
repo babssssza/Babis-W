@@ -15,6 +15,8 @@ namespace BabisWWRDWrapper
 {
     public class WRDAPI
     {
+        private static readonly object NativeCallLock = new object();
+        private static bool NativeInitialized;
 
         // BabisW already allocates a console
 
@@ -52,7 +54,14 @@ namespace BabisWWRDWrapper
             {
                 try
                 {
-                    initialize();
+                    lock (NativeCallLock)
+                    {
+                        if (!NativeInitialized)
+                        {
+                            initialize();
+                            NativeInitialized = true;
+                        }
+                    }
                     return;
                 }
                 catch (Exception ex)
@@ -88,7 +97,14 @@ namespace BabisWWRDWrapper
             AllocConsole();
             Thread initthread = new Thread(delegate ()
             {
-                initialize();
+                try
+                {
+                    InitializeWithRetry();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Native API initialization failed: {ex.Message}");
+                }
                 ShowConsole();
             });
             initthread.Start();
@@ -98,19 +114,31 @@ namespace BabisWWRDWrapper
 
         public static void Execute(String Script)
         {
-            execute(Script);
+            lock (NativeCallLock)
+            {
+                execute(Script);
+            }
             ShowConsole();
         }
 
         public static bool IsInjected()
         {
             ShowConsole();
-            return isAttached();
+            lock (NativeCallLock)
+            {
+                return isAttached();
+            }
         }
 
         public static bool WaitUntilAttached(int timeoutMs = 30000)
         {
             var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+            var probeDelayMs = 1500;
+
+            // Roblox and the native API need time to finish creating the script context.
+            // Probing immediately causes the native API to scan an incomplete tree.
+            Thread.Sleep(probeDelayMs);
+
             while (DateTime.UtcNow < deadline)
             {
                 if (IsInjected())
@@ -118,7 +146,8 @@ namespace BabisWWRDWrapper
                     return true;
                 }
 
-                Thread.Sleep(500);
+                Thread.Sleep(probeDelayMs);
+                probeDelayMs = Math.Min(probeDelayMs + 500, 4000);
             }
 
             return false;
