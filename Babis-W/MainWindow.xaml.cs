@@ -228,7 +228,6 @@ namespace BabisW
             try
             {
                 scripts = await ScriptHub.BabisWSC.GetSCData().ConfigureAwait(true);
-                gamescripts = await Task.Run(() => ScriptHub.BabisWGSC.GetGSCData()).ConfigureAwait(true);
                 if (IsScriptHubOpened)
                 {
                     RenderScriptHub(scripts);
@@ -237,8 +236,17 @@ namespace BabisW
             catch (Exception ex)
             {
                 scripts = Array.Empty<ScriptHub.ScriptData>();
-                gamescripts = Array.Empty<ScriptHub.GameScriptData>();
                 Console.WriteLine($"Unable to load script hub data: {ex.Message}");
+            }
+
+            try
+            {
+                gamescripts = await ScriptHub.BabisWGSC.GetGSCData().ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                gamescripts = Array.Empty<ScriptHub.GameScriptData>();
+                Console.WriteLine($"Unable to load game hub data: {ex.Message}");
             }
         }
 

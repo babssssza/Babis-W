@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,6 +50,11 @@ namespace BabisW.ScriptHub
         private const string Endpoint = "https://scriptblox.com/api/script/fetch";
         private const string ScriptBloxBaseUrl = "https://scriptblox.com";
         private static readonly HttpClient Client = CreateClient();
+
+        static BabisWSC()
+        {
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+        }
 
         public static async Task<ScriptData[]> GetSCData(
             ScriptBloxFetchOptions options = null,
