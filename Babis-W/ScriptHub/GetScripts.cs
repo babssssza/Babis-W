@@ -1,47 +1,188 @@
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BabisW.ScriptHub
 {
-    // We will declare these 4 stuff first
     public struct ScriptData
     {
+        public string Id;
         public string Title;
         public string Script;
         public string Desc;
         public string Credits;
         public string ImageURL;
-
+        public string Slug;
+        public string GameName;
+        public bool Verified;
+        public bool HasKey;
+        public bool IsUniversal;
+        public bool IsPatched;
+        public int Views;
+        public string ScriptType;
+        public string CreatedAt;
     }
+
+    public sealed class ScriptBloxFetchOptions
+    {
+        public int Page { get; set; } = 1;
+        public int Max { get; set; } = 20;
+        public string Exclude { get; set; }
+        public string Mode { get; set; }
+        public bool? Patched { get; set; }
+        public bool? Key { get; set; }
+        public bool? Universal { get; set; }
+        public bool? Verified { get; set; }
+        public string SortBy { get; set; } = "updatedAt";
+        public string Order { get; set; } = "desc";
+        public string Owner { get; set; }
+        public long? PlaceId { get; set; }
+    }
+
     public static class BabisWSC
     {
+        private const string Endpoint = "https://scriptblox.com/api/script/fetch";
+        private const string ScriptBloxBaseUrl = "https://scriptblox.com";
+        private static readonly HttpClient Client = CreateClient();
 
-        private static readonly WebClient Web = new WebClient();
-
-        // We want to supress this warning just to keep the error list clean
-        // should really be ran asynchronously
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public static async Task<ScriptData[]> GetSCData()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-        
+        public static async Task<ScriptData[]> GetSCData(
+            ScriptBloxFetchOptions options = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Now we parse the json, making use of Newtonsoft
-            var json = Web.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Scripts.json");
-            var arrays = JArray.Parse(json);
-
-            // Then we return each of it
-            return arrays.Values<JObject>()
-                .Select(wow => new ScriptData
+            options = options ?? new ScriptBloxFetchOptions();
+            var query = BuildQuery(options);
+            using (var response = await Client.GetAsync(Endpoint + query, cancellationToken).ConfigureAwait(false))
+            {
+                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
                 {
-                    Title = wow.Value<string>("title") ?? string.Empty,
-                    Credits = wow.Value<string>("credits") ?? string.Empty,
-                    Desc = wow.Value<string>("desc") ?? string.Empty,
-                    Script = wow.Value<string>("script") ?? string.Empty,
-                    ImageURL = wow.Value<string>("imgurl") ?? string.Empty
-                }).ToArray();
+                    throw new HttpRequestException(
+                        $"ScriptBlox returned {(int)response.StatusCode} ({response.ReasonPhrase}): {body}");
+                }
+
+                JObject payload;
+                try
+                {
+                    payload = JObject.Parse(body);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException("ScriptBlox returned invalid JSON.", ex);
+                }
+
+                var message = payload.Value<string>("message");
+                var result = payload["result"] as JObject;
+                if (result == null)
+                {
+                    throw new InvalidOperationException(
+                        string.IsNullOrWhiteSpace(message)
+                            ? "ScriptBlox response did not contain a result."
+                            : "ScriptBlox error: " + message);
+                }
+
+                var scripts = result["scripts"] as JArray;
+                if (scripts == null)
+                {
+                    throw new InvalidOperationException("ScriptBlox response did not contain a scripts list.");
+                }
+
+                return scripts.OfType<JObject>().Select(ParseScript).ToArray();
+            }
+        }
+
+        private static HttpClient CreateClient()
+        {
+            var client = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(20)
+            };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Babis-W Script Hub");
+            return client;
+        }
+
+        private static string BuildQuery(ScriptBloxFetchOptions options)
+        {
+            var values = new List<string>
+            {
+                "page=" + Math.Max(1, options.Page).ToString(CultureInfo.InvariantCulture),
+                "max=" + Math.Min(20, Math.Max(1, options.Max)).ToString(CultureInfo.InvariantCulture),
+                "sortBy=" + Uri.EscapeDataString(string.IsNullOrWhiteSpace(options.SortBy) ? "updatedAt" : options.SortBy),
+                "order=" + Uri.EscapeDataString(string.IsNullOrWhiteSpace(options.Order) ? "desc" : options.Order)
+            };
+
+            Add(values, "exclude", options.Exclude);
+            Add(values, "mode", options.Mode);
+            Add(values, "patched", options.Patched);
+            Add(values, "key", options.Key);
+            Add(values, "universal", options.Universal);
+            Add(values, "verified", options.Verified);
+            Add(values, "owner", options.Owner);
+            Add(values, "placeId", options.PlaceId);
+            return "?" + string.Join("&", values);
+        }
+
+        private static void Add(List<string> values, string name, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                values.Add(name + "=" + Uri.EscapeDataString(value));
+            }
+        }
+
+        private static void Add(List<string> values, string name, bool? value)
+        {
+            if (value.HasValue)
+            {
+                values.Add(name + "=" + (value.Value ? "1" : "0"));
+            }
+        }
+
+        private static void Add(List<string> values, string name, long? value)
+        {
+            if (value.HasValue)
+            {
+                values.Add(name + "=" + value.Value.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        private static ScriptData ParseScript(JObject script)
+        {
+            var game = script["game"] as JObject;
+            return new ScriptData
+            {
+                Id = script.Value<string>("_id") ?? string.Empty,
+                Title = script.Value<string>("title") ?? "Untitled script",
+                Script = script.Value<string>("script") ?? string.Empty,
+                Desc = game?.Value<string>("name") ?? "Universal script",
+                Credits = "ScriptBlox" + (script.Value<bool?>("verified") == true ? " - Verified" : string.Empty),
+                ImageURL = NormalizeUrl(script.Value<string>("image")),
+                Slug = script.Value<string>("slug") ?? string.Empty,
+                GameName = game?.Value<string>("name") ?? string.Empty,
+                Verified = script.Value<bool?>("verified") == true,
+                HasKey = script.Value<bool?>("key") == true,
+                IsUniversal = script.Value<bool?>("isUniversal") == true,
+                IsPatched = script.Value<bool?>("isPatched") == true,
+                Views = script.Value<int?>("views") ?? 0,
+                ScriptType = script.Value<string>("scriptType") ?? string.Empty,
+                CreatedAt = script.Value<string>("createdAt") ?? string.Empty
+            };
+        }
+
+        private static string NormalizeUrl(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return string.Empty;
+            }
+
+            return Uri.TryCreate(url, UriKind.Absolute, out Uri absolute)
+                ? absolute.ToString()
+                : ScriptBloxBaseUrl + (url.StartsWith("/") ? url : "/" + url);
         }
     }
 }

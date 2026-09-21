@@ -9,10 +9,12 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -75,7 +77,7 @@ namespace BabisW
         bool IsInjected = false;
 
         // Variables for custom icons (to be implemented in the future)
-        Array scripts = Array.Empty<ScriptHub.ScriptData>();
+        ScriptHub.ScriptData[] scripts = Array.Empty<ScriptHub.ScriptData>();
         Array gamescripts = Array.Empty<ScriptHub.GameScriptData>();
 
         // WebClient Creation
@@ -212,23 +214,32 @@ namespace BabisW
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
             IsAvalonLoaded = true;
 
-            // Finally, load optional script hub data. A missing or unavailable feed
-            // must not prevent the main application from opening.
-            Console.WriteLine("Loading script hub data...");
+            // Load optional script hub data without blocking the desktop UI.
+            _ = LoadScriptHubDataAsync();
+
+
+            Console.Title = "Babis-W";
+            Console.WriteLine("All done!\n");
+        }
+
+        private async Task LoadScriptHubDataAsync()
+        {
+            Console.WriteLine("Loading ScriptBlox script hub data...");
             try
             {
-                scripts = ScriptHub.BabisWSC.GetSCData().GetAwaiter().GetResult();
-                gamescripts = ScriptHub.BabisWGSC.GetGSCData().GetAwaiter().GetResult();
+                scripts = await ScriptHub.BabisWSC.GetSCData().ConfigureAwait(true);
+                gamescripts = await Task.Run(() => ScriptHub.BabisWGSC.GetGSCData()).ConfigureAwait(true);
+                if (IsScriptHubOpened)
+                {
+                    RenderScriptHub(scripts);
+                }
             }
             catch (Exception ex)
             {
                 scripts = Array.Empty<ScriptHub.ScriptData>();
                 gamescripts = Array.Empty<ScriptHub.GameScriptData>();
+                Console.WriteLine($"Unable to load script hub data: {ex.Message}");
             }
-
-
-            Console.Title = "Babis-W";
-            Console.WriteLine("All done!\n");
         }
 
         private static void EnsureDesktopShortcut()
@@ -1751,23 +1762,27 @@ namespace BabisW
             SettingsGrid.Visibility = Visibility.Hidden;
         }
 
+        private void RenderScriptHub(IEnumerable<ScriptHub.ScriptData> source)
+        {
+            WP.Children.Clear();
+            foreach (var scriptData in source ?? Enumerable.Empty<ScriptHub.ScriptData>())
+            {
+                var obj = new TabThingy
+                {
+                    Script = scriptData
+                };
+                obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
+                obj.CopyScript += (_, _) => Clipboard.SetDataObject(obj.Script.Script);
+                WP.Children.Add(obj);
+            }
+        }
+
         private void ScriptHubRadioButtonClick(object sender, RoutedEventArgs e)
         {
             if (IsScriptHubOpened == false)
             {
                 IsScriptHubOpened = true;
-                WP.Children.Clear();
-                foreach (var scriptData in scripts)
-                {
-                    var obj = new TabThingy
-                    {
-                        Script = (ScriptHub.ScriptData)scriptData
-                    };
-                    // Functions for buttons
-                    obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
-                    obj.CopyScript += (_, _) => Clipboard.SetDataObject(obj.Script.Script);
-                    WP.Children.Add(obj); // Add objects into scripthub panel
-                }
+                RenderScriptHub(scripts);
             }
 
 
