@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BabisW.Execution
@@ -40,7 +41,7 @@ namespace BabisW.Execution
             }
         }
 
-        public T SendRequest<T>(string messageType, object data)
+        public T SendRequest<T>(string messageType, object data, int requestTimeoutMs = 5000)
         {
             lock (Lock) // requests are sent one at a time
             {
@@ -52,6 +53,8 @@ namespace BabisW.Execution
                     try
                     {
                         EnsureConnected();
+                        Pipe.ReadTimeout = requestTimeoutMs;
+                        Pipe.WriteTimeout = requestTimeoutMs;
                         var Req = new RequestMessage
                         {
                             MessageType = messageType,

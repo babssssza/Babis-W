@@ -30,8 +30,6 @@ namespace BabisW.Execution
                 NativeHealthFailed = false;
                 InjectionStartedAt = DateTime.UtcNow;
 
-                try
-                {
                 // kill previous wrappers
                 try
                 {
@@ -90,7 +88,10 @@ namespace BabisW.Execution
                 }
                 try
                 {
-                    var Response = SelectedAPI.NewPipe.SendRequest<InjectionRequest>("Inject", new InjectionRequest{AdditionalData = "blank"}); // blank
+                    var Response = SelectedAPI.NewPipe.SendRequest<InjectionRequest>(
+                        "Inject",
+                        new InjectionRequest { AdditionalData = "blank" },
+                        60000);
                     Console.WriteLine($"injection result: {Response}");
                     if (Response.InjectionSuccessful == true)
                     {
