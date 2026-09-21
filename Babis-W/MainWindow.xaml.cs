@@ -143,6 +143,7 @@ namespace BabisW
                 "Babis-WWRDWrapper.exe",
                 "Babis-WWRDWrapper.pdb",
                 "Babis-WWRDWrapper.runtimeconfig.json",
+                "Newtonsoft.Json.dll",
                 "WRDFakeServer.exe"
             };
             foreach (var fileName in wrapperFiles)
