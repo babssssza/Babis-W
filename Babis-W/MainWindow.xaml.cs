@@ -37,9 +37,10 @@ namespace BabisW
         // VARIABLES //
         private const string DiscordInviteUrl = "https://discord.gg/75auNNfmhS";
         private const string CurrentVersion = "Babis-W 15.2 SP3";
-        private const string GitHubRepository = "babssssza/Babis-W";
+        private const string GitHubRepository = "babsssszass/Babis-W";
         private const string GitHubRawBase = "https://raw.githubusercontent.com/" + GitHubRepository + "/main/";
         private const string NativeApiSha256 = "567C197658CB3FE2B1D5936B20D0DA5CCA7A5B505A9DA10D4003F5AF8B8D0705";
+        private const string NewtonsoftJsonNet45Sha256 = "E1E27AF7B07EEEDF5CE71A9255F0422816A6FC5849A483C6714E1B472044FA9D";
 
         // The default text editor text
         string DefaultTextEditorText = "--[[\r\nWelcome to Babis-W!\r\nJoin Team Babis on Discord: https://discord.gg/75auNNfmhS\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"Babis-W\")";
@@ -151,10 +152,15 @@ namespace BabisW
             foreach (var fileName in wrapperFiles)
             {
                 var destination = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-                if (!File.Exists(destination))
+                var isNewtonsoftJson = string.Equals(fileName, "Newtonsoft.Json.dll", StringComparison.OrdinalIgnoreCase);
+                if (!File.Exists(destination) ||
+                    (isNewtonsoftJson && !HasSha256(destination, NewtonsoftJsonNet45Sha256)))
                 {
                     Console.WriteLine($"Downloading {fileName}, please wait...");
-                    TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/" + fileName, destination);
+                    TryDownloadFile(
+                        GitHubRawBase + "Babis-W/bin/x64/Debug/" + fileName,
+                        destination,
+                        isNewtonsoftJson ? NewtonsoftJsonNet45Sha256 : null);
                 }
             }
             if (!File.Exists("wearedevs_exploit_api.dll"))
@@ -2010,6 +2016,24 @@ namespace BabisW
                 {
                     File.Delete(temporaryPath);
                 }
+                return false;
+            }
+        }
+
+        private static bool HasSha256(string path, string expectedSha256)
+        {
+            try
+            {
+                using (var stream = File.OpenRead(path))
+                using (var sha256 = SHA256.Create())
+                {
+                    var hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty);
+                    return string.Equals(hash, expectedSha256, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to validate {path}: {ex.Message}");
                 return false;
             }
         }
