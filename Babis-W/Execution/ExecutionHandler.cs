@@ -54,6 +54,7 @@ namespace BabisW.Execution
                 string wrapperPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Babis-WWRDWrapper.exe");
                 if (!File.Exists(wrapperPath))
                 {
+                    InjectionInProgress = false;
                     MessageBox.Show($"The Babis-W wrapper is missing: {wrapperPath}", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
@@ -66,6 +67,7 @@ namespace BabisW.Execution
                 });
                 if (wrapperProcess == null)
                 {
+                    InjectionInProgress = false;
                     MessageBox.Show("The Babis-W wrapper could not be started.", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
@@ -80,6 +82,7 @@ namespace BabisW.Execution
 
                 if (wrapperProcess.HasExited)
                 {
+                    InjectionInProgress = false;
                     MessageBox.Show(
                         $"The Babis-W wrapper exited during startup (code {wrapperProcess.ExitCode}). Check the wrapper console for details.",
                         "Babis-W",
@@ -106,8 +109,12 @@ namespace BabisW.Execution
                 }
                 catch (Exception ex)
                 {
+                    SelectedAPI.NewPipe.ResetConnection();
+                    WrapperResponsive = false;
+                    NativeHealthFailed = false;
+                    StopWrapperProcesses();
                     MessageBox.Show(
-                        "Babis-W could not complete the injection. Please make sure Roblox is fully loaded and try again.",
+                        $"Babis-W could not complete the injection: {ex.Message}\n\nPlease make sure Roblox is fully loaded and try again.",
                         "Babis-W",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
@@ -121,6 +128,25 @@ namespace BabisW.Execution
             else
             {
                 return false;
+            }
+        }
+
+        private static void StopWrapperProcesses()
+        {
+            foreach (var processName in new[] { "Babis-WWRDWrapper", "WRDFakeServer" })
+            {
+                try
+                {
+                    foreach (Process proc in Process.GetProcessesByName(processName))
+                    {
+                        proc.Kill();
+                        proc.WaitForExit(5000);
+                        proc.Dispose();
+                    }
+                }
+                catch
+                {
+                }
             }
         }
 
