@@ -744,7 +744,7 @@ namespace BabisW
             try
             {
                 Changelog.Text = WebStuff.DownloadString(
-                    "https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Changelog");
+                    "https://raw.githubusercontent.com/babssssza/Babis-W/main/Changelog.txt");
             }
             catch (Exception ex)
             {
@@ -893,7 +893,7 @@ namespace BabisW
             }
             else
             {
-                CurrentAPILabel.Content = "Using WeAreDevs API";
+                CurrentAPILabel.Content = "Using Babis-W Engine";
                 Execution.SelectedAPI.API = "Selected API: WeAreDevs API";
             }
         }
@@ -918,7 +918,7 @@ namespace BabisW
                             IsInjected = Execution.ExecutionHandler.IsInjected();
                             if (IsInjected)
                             {
-                                SetInjectionStatus("WeAreDevs injected", Color.FromRgb(0, 192, 140));
+                                SetInjectionStatus("Babis-W is ready", Color.FromRgb(0, 192, 140));
                             }
                             else if (Execution.ExecutionHandler.InjectionTimedOut)
                             {
@@ -926,12 +926,12 @@ namespace BabisW
                             }
                             else if (!Execution.ExecutionHandler.WrapperResponsive)
                             {
-                                SetInjectionStatus("Wrapper not responding", Color.FromRgb(192, 110, 0));
+                                SetInjectionStatus("Babis-W engine unavailable", Color.FromRgb(192, 110, 0));
                             }
                             else
                             {
                                 ShowWindow(GetConsoleWindow(), 5);
-                                SetInjectionStatus("WeAreDevs injection in progress", Color.FromRgb(170, 192, 0));
+                                SetInjectionStatus("Babis-W is initializing", Color.FromRgb(170, 192, 0));
                             }
                         }
                         else
@@ -1948,34 +1948,6 @@ namespace BabisW
             ToolsGrid.Visibility = Visibility.Hidden;
             CustomisationGrid.Visibility = Visibility.Visible;
             SettingsGrid.Visibility = Visibility.Hidden;
-        }
-
-        private void WRDStatus_Loaded_1(object sender, RoutedEventArgs e)
-        {
-            // wrd status checker
-
-            string WRDStatusDl = WebStuff.DownloadString("https://cdn.wearedevs.net/software/jjsploit/tauri.json");
-
-
-
-
-            dynamic WRDStatusFormat = JsonConvert.DeserializeObject(WRDStatusDl);
-            bool IsWRDPatched = WRDStatusFormat.patched;
-            WRDStatusTextFromWe.Text = $"Message from WRD: {WRDStatusFormat.serverMessage}";
-
-            if (!IsWRDPatched) // not patch
-            {
-                WRDStatus.Fill = new SolidColorBrush(Color.FromRgb(40, 195, 126));
-                WRDStatusText.Text = "Unpatched and working!";
-            }
-            else
-            {
-                WRDStatus.Fill = new SolidColorBrush(Color.FromRgb(255, 30, 30));
-                WRDStatusText.Text = "Currently patched";
-            }
-
-
-
         }
 
         private void JoinTelegramGroup(object sender, MouseButtonEventArgs e)

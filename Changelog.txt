@@ -1,3 +1,17 @@
+== Babis-W Maintenance Update ==
+
+Fixes/removals
+• Replaced the native API startup probe with a safe wrapper readiness check.
+• Improved injection reliability after restarting Babis-W or Roblox.
+• Increased the injection request timeout so slow initialization is not reported as a lost connection.
+• Replaced external API branding in the interface with Babis-W branding.
+• Fixed the changelog panel so it reads this file from the repository.
+
+Updates
+• Added the Babis-W logo to the engine status panel.
+
+<------------------------------------------------------------------------------------------------------------------------------------->
+
 == Babis-W 15.2 SP2 Released ==
 Build number: 176
 Release date: 22 January 2026

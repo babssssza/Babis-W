@@ -18,5 +18,10 @@ namespace BabisW.Execution
         {
             Pipe.Dispose();
         }
+
+        public void ResetConnection()
+        {
+            Pipe.ResetConnection();
+        }
     }
 }

@@ -156,6 +156,14 @@ namespace BabisW.Execution
             }
         }
 
+        public void ResetConnection()
+        {
+            lock (Lock)
+            {
+                Disconnect();
+            }
+        }
+
         private void Disconnect()
         {
             Pipe?.Dispose();

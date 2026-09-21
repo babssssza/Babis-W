@@ -192,6 +192,14 @@ namespace BabisWWRDWrapper
                 // would be wise
                 switch (request.MessageType)
                 {
+                    case "Ping":
+                        response.Data = JsonConvert.SerializeObject(new InjectionRequest
+                        {
+                            InjectionSuccessful = true,
+                            AdditionalData = "Wrapper ready"
+                        });
+                        break;
+
                     case "Inject":
                         // initilise fake server
                         Console.WriteLine("inject");

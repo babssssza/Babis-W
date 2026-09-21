@@ -29,6 +29,7 @@ namespace BabisW.Execution
                 NativeExecutionStarted = false;
                 NativeHealthFailed = false;
                 InjectionStartedAt = DateTime.UtcNow;
+                SelectedAPI.NewPipe.ResetConnection();
 
                 // kill previous wrappers
                 try
@@ -91,7 +92,7 @@ namespace BabisW.Execution
                     var Response = SelectedAPI.NewPipe.SendRequest<InjectionRequest>(
                         "Inject",
                         new InjectionRequest { AdditionalData = "blank" },
-                        60000);
+                        120000);
                     Console.WriteLine($"injection result: {Response}");
                     if (Response.InjectionSuccessful == true)
                     {
@@ -105,7 +106,11 @@ namespace BabisW.Execution
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"error during injection: {ex.Message}");
+                    MessageBox.Show(
+                        "Babis-W could not complete the injection. Please make sure Roblox is fully loaded and try again.",
+                        "Babis-W",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
                     return false;
                 }
                 finally
@@ -123,9 +128,9 @@ namespace BabisW.Execution
         {
             try
             {
-                var response = SelectedAPI.NewPipe.SendRequest<IsInjectedRequest>(
-                    "IsInjected",
-                    new IsInjectedRequest { AdditionalData = "startup-check" });
+                var response = SelectedAPI.NewPipe.SendRequest<InjectionRequest>(
+                    "Ping",
+                    new InjectionRequest { AdditionalData = "startup-check" });
                 return response != null;
             }
             catch
