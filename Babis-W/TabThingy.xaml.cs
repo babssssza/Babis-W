@@ -51,8 +51,12 @@ namespace BabisW
                         img.BeginInit();
                         img.DecodePixelWidth = 200;
                         img.DecodePixelHeight = 100;
-                        img.UriSource = new Uri(filename, UriKind.RelativeOrAbsolute);
-                        imageBrush.ImageSource = img;
+                        if (!string.IsNullOrWhiteSpace(filename) &&
+                            Uri.TryCreate(filename, UriKind.RelativeOrAbsolute, out var imageUri))
+                        {
+                            img.UriSource = imageUri;
+                            imageBrush.ImageSource = img;
+                        }
                         img.CacheOption = BitmapCacheOption.None;
                         img.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
                         img.EndInit();

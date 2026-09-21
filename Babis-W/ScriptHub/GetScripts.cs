@@ -108,7 +108,7 @@ namespace BabisW.ScriptHub
 
                 var parsed = scripts.OfType<JObject>().Select(ParseScript).ToArray();
                 await PopulateScriptBodiesAsync(parsed, cancellationToken).ConfigureAwait(false);
-                return parsed;
+                return parsed.Where(script => !string.IsNullOrWhiteSpace(script.Title)).ToArray();
             }
         }
 
@@ -132,7 +132,7 @@ namespace BabisW.ScriptHub
                         script.Script = body;
                     }
                 }
-                catch
+                catch (Exception)
                 {
                     script.Script = string.Empty;
                 }

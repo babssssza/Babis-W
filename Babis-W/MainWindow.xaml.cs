@@ -1784,13 +1784,20 @@ namespace BabisW
             WP.Children.Clear();
             foreach (var scriptData in source ?? Enumerable.Empty<ScriptHub.ScriptData>())
             {
-                var obj = new TabThingy
+                try
                 {
-                    Script = scriptData
-                };
-                obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
-                obj.CopyScript += (_, _) => Clipboard.SetDataObject(obj.Script.Script);
-                WP.Children.Add(obj);
+                    var obj = new TabThingy
+                    {
+                        Script = scriptData
+                    };
+                    obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
+                    obj.CopyScript += (_, _) => Clipboard.SetDataObject(obj.Script.Script);
+                    WP.Children.Add(obj);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unable to render RScripts result '{scriptData.Title}': {ex.Message}");
+                }
             }
         }
 
@@ -1941,6 +1948,7 @@ namespace BabisW
                 var results = await ScriptHub.BabisWSC.SearchSCData(query).ConfigureAwait(true);
                 scripts = results;
                 RenderScriptHub(results);
+                Console.WriteLine($"RScripts returned {results.Length} result(s) for '{query}'.");
             }
             catch (Exception ex)
             {
