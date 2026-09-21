@@ -602,6 +602,9 @@ namespace BabisW
             Storyboard sb = TryFindResource("ScriptHubOpen") as Storyboard;
             sb.Begin();
 
+            IsScriptHubOpened = true;
+            RenderScriptHub(scripts);
+
             HomeGrid.Visibility = Visibility.Hidden;
             ExecutorGrid.Visibility = Visibility.Hidden;
             ScriptHubGrid.Visibility = Visibility.Visible;
@@ -1919,10 +1922,7 @@ namespace BabisW
 
         private async void SearchScriptHub(object sender, RoutedEventArgs e)
         {
-            if (!IsScriptHubOpened)
-            {
-                return;
-            }
+            IsScriptHubOpened = true;
 
             var query = GeneralScriptSearch.Text;
             if (query == "Search for a script here")
