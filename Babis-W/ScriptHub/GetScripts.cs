@@ -60,10 +60,55 @@ namespace BabisW.ScriptHub
             string query,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return FetchAsync(new ScriptHubFetchOptions
+            return SearchAsync(query, cancellationToken);
+        }
+
+        private static async Task<ScriptData[]> SearchAsync(
+            string query,
+            CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(query))
             {
-                Query = string.IsNullOrWhiteSpace(query) ? null : query.Trim()
-            }, cancellationToken);
+                return await FetchAsync(new ScriptHubFetchOptions(), cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            var normalizedQuery = query.Trim();
+            var results = await FetchAsync(new ScriptHubFetchOptions
+            {
+                Query = normalizedQuery
+            }, cancellationToken).ConfigureAwait(false);
+            if (results.Length > 0)
+            {
+                return results;
+            }
+
+            // Some catalogue mirrors intermittently ignore q. Search a few
+            // pages locally so a valid query does not appear empty.
+            var fallback = new List<ScriptData>();
+            for (var page = 1; page <= 3; page++)
+            {
+                var pageResults = await FetchAsync(new ScriptHubFetchOptions
+                {
+                    Page = page
+                }, cancellationToken).ConfigureAwait(false);
+                fallback.AddRange(pageResults.Where(script =>
+                    Contains(script.Title, normalizedQuery) ||
+                    Contains(script.Desc, normalizedQuery) ||
+                    Contains(script.GameName, normalizedQuery) ||
+                    Contains(script.Credits, normalizedQuery)));
+            }
+
+            return fallback
+                .GroupBy(script => string.IsNullOrWhiteSpace(script.Id) ? script.Title : script.Id)
+                .Select(group => group.First())
+                .ToArray();
+        }
+
+        private static bool Contains(string value, string query)
+        {
+            return !string.IsNullOrWhiteSpace(value) &&
+                value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static async Task<ScriptData[]> FetchAsync(

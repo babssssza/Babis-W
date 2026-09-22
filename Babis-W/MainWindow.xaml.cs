@@ -1997,7 +1997,13 @@ namespace BabisW
             }
             catch (Exception ex)
             {
+                WP.Children.Clear();
                 Console.WriteLine($"Unable to search RScripts: {ex.Message}");
+                MessageBox.Show(
+                    $"Script Hub search failed:\n{ex.Message}",
+                    "Script Hub",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
         }
 

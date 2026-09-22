@@ -48,18 +48,25 @@ namespace BabisW
                             img.Freeze();
                         };
 
-                        img.BeginInit();
-                        img.DecodePixelWidth = 200;
-                        img.DecodePixelHeight = 100;
                         if (!string.IsNullOrWhiteSpace(filename) &&
-                            Uri.TryCreate(filename, UriKind.RelativeOrAbsolute, out var imageUri))
+                            Uri.TryCreate(filename, UriKind.Absolute, out var imageUri))
                         {
-                            img.UriSource = imageUri;
-                            imageBrush.ImageSource = img;
+                            try
+                            {
+                                img.BeginInit();
+                                img.DecodePixelWidth = 200;
+                                img.DecodePixelHeight = 100;
+                                img.UriSource = imageUri;
+                                img.CacheOption = BitmapCacheOption.OnLoad;
+                                img.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+                                img.EndInit();
+                                imageBrush.ImageSource = img;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Unable to load Script Hub image: {ex.Message}");
+                            }
                         }
-                        img.CacheOption = BitmapCacheOption.None;
-                        img.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-                        img.EndInit();
                     });
                 })
                 { }.Start();
