@@ -91,6 +91,9 @@ namespace BabisW
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow); // show = 5, hide = 0
 
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
         // WINDOW INITILISATION //
         public MainWindow()
         {
@@ -824,7 +827,13 @@ namespace BabisW
                             {
                                 SetInjectionStatus("Injection failed", Color.FromRgb(192, 0, 0));
                             }
+                            else
+                            {
+                                InjectionToast.ShowAttached();
+                                HideNativeApiNotification();
+                            }
                         }
+
                         finally
                         {
                             InjectionInProgress = false;
@@ -836,6 +845,31 @@ namespace BabisW
             {
                 MessageBox.Show("Please open Roblox first before attempting to inject");
             }
+        }
+
+        private static void HideNativeApiNotification()
+        {
+            // The native API owns this legacy popup, so remove it after injection.
+            var dismissTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(250)
+            };
+            var attempts = 0;
+            dismissTimer.Tick += (sender, args) =>
+            {
+                attempts++;
+                var popup = FindWindow(null, "WeAreDevs API");
+                if (popup != IntPtr.Zero)
+                {
+                    ShowWindow(popup, 0);
+                }
+
+                if (attempts >= 24)
+                {
+                    dismissTimer.Stop();
+                }
+            };
+            dismissTimer.Start();
         }
 
         // Clear icon
