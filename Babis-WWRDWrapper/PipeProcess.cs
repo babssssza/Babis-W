@@ -252,7 +252,7 @@ namespace BabisWWRDWrapper
             {
                 response.Success = false;
                 response.ErrorMessage = $"{ex.GetType().Name}: {ex.Message}";
-                Console.WriteLine($"Request {request.MessageType} failed: {ex}");
+                Console.WriteLine($"Request {request?.MessageType ?? "<null>"} failed: {ex}");
             }
 
             return response;

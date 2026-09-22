@@ -40,7 +40,7 @@ namespace BabisW
         private const string GitHubRepository = "babsssszass/Babis-W";
         private const string GitHubRawBase = "https://raw.githubusercontent.com/" + GitHubRepository + "/main/";
         private const string NativeApiSha256 = "567C197658CB3FE2B1D5936B20D0DA5CCA7A5B505A9DA10D4003F5AF8B8D0705";
-        private const string NewtonsoftJsonNet45Sha256 = "E1E27AF7B07EEEDF5CE71A9255F0422816A6FC5849A483C6714E1B472044FA9D";
+        private const string NewtonsoftJsonNet6Sha256 = "22C649F75FCE5BE7C7CCDA8880473B634EF69ECF33F5D1AB8AD892CAF47D5A07";
 
         // The default text editor text
         string DefaultTextEditorText = "--[[\r\nWelcome to Babis-W!\r\nJoin Team Babis on Discord: https://discord.gg/75auNNfmhS\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"Babis-W\")";
@@ -158,13 +158,13 @@ namespace BabisW
                 var destination = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
                 var isNewtonsoftJson = string.Equals(fileName, "Newtonsoft.Json.dll", StringComparison.OrdinalIgnoreCase);
                 if (!File.Exists(destination) ||
-                    (isNewtonsoftJson && !HasSha256(destination, NewtonsoftJsonNet45Sha256)))
+                    (isNewtonsoftJson && !HasSha256(destination, NewtonsoftJsonNet6Sha256)))
                 {
                     Console.WriteLine($"Downloading {fileName}, please wait...");
                     TryDownloadFile(
                         GitHubRawBase + "Babis-W/bin/x64/Debug/" + fileName,
                         destination,
-                        isNewtonsoftJson ? NewtonsoftJsonNet45Sha256 : null);
+                        isNewtonsoftJson ? NewtonsoftJsonNet6Sha256 : null);
                 }
             }
             if (!File.Exists("wearedevs_exploit_api.dll"))

@@ -222,6 +222,9 @@ namespace BabisW.Execution
                 {
                     NativeHealthFailed = true;
                     Console.WriteLine($"Error while checking for isinjected res: {ex}");
+                    SelectedAPI.NewPipe.ResetConnection();
+                    StopWrapperProcesses();
+                    NativeExecutionStarted = false;
                     if ((DateTime.UtcNow - LastPipeWarning).TotalSeconds >= 10)
                     {
                         Console.WriteLine("The Babis-W wrapper is not responding. Start injection to reconnect.");

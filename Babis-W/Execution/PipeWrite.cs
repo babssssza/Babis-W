@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
@@ -81,6 +82,8 @@ namespace BabisW.Execution
                         ex is TimeoutException ||
                         ex is InvalidDataException ||
                         ex is EndOfStreamException ||
+                        ex is ObjectDisposedException ||
+                        ex is Win32Exception ||
                         ex is JsonException)
                     {
                         lastError = ex;
