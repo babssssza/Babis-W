@@ -54,6 +54,7 @@ namespace BabisW
         // Scripthub stuff
         bool IsScriptHubOpened = false;
         bool IsGameHubOpened = false;
+        private int scriptSearchGeneration;
 
         // Theme
         bool IsDefaultTheme = true; // So it won't apply on startup smh
@@ -1847,6 +1848,28 @@ namespace BabisW
             }
         }
 
+        private IEnumerable<ScriptHub.ScriptData> FilterScriptHubResults(
+                IEnumerable<ScriptHub.ScriptData> source,
+                string query)
+            {
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    return source ?? Enumerable.Empty<ScriptHub.ScriptData>();
+                }
+
+                return (source ?? Enumerable.Empty<ScriptHub.ScriptData>()).Where(script =>
+                    ContainsSearchText(script.Title, query) ||
+                    ContainsSearchText(script.Desc, query) ||
+                    ContainsSearchText(script.Credits, query) ||
+                    ContainsSearchText(script.GameName, query));
+            }
+
+            private static bool ContainsSearchText(string value, string query)
+            {
+                return !string.IsNullOrWhiteSpace(value) &&
+                    value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
         private async Task<ScriptHub.ScriptData> LoadScriptHubEntryAsync(ScriptHub.ScriptData script)
             {
                 if (string.IsNullOrWhiteSpace(script.Script))
@@ -2041,6 +2064,14 @@ namespace BabisW
                 query = string.Empty;
             }
 
+            var searchGeneration = ++scriptSearchGeneration;
+            var localResults = FilterScriptHubResults(scripts, query).ToArray();
+            if (localResults.Length > 0 || (string.IsNullOrWhiteSpace(query) && scripts.Length > 0))
+            {
+                RenderScriptHub(localResults);
+                return;
+            }
+
             try
             {
                 WP.Children.Clear();
@@ -2051,12 +2082,22 @@ namespace BabisW
                     Margin = new Thickness(8, 8, 0, 0)
                 });
                 var results = await ScriptHub.BabisWSC.SearchSCData(query).ConfigureAwait(true);
+                if (searchGeneration != scriptSearchGeneration)
+                {
+                    return;
+                }
+
                 scripts = results;
                 RenderScriptHub(results);
                 Console.WriteLine($"RScripts returned {results.Length} result(s) for '{query}'.");
             }
             catch (Exception ex)
             {
+                if (searchGeneration != scriptSearchGeneration)
+                {
+                    return;
+                }
+
                 WP.Children.Clear();
                 Console.WriteLine($"Unable to search RScripts: {ex.Message}");
                 MessageBox.Show(
@@ -2064,6 +2105,15 @@ namespace BabisW
                     "Script Hub",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
+            }
+        }
+
+        private void GeneralScriptSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SearchScriptHub(sender, e);
+                e.Handled = true;
             }
         }
 
