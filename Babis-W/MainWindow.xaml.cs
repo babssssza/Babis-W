@@ -39,8 +39,6 @@ namespace BabisW
         private const string CurrentVersion = "Babis-W 15.2 SP3";
         private const string GitHubRepository = "babsssszass/Babis-W";
         private const string GitHubRawBase = "https://raw.githubusercontent.com/" + GitHubRepository + "/main/";
-        private const string NativeApiSha256 = "567C197658CB3FE2B1D5936B20D0DA5CCA7A5B505A9DA10D4003F5AF8B8D0705";
-        private const string NewtonsoftJsonNet6Sha256 = "22C649F75FCE5BE7C7CCDA8880473B634EF69ECF33F5D1AB8AD892CAF47D5A07";
 
         // The default text editor text
         string DefaultTextEditorText = "--[[\r\nWelcome to Babis-W!\r\nJoin Team Babis on Discord: https://discord.gg/75auNNfmhS\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"Babis-W\")";
@@ -138,71 +136,6 @@ namespace BabisW
             {
                 Console.WriteLine("Created new directory: Workspace");
                 Directory.CreateDirectory("Workspace");
-            }
-
-            // Keep an existing wrapper installation. Missing files are downloaded below.
-            Console.WriteLine("Checking to see if the Babis-W wrapper is installed");
-
-            var wrapperFiles = new[]
-            {
-                "Babis-WWRDWrapper.deps.json",
-                "Babis-WWRDWrapper.dll",
-                "Babis-WWRDWrapper.exe",
-                "Babis-WWRDWrapper.pdb",
-                "Babis-WWRDWrapper.runtimeconfig.json",
-                "Newtonsoft.Json.dll",
-                "WRDFakeServer.exe"
-            };
-            foreach (var fileName in wrapperFiles)
-            {
-                var destination = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-                var isNewtonsoftJson = string.Equals(fileName, "Newtonsoft.Json.dll", StringComparison.OrdinalIgnoreCase);
-                if (!File.Exists(destination) ||
-                    (isNewtonsoftJson && !HasSha256(destination, NewtonsoftJsonNet6Sha256)))
-                {
-                    Console.WriteLine($"Downloading {fileName}, please wait...");
-                    TryDownloadFile(
-                        GitHubRawBase + "Babis-W/bin/x64/Debug/" + fileName,
-                        destination,
-                        isNewtonsoftJson ? NewtonsoftJsonNet6Sha256 : null);
-                }
-            }
-            if (!File.Exists("wearedevs_exploit_api.dll"))
-            {
-                Console.WriteLine("Downloading wearedevs_exploit_api.dll, please wait...");
-                TryDownloadFile(
-                    "https://wrdcdn.net/r/2/exploit%20api/wearedevs_exploit_api.dll",
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wearedevs_exploit_api.dll"),
-                    NativeApiSha256);
-            }
-
-            // OpenSSL req for cert signing
-            Console.WriteLine("Checking to see if OpenSSL is downloaded...");
-
-            if (!Directory.Exists("OpenSSL"))
-            {
-                Console.WriteLine("Created new directory: OpenSSL");
-                Directory.CreateDirectory("OpenSSL");
-            }
-            if (!File.Exists("OpenSSL\\msys-2.0.dll"))
-            {
-                Console.WriteLine("Downloading msys-2.0.dll...");
-                TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
-            }
-            if (!File.Exists("OpenSSL\\msys-crypto-3.dll"))
-            {
-                Console.WriteLine("Downloading msys-crypto-3.dll...");
-                TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
-            }
-            if (!File.Exists("OpenSSL\\msys-ssl-3.dll"))
-            {
-                Console.WriteLine("Downloading msys-ssl-3.dll...");
-                TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
-            }
-            if (!File.Exists("OpenSSL\\openssl.exe"))
-            {
-                Console.WriteLine("Downloading openssl.exe...");
-                TryDownloadFile(GitHubRawBase + "Babis-W/bin/x64/Debug/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
             }
 
             // Theme checking for Avalon stuff, etc
@@ -815,30 +748,23 @@ namespace BabisW
                 InjectionInProgress = true;
 
                 // wrd
-                if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+                if (Execution.SelectedAPI.API == "Selected API: Quorum API")
                 {
-                    ShowWindow(GetConsoleWindow(), 5);
-                    // wrd
-                    if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+                    try
                     {
-                        ShowWindow(GetConsoleWindow(), 5);
-                        try
+                        if (!ExecutionHandler.Inject())
                         {
-                            if (!ExecutionHandler.Inject())
-                            {
-                                SetInjectionStatus("Injection failed", Color.FromRgb(192, 0, 0));
-                            }
-                            else
-                            {
-                                InjectionToast.ShowAttached();
-                                HideNativeApiNotification();
-                            }
+                            SetInjectionStatus("Injection failed", Color.FromRgb(192, 0, 0));
                         }
-
-                        finally
+                        else
                         {
-                            InjectionInProgress = false;
+                            InjectionToast.ShowAttached();
+                            HideNativeApiNotification();
                         }
+                    }
+                    finally
+                    {
+                        InjectionInProgress = false;
                     }
                 }
             }
@@ -952,13 +878,24 @@ namespace BabisW
             if (key != null)
             {
                 string apishouldbe = (key.GetValue("DLL").ToString());
-                CurrentAPILabel.Content = apishouldbe;
+                if (apishouldbe == "Selected API: WeAreDevs API")
+                {
+                    apishouldbe = "Selected API: Quorum API";
+                    key.Close();
+                    key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\BabisWData");
+                    key.SetValue("DLL", apishouldbe);
+                }
+
+                CurrentAPILabel.Content = apishouldbe == "Selected API: Quorum API"
+                    ? "Using Quorum API"
+                    : apishouldbe;
                 Execution.SelectedAPI.API = apishouldbe;
+                key.Close();
             }
             else
             {
-                CurrentAPILabel.Content = "Using Babis-W Engine";
-                Execution.SelectedAPI.API = "Selected API: WeAreDevs API";
+                CurrentAPILabel.Content = "Using Quorum API";
+                Execution.SelectedAPI.API = "Selected API: Quorum API";
             }
         }
 
@@ -974,10 +911,9 @@ namespace BabisW
                 Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
                 if (pname.Length > 0)
                 {
-                    if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+                    if (Execution.SelectedAPI.API == "Selected API: Quorum API")
                     {
-                        Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
-                        if (pname1.Length > 0 && !Execution.ExecutionHandler.InjectionInProgress)
+                        if (!Execution.ExecutionHandler.InjectionInProgress)
                         {
                             IsInjected = Execution.ExecutionHandler.IsInjected();
                             if (IsInjected)
@@ -994,7 +930,6 @@ namespace BabisW
                             }
                             else
                             {
-                                ShowWindow(GetConsoleWindow(), 5);
                                 SetInjectionStatus("Babis-W is initializing", Color.FromRgb(170, 192, 0));
                             }
                         }
@@ -1101,15 +1036,15 @@ namespace BabisW
         // SETTINGS GRID FUNCTIONS //
         // There are multiple tabs on this grid //
 
-        // WeAreDevs API selection
+        // Quorum API selection
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Execution.SelectedAPI.API = "Selected API: WeAreDevs API";
-            CurrentAPILabel.Content = "Using WeAreDevs API";
+            Execution.SelectedAPI.API = "Selected API: Quorum API";
+            CurrentAPILabel.Content = "Using Quorum API";
             RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\BabisWData");
-            key.SetValue("DLL", "Selected API: WeAreDevs API");
+            key.SetValue("DLL", "Selected API: Quorum API");
             key.Close();
-            MessageBox.Show("API set to WeAreDevs", "BabisW");
+            MessageBox.Show("API set to Quorum", "BabisW");
         }
 
         // Join Discord for help button

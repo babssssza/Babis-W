@@ -2140,7 +2140,7 @@
                     <TextBlock HorizontalAlignment="Right" Height="31" TextWrapping="Wrap" VerticalAlignment="Center" Width="489" Foreground="#FFD1CFCF" FontFamily="Calibri Light" FontSize="19" Margin="0,2,0,325.4" TextAlignment="Center"><Run Text="API Selection"/><LineBreak/><Run/></TextBlock>
                     <Border BorderThickness="1" HorizontalAlignment="Center" Height="49" Margin="0,36,0,0" CornerRadius="9 9 9 9" VerticalAlignment="Top" Width="241" Background="#19000000" BorderBrush="#19A5A5A5"/>
                     <Image x:Name="BabisWApiLogo" Source="Babis-WIcon.png" HorizontalAlignment="Left" Height="25" Margin="130,41,0,0" VerticalAlignment="Top" Width="25" Stretch="Uniform"/>
-                    <Button Content="Use" Margin="321,43,129,283" Background="#23656565" Template ="{DynamicResource NoHighlightBut}" Foreground="#FFE2E2E2" BorderBrush="{x:Null}" Click="Button_Click_1" Opacity="0.75">
+                    <Button Content="Use Quorum" Margin="321,43,129,283" Background="#23656565" Template ="{DynamicResource NoHighlightBut}" Foreground="#FFE2E2E2" BorderBrush="{x:Null}" Click="Button_Click_1" Opacity="0.75">
                         <Button.Style>
                             <Style TargetType="{x:Type Button}">
                                 <Style.Triggers>
