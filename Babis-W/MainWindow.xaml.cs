@@ -648,8 +648,6 @@ namespace BabisW
         {
             CloseCompleted = true;
             // just in case
-            try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
-            try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
             Environment.Exit(0);
         }
 
@@ -728,75 +726,55 @@ namespace BabisW
         }
 
         // Injection icon
-        private void Inject(object sender, MouseButtonEventArgs e)
+        private async void Inject(object sender, MouseButtonEventArgs e)
         {
             Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
-            if (Execution.ExecutionHandler.NativeHealthFailed)
-            {
-                SetInjectionStatus("Native API stopped responding", Color.FromRgb(192, 0, 0));
-            }
-            else if (IsInjected)
+            if (IsInjected)
             {
                 MessageBox.Show("The API has already been injected. Attempting to inject twice will result in a crash");
             }
-            else if (InjectionInProgress)
+            else if (InjectionInProgress || Execution.ExecutionHandler.InjectionInProgress)
             {
                 MessageBox.Show("Injection is already in process");
             }
             else if (pname.Length > 0) // If Roblox is running
             {
                 InjectionInProgress = true;
-
-                // wrd
-                if (Execution.SelectedAPI.API == "Selected API: Quorum API")
+                SetInjectionStatus("Babis-W is injecting...", Color.FromRgb(170, 192, 0));
+                try
                 {
-                    try
+                    if (!await ExecutionHandler.InjectAsync())
                     {
-                        if (!ExecutionHandler.Inject())
+                        IsInjected = false;
+                        SetInjectionStatus(
+                            Execution.ExecutionHandler.NativeHealthFailed
+                                ? "Quorum API unavailable"
+                                : "Injection failed",
+                            Color.FromRgb(192, 0, 0));
+                    }
+                    else
+                    {
+                        IsInjected = ExecutionHandler.IsInjected();
+                        if (IsInjected)
                         {
-                            SetInjectionStatus("Injection failed", Color.FromRgb(192, 0, 0));
+                            InjectionToast.ShowAttached();
+                            SetInjectionStatus("Babis-W is ready", Color.FromRgb(0, 192, 140));
                         }
                         else
                         {
-                            InjectionToast.ShowAttached();
-                            HideNativeApiNotification();
+                            SetInjectionStatus("Injection is initializing", Color.FromRgb(170, 192, 0));
                         }
                     }
-                    finally
-                    {
-                        InjectionInProgress = false;
-                    }
+                }
+                finally
+                {
+                    InjectionInProgress = false;
                 }
             }
             else
             {
                 MessageBox.Show("Please open Roblox first before attempting to inject");
             }
-        }
-
-        private static void HideNativeApiNotification()
-        {
-            // The native API owns this legacy popup, so remove it after injection.
-            var dismissTimer = new System.Windows.Threading.DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(250)
-            };
-            var attempts = 0;
-            dismissTimer.Tick += (sender, args) =>
-            {
-                attempts++;
-                var popup = FindWindow(null, "WeAreDevs API");
-                if (popup != IntPtr.Zero)
-                {
-                    ShowWindow(popup, 0);
-                }
-
-                if (attempts >= 24)
-                {
-                    dismissTimer.Stop();
-                }
-            };
-            dismissTimer.Start();
         }
 
         // Clear icon
@@ -941,8 +919,7 @@ namespace BabisW
                 }
                 else
                 {
-                    try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
-                    try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
+                    IsInjected = false;
                     SetInjectionStatus("Roblox not opened", Color.FromRgb(192, 0, 0));
                     InjectionInProgress = false;
                 }
