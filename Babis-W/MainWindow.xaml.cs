@@ -1790,8 +1790,8 @@ namespace BabisW
                     {
                         Script = scriptData
                     };
-                    obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
-                    obj.CopyScript += (_, _) => Clipboard.SetDataObject(obj.Script.Script);
+                    obj.Executed += async (_, _) => await ExecuteScriptHubEntryAsync(obj.Script);
+                    obj.CopyScript += async (_, _) => await CopyScriptHubEntryAsync(obj.Script);
                     WP.Children.Add(obj);
                 }
                 catch (Exception ex)
@@ -1801,6 +1801,51 @@ namespace BabisW
             }
         }
 
+        private async Task<ScriptHub.ScriptData> LoadScriptHubEntryAsync(ScriptHub.ScriptData script)
+            {
+                if (string.IsNullOrWhiteSpace(script.Script))
+                {
+                    script.Script = await ScriptHub.BabisWSC.DownloadScriptAsync(
+                        script.RawScriptUrl,
+                        CancellationToken.None).ConfigureAwait(true);
+                }
+
+                return script;
+            }
+
+        private async Task ExecuteScriptHubEntryAsync(ScriptHub.ScriptData script)
+            {
+                try
+                {
+                    var loaded = await LoadScriptHubEntryAsync(script).ConfigureAwait(true);
+                    Execution.ExecutionHandler.Execute(loaded.Script);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Unable to load this script from RScripts:\n{ex.Message}",
+                        "Script Hub",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            }
+
+        private async Task CopyScriptHubEntryAsync(ScriptHub.ScriptData script)
+            {
+                try
+                {
+                    var loaded = await LoadScriptHubEntryAsync(script).ConfigureAwait(true);
+                    Clipboard.SetDataObject(loaded.Script);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Unable to load this script from RScripts:\n{ex.Message}",
+                        "Script Hub",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            }
         private void ScriptHubRadioButtonClick(object sender, RoutedEventArgs e)
         {
             if (IsScriptHubOpened == false)

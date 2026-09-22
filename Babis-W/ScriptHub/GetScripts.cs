@@ -15,6 +15,7 @@ namespace BabisW.ScriptHub
         public string Id;
         public string Title;
         public string Script;
+        public string RawScriptUrl;
         public string Desc;
         public string Credits;
         public string ImageURL;
@@ -106,44 +107,32 @@ namespace BabisW.ScriptHub
                     throw new InvalidOperationException("RScripts response did not contain a scripts list.");
                 }
 
-                var parsed = scripts.OfType<JObject>().Select(ParseScript).ToArray();
-                await PopulateScriptBodiesAsync(parsed, cancellationToken).ConfigureAwait(false);
-                return parsed.Where(script => !string.IsNullOrWhiteSpace(script.Title)).ToArray();
+                return scripts.OfType<JObject>()
+                    .Select(ParseScript)
+                    .Where(script => !string.IsNullOrWhiteSpace(script.Title))
+                    .ToArray();
             }
         }
 
-        private static async Task PopulateScriptBodiesAsync(
-            ScriptData[] scripts,
+        public static async Task<string> DownloadScriptAsync(
+            string rawScriptUrl,
             CancellationToken cancellationToken)
         {
-            var tasks = scripts.Select(async script =>
+            if (string.IsNullOrWhiteSpace(rawScriptUrl))
             {
-                if (string.IsNullOrWhiteSpace(script.Script))
-                {
-                    return script;
-                }
+                throw new InvalidOperationException("This catalogue entry does not contain a raw script URL.");
+            }
 
-                try
-                {
-                    using (var response = await Client.GetAsync(script.Script, cancellationToken).ConfigureAwait(false))
-                    {
-                        response.EnsureSuccessStatusCode();
-                        var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        script.Script = body;
-                    }
-                }
-                catch (Exception)
-                {
-                    script.Script = string.Empty;
-                }
-
-                return script;
-            });
-
-            var completed = await Task.WhenAll(tasks).ConfigureAwait(false);
-            for (var index = 0; index < scripts.Length; index++)
+            using (var response = await Client.GetAsync(rawScriptUrl, cancellationToken).ConfigureAwait(false))
             {
-                scripts[index] = completed[index];
+                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode || string.IsNullOrWhiteSpace(body))
+                {
+                    throw new HttpRequestException(
+                        $"RScripts raw script request failed with {(int)response.StatusCode} ({response.ReasonPhrase}).");
+                }
+
+                return body;
             }
         }
 
@@ -163,7 +152,8 @@ namespace BabisW.ScriptHub
             {
                 Id = script.Value<string>("_id") ?? string.Empty,
                 Title = script.Value<string>("title") ?? "Untitled script",
-                Script = NormalizeUrl(rawScript),
+                Script = string.Empty,
+                RawScriptUrl = NormalizeUrl(rawScript),
                 Desc = script.Value<string>("description") ?? game?.Value<string>("title") ?? "Roblox script",
                 Credits = user?.Value<string>("username") ?? "RScripts",
                 ImageURL = NormalizeUrl(script.Value<string>("image") ?? game?.Value<string>("imgurl")),
