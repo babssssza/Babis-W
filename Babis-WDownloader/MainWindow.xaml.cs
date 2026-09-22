@@ -34,7 +34,10 @@ namespace BabisW_Bootstrapper
         private const string ExecutableName = "Babis-W.exe";
         private const string InstallDirectory = "Babis-W";
         private const string GitHubRepository = "babssssza/Babis-W";
-        private const string LatestReleaseDownload = "https://raw.githubusercontent.com/" + GitHubRepository + "/main/Babis-W/bin/Release/" + ExecutableName;
+        private const string DistributionBranch = "babis-w-new-injection";
+        private const string LatestReleaseDownload = "https://raw.githubusercontent.com/" + GitHubRepository + "/" + DistributionBranch + "/Babis-W/bin/Release/" + ExecutableName;
+        private const string QuorumApiDownload = "https://raw.githubusercontent.com/" + GitHubRepository + "/" + DistributionBranch + "/Babis-W/QuorumAPI.dll";
+        private const string QuorumApiName = "QuorumAPI.dll";
 
         // WebClient Creation
         WebClient WebStuff = new WebClient(); // Create a new generally used WebClient
@@ -370,6 +373,26 @@ namespace BabisW_Bootstrapper
                 }
 
                 DownloadDetails.Content = "Download complete";
+                try
+                {
+                    DownloadDetails.Content = "Downloading Quorum API...";
+                    await WebStuff.DownloadFileTaskAsync(
+                        new Uri(QuorumApiDownload),
+                        System.IO.Path.Combine(InstallDirectory, QuorumApiName));
+                }
+                catch (Exception apiError)
+                {
+                    DownloadDetails.Content = "Quorum API download failed.";
+                    MessageBox.Show(
+                        apiError.Message,
+                        ProductName + " Downloader",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    InstallButton.IsEnabled = true;
+                    return;
+                }
+
+                DownloadDetails.Content = "Babis-W and Quorum API installed";
                 await Task.Delay(500);
                 Fade(DownloadingBabisW, 1, 0, 0.5);
                 Fade(Gif4, 0.8, 0, 0.5);
