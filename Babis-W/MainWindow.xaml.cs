@@ -1782,7 +1782,19 @@ namespace BabisW
         private void RenderScriptHub(IEnumerable<ScriptHub.ScriptData> source)
         {
             WP.Children.Clear();
-            foreach (var scriptData in source ?? Enumerable.Empty<ScriptHub.ScriptData>())
+            var results = (source ?? Enumerable.Empty<ScriptHub.ScriptData>()).ToArray();
+            if (results.Length == 0)
+            {
+                WP.Children.Add(new TextBlock
+                {
+                    Text = "No scripts found. Try another search.",
+                    Foreground = new SolidColorBrush(Color.FromRgb(190, 190, 190)),
+                    Margin = new Thickness(8, 8, 0, 0)
+                });
+                return;
+            }
+
+            foreach (var scriptData in results)
             {
                 try
                 {
@@ -1981,15 +1993,29 @@ namespace BabisW
         private async void SearchScriptHub(object sender, RoutedEventArgs e)
         {
             IsScriptHubOpened = true;
+            HomeGrid.Visibility = Visibility.Hidden;
+            ExecutorGrid.Visibility = Visibility.Hidden;
+            ScriptHubGrid.Visibility = Visibility.Visible;
+            GameHubGrid.Visibility = Visibility.Hidden;
+            ToolsGrid.Visibility = Visibility.Hidden;
+            CustomisationGrid.Visibility = Visibility.Hidden;
+            SettingsGrid.Visibility = Visibility.Hidden;
 
-            var query = GeneralScriptSearch.Text;
-            if (query == "Search for a script here")
+            var query = (GeneralScriptSearch.Text ?? string.Empty).Trim();
+            if (string.Equals(query, "Search for a script here", StringComparison.OrdinalIgnoreCase))
             {
                 query = string.Empty;
             }
 
             try
             {
+                WP.Children.Clear();
+                WP.Children.Add(new TextBlock
+                {
+                    Text = "Searching scripts...",
+                    Foreground = new SolidColorBrush(Color.FromRgb(190, 190, 190)),
+                    Margin = new Thickness(8, 8, 0, 0)
+                });
                 var results = await ScriptHub.BabisWSC.SearchSCData(query).ConfigureAwait(true);
                 scripts = results;
                 RenderScriptHub(results);
