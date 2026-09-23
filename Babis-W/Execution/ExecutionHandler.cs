@@ -21,6 +21,7 @@ namespace BabisW.Execution
         public static bool NativeExecutionStarted { get; private set; }
         public static bool NativeHealthFailed { get; private set; }
         private static readonly SemaphoreSlim InjectionGate = new SemaphoreSlim(1, 1);
+        private static int CommunicationStarted;
 
         public static async Task<bool> InjectAsync()
         {
@@ -41,9 +42,13 @@ namespace BabisW.Execution
                 var attached = await Task.Run(() =>
                 {
                     QuorumModule.UseAutoUpdate(true);
-                    QuorumModule.SetAttachNotify(null);
-                    return QuorumModule.AttachAPI();
+                    return QuorumModule.AttachAPIAsync();
                 });
+
+                if (attached)
+                {
+                    EnsureCommunication();
+                }
 
                 return attached;
             }
@@ -78,7 +83,7 @@ namespace BabisW.Execution
             {
                 try
                 {
-                    if (!await QuorumModule.ExecuteScript(script))
+                    if (!await QuorumModule.ExecuteScript(script, null))
                     {
                         throw new InvalidOperationException("Quorum API rejected the script.");
                     }
@@ -97,6 +102,7 @@ namespace BabisW.Execution
             {
                 try
                 {
+                    EnsureCommunication();
                     var attached = QuorumModule.IsAttached();
                     WrapperResponsive = true;
                     if (attached)
@@ -135,6 +141,33 @@ namespace BabisW.Execution
         public static void Stop()
         {
             NativeExecutionStarted = false;
+            if (Interlocked.Exchange(ref CommunicationStarted, 0) == 1)
+            {
+                try
+                {
+                    QuorumModule.StopCommunication();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error stopping Quorum communication: {ex.Message}");
+                }
+            }
+        }
+
+        private static void EnsureCommunication()
+        {
+            if (Interlocked.CompareExchange(ref CommunicationStarted, 1, 0) == 0)
+            {
+                try
+                {
+                    QuorumModule.StartCommunication();
+                }
+                catch
+                {
+                    Interlocked.Exchange(ref CommunicationStarted, 0);
+                    throw;
+                }
+            }
         }
     }
 }
