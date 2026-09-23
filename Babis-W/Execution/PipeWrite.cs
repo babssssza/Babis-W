@@ -1,10 +1,12 @@
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BabisW.Execution
@@ -40,17 +42,20 @@ namespace BabisW.Execution
             }
         }
 
-        public T SendRequest<T>(string messageType, object data)
+        public T SendRequest<T>(string messageType, object data, int requestTimeoutMs = 5000)
         {
             lock (Lock) // requests are sent one at a time
             {
                 if (Disposed) throw new ObjectDisposedException(nameof(PipeWrite)); // unlikely case
 
-                for (var attempt = 0; attempt < 2; attempt++)
+                Exception lastError = null;
+                for (var attempt = 0; attempt < 3; attempt++)
                 {
                     try
                     {
                         EnsureConnected();
+                        Pipe.ReadTimeout = requestTimeoutMs;
+                        Pipe.WriteTimeout = requestTimeoutMs;
                         var Req = new RequestMessage
                         {
                             MessageType = messageType,
@@ -60,26 +65,39 @@ namespace BabisW.Execution
                         WriteMessage(Pipe, Req);
                         var Res = ReadMessage(Pipe);
 
+                        if (Res == null)
+                        {
+                            throw new InvalidDataException("The wrapper returned an empty response.");
+                        }
+
                         if (!Res.Success)
                         {
-                            throw new Exception($"error: {Res.ErrorMessage}");
+                            throw new Exception($"The wrapper rejected the request: {Res.ErrorMessage}");
                         }
 
                         return JsonConvert.DeserializeObject<T>(Res.Data);
                     }
-                    catch (IOException)
+                    catch (Exception ex) when (
+                        ex is IOException ||
+                        ex is TimeoutException ||
+                        ex is InvalidDataException ||
+                        ex is EndOfStreamException ||
+                        ex is ObjectDisposedException ||
+                        ex is Win32Exception ||
+                        ex is JsonException)
                     {
+                        lastError = ex;
                         Disconnect();
-                        if (attempt == 1) throw;
-                    }
-                    catch (TimeoutException)
-                    {
-                        Disconnect();
-                        if (attempt == 1) throw;
+                        if (attempt < 2)
+                        {
+                            Thread.Sleep(250);
+                        }
                     }
                 }
 
-                throw new InvalidOperationException("The Babis-W wrapper connection failed.");
+                throw new InvalidOperationException(
+                    "The Babis-W wrapper connection was lost. Restart injection and try again.",
+                    lastError);
             }
         }
 
@@ -138,6 +156,14 @@ namespace BabisW.Execution
                     Disconnect();
                     Disposed = true;
                 }
+            }
+        }
+
+        public void ResetConnection()
+        {
+            lock (Lock)
+            {
+                Disconnect();
             }
         }
 

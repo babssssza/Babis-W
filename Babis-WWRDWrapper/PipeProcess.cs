@@ -141,8 +141,9 @@ namespace BabisWWRDWrapper
 
                 return JsonConvert.DeserializeObject<RequestMessage>(Encoding.UTF8.GetString(MessageBuffer));
             }
-            catch
+            catch (JsonException ex)
             {
+                Console.WriteLine($"Invalid request payload: {ex.Message}");
                 return null;
             }
         }
@@ -181,9 +182,24 @@ namespace BabisWWRDWrapper
 
             try
             {
+                if (request == null || string.IsNullOrWhiteSpace(request.MessageType))
+                {
+                    response.Success = false;
+                    response.ErrorMessage = "The request was empty or missing its message type.";
+                    return response;
+                }
+
                 // would be wise
                 switch (request.MessageType)
                 {
+                    case "Ping":
+                        response.Data = JsonConvert.SerializeObject(new InjectionRequest
+                        {
+                            InjectionSuccessful = true,
+                            AdditionalData = "Wrapper ready"
+                        });
+                        break;
+
                     case "Inject":
                         // initilise fake server
                         Console.WriteLine("inject");
@@ -236,7 +252,7 @@ namespace BabisWWRDWrapper
             {
                 response.Success = false;
                 response.ErrorMessage = $"{ex.GetType().Name}: {ex.Message}";
-                Console.WriteLine($"Request {request.MessageType} failed: {ex}");
+                Console.WriteLine($"Request {request?.MessageType ?? "<null>"} failed: {ex}");
             }
 
             return response;

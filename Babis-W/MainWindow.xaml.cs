@@ -9,12 +9,15 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -34,6 +37,8 @@ namespace BabisW
         // VARIABLES //
         private const string DiscordInviteUrl = "https://discord.gg/75auNNfmhS";
         private const string CurrentVersion = "Babis-W 15.2 SP3";
+        private const string GitHubRepository = "babsssszass/Babis-W";
+        private const string GitHubRawBase = "https://raw.githubusercontent.com/" + GitHubRepository + "/main/";
 
         // The default text editor text
         string DefaultTextEditorText = "--[[\r\nWelcome to Babis-W!\r\nJoin Team Babis on Discord: https://discord.gg/75auNNfmhS\r\n--]]\r\n-- Paste in your text below this comment.\r\n\r\nprint(\"Babis-W\")";
@@ -47,6 +52,7 @@ namespace BabisW
         // Scripthub stuff
         bool IsScriptHubOpened = false;
         bool IsGameHubOpened = false;
+        private int scriptSearchGeneration;
 
         // Theme
         bool IsDefaultTheme = true; // So it won't apply on startup smh
@@ -71,7 +77,7 @@ namespace BabisW
         bool IsInjected = false;
 
         // Variables for custom icons (to be implemented in the future)
-        Array scripts = Array.Empty<ScriptHub.ScriptData>();
+        ScriptHub.ScriptData[] scripts = Array.Empty<ScriptHub.ScriptData>();
         Array gamescripts = Array.Empty<ScriptHub.GameScriptData>();
 
         // WebClient Creation
@@ -83,6 +89,9 @@ namespace BabisW
 
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow); // show = 5, hide = 0
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         // WINDOW INITILISATION //
         public MainWindow()
@@ -129,118 +138,59 @@ namespace BabisW
                 Directory.CreateDirectory("Workspace");
             }
 
-            // Keep an existing wrapper installation. Missing files are downloaded below.
-            Console.WriteLine("Checking to see if the Babis-W wrapper is installed");
-
-            if (!File.Exists("Babis-WWRDWrapper.deps.json"))
-            {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.deps.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.deps.json", "Babis-WWRDWrapper.deps.json");
-            }
-            if (!File.Exists("Babis-WWRDWrapper.dll"))
-            {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.dll, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.dll", "Babis-WWRDWrapper.dll");
-            }
-            if (!File.Exists("Babis-WWRDWrapper.exe"))
-            {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.exe, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.exe", "Babis-WWRDWrapper.exe");
-            }
-            if (!File.Exists("Babis-WWRDWrapper.pdb"))
-            {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.pdb, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.pdb", "Babis-WWRDWrapper.pdb");
-            }
-            if (!File.Exists("Babis-WWRDWrapper.runtimeconfig.json"))
-            {
-                Console.WriteLine("Downloading Babis-WWRDWrapper.runtimeconfig.json, please wait...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/Babis-WWRDWrapper.runtimeconfig.json", "Babis-WWRDWrapper.runtimeconfig.json");
-            }
-            if (!File.Exists("WRDFakeServer.exe"))
-            {
-                Console.WriteLine("Downloading WRDFakeServer.exe, please wait (this will take some time)...");
-                WebStuff.DownloadFile("https://github.com/babssssza/Babis-W/raw/main/Babis-W/bin/x64/Debug/WRDFakeServer.exe", "WRDFakeServer.exe");
-            }
-            if (!File.Exists("wearedevs_exploit_api.dll"))
-            {
-                try
-                {
-                    Console.WriteLine("Downloading wearedevs_exploit_api.dll, please wait...");
-                    WebStuff.DownloadFile("https://wrdcdn.net/r/2/exploit%20api/wearedevs_exploit_api.dll", "wearedevs_exploit_api.dll");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Failed to download original wearedevs_exploit_api.dll: " + ex + ", so now will try GitHub mirror");
-                    try
-                    {
-                        WebStuff.DownloadFile("https://github.com/wcrddn/wcrddn.github.io/raw/main/wearedevs_exploit_api.dll", "wearedevs_exploit_api.dll");
-                    }
-                    catch (Exception ex1)
-                    {
-                        Console.WriteLine("Failed to download wearedevs_exploit_api.dll even from mirror: " + ex1 + "\nBabisW DEPENDS on the existence of this file, so BabisW cannot be ran. Please contact BabisW staff for help...");
-                    }
-                }
-            }
-
-            // OpenSSL req for cert signing
-            Console.WriteLine("Checking to see if OpenSSL is downloaded...");
-
-            if (!Directory.Exists("OpenSSL"))
-            {
-                Console.WriteLine("Created new directory: OpenSSL");
-                Directory.CreateDirectory("OpenSSL");
-            }
-            if (!File.Exists("OpenSSL\\msys-2.0.dll"))
-            {
-                Console.WriteLine("Downloading msys-2.0.dll...");
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-2.0.dll", "OpenSSL\\msys-2.0.dll");
-            }
-            if (!File.Exists("OpenSSL\\msys-crypto-3.dll"))
-            {
-                Console.WriteLine("Downloading msys-crypto-3.dll...");
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-crypto-3.dll", "OpenSSL\\msys-crypto-3.dll");
-            }
-            if (!File.Exists("OpenSSL\\msys-ssl-3.dll"))
-            {
-                Console.WriteLine("Downloading msys-ssl-3.dll...");
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/msys-ssl-3.dll", "OpenSSL\\msys-ssl-3.dll");
-            }
-            if (!File.Exists("OpenSSL\\openssl.exe"))
-            {
-                Console.WriteLine("Downloading openssl.exe...");
-                WebStuff.DownloadFile("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/OpenSSL/openssl.exe", "OpenSSL\\openssl.exe");
-            }
-
             // Theme checking for Avalon stuff, etc
             Console.WriteLine("Checking Avalon theme definitions (text editor syntax highlighting)");
             if (!File.Exists("EditorThemes\\lua_md_default.xshd"))
             {
                 Console.WriteLine("Downloading Avalon theme definitions...");
-                string themeData = WebStuff.DownloadString("https://raw.githubusercontent.com/babssssza/Babis-W/main/Babis-W/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
-                File.WriteAllText("EditorThemes\\lua_md_default.xshd", themeData);
+                try
+                {
+                    string themeData = WebStuff.DownloadString(GitHubRawBase + "Babis-W/bin/x64/Debug/EditorThemes/lua_md_default.xshd");
+                    File.WriteAllText("EditorThemes\\lua_md_default.xshd", themeData);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unable to download the default editor theme: {ex.Message}");
+                }
             }
 
             CurrentLuaXSHDLocation = "EditorThemes\\lua_md_default.xshd";
             IsAvalonLoaded = true;
 
-            // Finally, load optional script hub data. A missing or unavailable feed
-            // must not prevent the main application from opening.
-            Console.WriteLine("Loading script hub data...");
-            try
-            {
-                scripts = ScriptHub.BabisWSC.GetSCData().GetAwaiter().GetResult();
-                gamescripts = ScriptHub.BabisWGSC.GetGSCData().GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                scripts = Array.Empty<ScriptHub.ScriptData>();
-                gamescripts = Array.Empty<ScriptHub.GameScriptData>();
-            }
+            // Load optional script hub data without blocking the desktop UI.
+            _ = LoadScriptHubDataAsync();
 
 
             Console.Title = "Babis-W";
             Console.WriteLine("All done!\n");
+        }
+
+        private async Task LoadScriptHubDataAsync()
+        {
+            Console.WriteLine("Loading RScripts script hub data...");
+            try
+            {
+                scripts = await ScriptHub.BabisWSC.GetSCData().ConfigureAwait(true);
+                if (IsScriptHubOpened)
+                {
+                    RenderScriptHub(scripts);
+                }
+            }
+            catch (Exception ex)
+            {
+                scripts = Array.Empty<ScriptHub.ScriptData>();
+                Console.WriteLine($"Unable to load RScripts data: {ex.Message}");
+            }
+
+            try
+            {
+                gamescripts = await ScriptHub.BabisWGSC.GetGSCData().ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                gamescripts = Array.Empty<ScriptHub.GameScriptData>();
+                Console.WriteLine($"Unable to load game hub data: {ex.Message}");
+            }
         }
 
         private static void EnsureDesktopShortcut()
@@ -595,6 +545,9 @@ namespace BabisW
             Storyboard sb = TryFindResource("ScriptHubOpen") as Storyboard;
             sb.Begin();
 
+            IsScriptHubOpened = true;
+            RenderScriptHub(scripts);
+
             HomeGrid.Visibility = Visibility.Hidden;
             ExecutorGrid.Visibility = Visibility.Hidden;
             ScriptHubGrid.Visibility = Visibility.Visible;
@@ -695,8 +648,6 @@ namespace BabisW
         {
             CloseCompleted = true;
             // just in case
-            try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
-            try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
             Environment.Exit(0);
         }
 
@@ -757,7 +708,7 @@ namespace BabisW
             try
             {
                 Changelog.Text = WebStuff.DownloadString(
-                    "https://raw.githubusercontent.com/babssssza/Babis-W/main/UpdateStuff/Changelog");
+                    "https://raw.githubusercontent.com/babssssza/Babis-W/main/Changelog.txt");
             }
             catch (Exception ex)
             {
@@ -775,45 +726,49 @@ namespace BabisW
         }
 
         // Injection icon
-        private void Inject(object sender, MouseButtonEventArgs e)
+        private async void Inject(object sender, MouseButtonEventArgs e)
         {
             Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
-            if (Execution.ExecutionHandler.NativeHealthFailed)
-            {
-                SetInjectionStatus("Native API stopped responding", Color.FromRgb(192, 0, 0));
-            }
-            else if (IsInjected)
+            if (IsInjected)
             {
                 MessageBox.Show("The API has already been injected. Attempting to inject twice will result in a crash");
             }
-            else if (InjectionInProgress)
+            else if (InjectionInProgress || Execution.ExecutionHandler.InjectionInProgress)
             {
                 MessageBox.Show("Injection is already in process");
             }
             else if (pname.Length > 0) // If Roblox is running
             {
                 InjectionInProgress = true;
-
-                // wrd
-                if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+                SetInjectionStatus("Babis-W is injecting...", Color.FromRgb(170, 192, 0));
+                try
                 {
-                    ShowWindow(GetConsoleWindow(), 5);
-                    // wrd
-                    if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+                    if (!await ExecutionHandler.InjectAsync())
                     {
-                        ShowWindow(GetConsoleWindow(), 5);
-                        try
+                        IsInjected = false;
+                        SetInjectionStatus(
+                            Execution.ExecutionHandler.NativeHealthFailed
+                                ? "Quorum API unavailable"
+                                : "Injection failed",
+                            Color.FromRgb(192, 0, 0));
+                    }
+                    else
+                    {
+                        IsInjected = ExecutionHandler.IsInjected();
+                        if (IsInjected)
                         {
-                            if (!ExecutionHandler.Inject())
-                            {
-                                SetInjectionStatus("Injection failed", Color.FromRgb(192, 0, 0));
-                            }
+                            InjectionToast.ShowAttached();
+                            SetInjectionStatus("Babis-W is ready", Color.FromRgb(0, 192, 140));
                         }
-                        finally
+                        else
                         {
-                            InjectionInProgress = false;
+                            SetInjectionStatus("Injection is initializing", Color.FromRgb(170, 192, 0));
                         }
                     }
+                }
+                finally
+                {
+                    InjectionInProgress = false;
                 }
             }
             else
@@ -901,13 +856,24 @@ namespace BabisW
             if (key != null)
             {
                 string apishouldbe = (key.GetValue("DLL").ToString());
-                CurrentAPILabel.Content = apishouldbe;
+                if (apishouldbe == "Selected API: WeAreDevs API")
+                {
+                    apishouldbe = "Selected API: Quorum API";
+                    key.Close();
+                    key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\BabisWData");
+                    key.SetValue("DLL", apishouldbe);
+                }
+
+                CurrentAPILabel.Content = apishouldbe == "Selected API: Quorum API"
+                    ? "Using Quorum API"
+                    : apishouldbe;
                 Execution.SelectedAPI.API = apishouldbe;
+                key.Close();
             }
             else
             {
-                CurrentAPILabel.Content = "Using WeAreDevs API";
-                Execution.SelectedAPI.API = "Selected API: WeAreDevs API";
+                CurrentAPILabel.Content = "Using Quorum API";
+                Execution.SelectedAPI.API = "Selected API: Quorum API";
             }
         }
 
@@ -923,15 +889,14 @@ namespace BabisW
                 Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
                 if (pname.Length > 0)
                 {
-                    if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+                    if (Execution.SelectedAPI.API == "Selected API: Quorum API")
                     {
-                        Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
-                        if (pname1.Length > 0 && !Execution.ExecutionHandler.InjectionInProgress)
+                        if (!Execution.ExecutionHandler.InjectionInProgress)
                         {
                             IsInjected = Execution.ExecutionHandler.IsInjected();
                             if (IsInjected)
                             {
-                                SetInjectionStatus("WeAreDevs injected", Color.FromRgb(0, 192, 140));
+                                SetInjectionStatus("Babis-W is ready", Color.FromRgb(0, 192, 140));
                             }
                             else if (Execution.ExecutionHandler.InjectionTimedOut)
                             {
@@ -939,12 +904,11 @@ namespace BabisW
                             }
                             else if (!Execution.ExecutionHandler.WrapperResponsive)
                             {
-                                SetInjectionStatus("Wrapper not responding", Color.FromRgb(192, 110, 0));
+                                SetInjectionStatus("Babis-W engine unavailable", Color.FromRgb(192, 110, 0));
                             }
                             else
                             {
-                                ShowWindow(GetConsoleWindow(), 5);
-                                SetInjectionStatus("WeAreDevs injection in progress", Color.FromRgb(170, 192, 0));
+                                SetInjectionStatus("Babis-W is initializing", Color.FromRgb(170, 192, 0));
                             }
                         }
                         else
@@ -955,8 +919,7 @@ namespace BabisW
                 }
                 else
                 {
-                    try { foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper")) { proc.Kill(); } } catch { }
-                    try { foreach (Process proc in Process.GetProcessesByName("WRDFakeServer")) { proc.Kill(); } } catch { }
+                    IsInjected = false;
                     SetInjectionStatus("Roblox not opened", Color.FromRgb(192, 0, 0));
                     InjectionInProgress = false;
                 }
@@ -1050,15 +1013,15 @@ namespace BabisW
         // SETTINGS GRID FUNCTIONS //
         // There are multiple tabs on this grid //
 
-        // WeAreDevs API selection
+        // Quorum API selection
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Execution.SelectedAPI.API = "Selected API: WeAreDevs API";
-            CurrentAPILabel.Content = "Using WeAreDevs API";
+            Execution.SelectedAPI.API = "Selected API: Quorum API";
+            CurrentAPILabel.Content = "Using Quorum API";
             RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\BabisWData");
-            key.SetValue("DLL", "Selected API: WeAreDevs API");
+            key.SetValue("DLL", "Selected API: Quorum API");
             key.Close();
-            MessageBox.Show("API set to WeAreDevs", "BabisW");
+            MessageBox.Show("API set to Quorum", "BabisW");
         }
 
         // Join Discord for help button
@@ -1524,17 +1487,27 @@ namespace BabisW
                     sb.Begin();
 
                 });
-                var json = WebStuff.DownloadString("https://raw.githubusercontent.com/Avaluate/BabisWWeb/master/UpdateStuff/ThemeList.json");
+                var json = WebStuff.DownloadString(GitHubRawBase + "UpdateStuff/ThemeList.json");
                 dynamic dsfadfasdf = JsonConvert.DeserializeObject(json);
                 foreach (var item in dsfadfasdf)
                 {
                     string FileName = item.filename;
-                    string URL = item.themeurl;
-                    if (File.Exists("Themes\\" + FileName))
+                    if (string.IsNullOrWhiteSpace(FileName) ||
+                        FileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+                        FileName.Contains("..") ||
+                        !Uri.TryCreate((string)item.themeurl, UriKind.Absolute, out var themeUri) ||
+                        themeUri.Scheme != Uri.UriSchemeHttps ||
+                        !string.Equals(themeUri.Host, "raw.githubusercontent.com", StringComparison.OrdinalIgnoreCase))
                     {
-                        File.Delete("Themes\\" + FileName); // Update themes
+                        continue;
                     }
-                    WebStuff.DownloadFile(URL, "Themes\\" + FileName);
+
+                    string themePath = Path.Combine(Path.GetFullPath("Themes"), FileName);
+                    if (File.Exists(themePath))
+                    {
+                        File.Delete(themePath); // Update themes
+                    }
+                    WebStuff.DownloadFile(themeUri, themePath);
                     this.Dispatcher.Invoke(() =>
                     {
                         if (ThemeListBox.Items.Contains(FileName))
@@ -1753,23 +1726,113 @@ namespace BabisW
             SettingsGrid.Visibility = Visibility.Hidden;
         }
 
+        private void RenderScriptHub(IEnumerable<ScriptHub.ScriptData> source)
+        {
+            WP.Children.Clear();
+            var results = (source ?? Enumerable.Empty<ScriptHub.ScriptData>()).ToArray();
+            if (results.Length == 0)
+            {
+                WP.Children.Add(new TextBlock
+                {
+                    Text = "No scripts found. Try another search.",
+                    Foreground = new SolidColorBrush(Color.FromRgb(190, 190, 190)),
+                    Margin = new Thickness(8, 8, 0, 0)
+                });
+                return;
+            }
+
+            foreach (var scriptData in results)
+            {
+                try
+                {
+                    var obj = new TabThingy
+                    {
+                        Script = scriptData
+                    };
+                    obj.Executed += async (_, _) => await ExecuteScriptHubEntryAsync(obj.Script);
+                    obj.CopyScript += async (_, _) => await CopyScriptHubEntryAsync(obj.Script);
+                    WP.Children.Add(obj);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unable to render RScripts result '{scriptData.Title}': {ex.Message}");
+                }
+            }
+        }
+
+        private IEnumerable<ScriptHub.ScriptData> FilterScriptHubResults(
+                IEnumerable<ScriptHub.ScriptData> source,
+                string query)
+            {
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    return source ?? Enumerable.Empty<ScriptHub.ScriptData>();
+                }
+
+                return (source ?? Enumerable.Empty<ScriptHub.ScriptData>()).Where(script =>
+                    ContainsSearchText(script.Title, query) ||
+                    ContainsSearchText(script.Desc, query) ||
+                    ContainsSearchText(script.Credits, query) ||
+                    ContainsSearchText(script.GameName, query));
+            }
+
+            private static bool ContainsSearchText(string value, string query)
+            {
+                return !string.IsNullOrWhiteSpace(value) &&
+                    value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
+        private async Task<ScriptHub.ScriptData> LoadScriptHubEntryAsync(ScriptHub.ScriptData script)
+            {
+                if (string.IsNullOrWhiteSpace(script.Script))
+                {
+                    script.Script = await ScriptHub.BabisWSC.DownloadScriptAsync(
+                        script.RawScriptUrl,
+                        CancellationToken.None).ConfigureAwait(true);
+                }
+
+                return script;
+            }
+
+        private async Task ExecuteScriptHubEntryAsync(ScriptHub.ScriptData script)
+            {
+                try
+                {
+                    var loaded = await LoadScriptHubEntryAsync(script).ConfigureAwait(true);
+                    Execution.ExecutionHandler.Execute(loaded.Script);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Unable to load this script from RScripts:\n{ex.Message}",
+                        "Script Hub",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            }
+
+        private async Task CopyScriptHubEntryAsync(ScriptHub.ScriptData script)
+            {
+                try
+                {
+                    var loaded = await LoadScriptHubEntryAsync(script).ConfigureAwait(true);
+                    Clipboard.SetDataObject(loaded.Script);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Unable to load this script from RScripts:\n{ex.Message}",
+                        "Script Hub",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            }
         private void ScriptHubRadioButtonClick(object sender, RoutedEventArgs e)
         {
             if (IsScriptHubOpened == false)
             {
                 IsScriptHubOpened = true;
-                WP.Children.Clear();
-                foreach (var scriptData in scripts)
-                {
-                    var obj = new TabThingy
-                    {
-                        Script = (ScriptHub.ScriptData)scriptData
-                    };
-                    // Functions for buttons
-                    obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
-                    obj.CopyScript += (_, _) => Clipboard.SetDataObject(obj.Script.Script);
-                    WP.Children.Add(obj); // Add objects into scripthub panel
-                }
+                RenderScriptHub(scripts);
             }
 
 
@@ -1896,49 +1959,73 @@ namespace BabisW
             }
         }
 
-        private void SearchScriptHub(object sender, RoutedEventArgs e)
+        private async void SearchScriptHub(object sender, RoutedEventArgs e)
         {
-            // This is likely a very inefficient method of searching, if there are better ways, I would like to know
-            // The CPU usage rises while searching
-            if (IsScriptHubOpened == true)
+            IsScriptHubOpened = true;
+            HomeGrid.Visibility = Visibility.Hidden;
+            ExecutorGrid.Visibility = Visibility.Hidden;
+            ScriptHubGrid.Visibility = Visibility.Visible;
+            GameHubGrid.Visibility = Visibility.Hidden;
+            ToolsGrid.Visibility = Visibility.Hidden;
+            CustomisationGrid.Visibility = Visibility.Hidden;
+            SettingsGrid.Visibility = Visibility.Hidden;
+
+            var query = (GeneralScriptSearch.Text ?? string.Empty).Trim();
+            if (string.Equals(query, "Search for a script here", StringComparison.OrdinalIgnoreCase))
             {
-                new Thread(() =>
+                query = string.Empty;
+            }
+
+            var searchGeneration = ++scriptSearchGeneration;
+            var localResults = FilterScriptHubResults(scripts, query).ToArray();
+            if (localResults.Length > 0 || (string.IsNullOrWhiteSpace(query) && scripts.Length > 0))
+            {
+                RenderScriptHub(localResults);
+                return;
+            }
+
+            try
+            {
+                WP.Children.Clear();
+                WP.Children.Add(new TextBlock
                 {
-                    this.Dispatcher.Invoke(() => // Prevent error from this being done on "another thread"
-                    {
-                        WP.Children.Clear();
+                    Text = "Searching scripts...",
+                    Foreground = new SolidColorBrush(Color.FromRgb(190, 190, 190)),
+                    Margin = new Thickness(8, 8, 0, 0)
+                });
+                var results = await ScriptHub.BabisWSC.SearchSCData(query).ConfigureAwait(true);
+                if (searchGeneration != scriptSearchGeneration)
+                {
+                    return;
+                }
 
-                        foreach (var scriptData in scripts)
-                        {
-                            var obj = new TabThingy
-                            {
-                                Script = (ScriptHub.ScriptData)scriptData
-                            };
+                scripts = results;
+                RenderScriptHub(results);
+                Console.WriteLine($"RScripts returned {results.Length} result(s) for '{query}'.");
+            }
+            catch (Exception ex)
+            {
+                if (searchGeneration != scriptSearchGeneration)
+                {
+                    return;
+                }
 
-                            if (GeneralScriptSearch.Text == "" | GeneralScriptSearch.Text == "Search for a script here" | string.IsNullOrEmpty(GeneralScriptSearch.Text))
-                            {
-                                // Functions for buttons
-                                obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
-                                obj.CopyScript += (_, _) => Clipboard.SetText(obj.Script.Script);
-                                WP.Children.Add(obj); // Add objects into scripthub panel
-                            }
+                WP.Children.Clear();
+                Console.WriteLine($"Unable to search RScripts: {ex.Message}");
+                MessageBox.Show(
+                    $"Script Hub search failed:\n{ex.Message}",
+                    "Script Hub",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
 
-                            else if (obj.ScriptTitle.Content.ToString().ToLower().Contains(GeneralScriptSearch.Text.ToLower()) == true || obj.Description.Text.ToString().ToLower().Contains(GeneralScriptSearch.Text.ToLower()) == true || obj.Credit.Content.ToString().ToLower().Contains(GeneralScriptSearch.Text.ToLower()) == true)
-                            {
-                                // Functions for buttons
-                                obj.Executed += (_, _) => Execution.ExecutionHandler.Execute(obj.Script.Script);
-                                obj.CopyScript += (_, _) => Clipboard.SetText(obj.Script.Script);
-                                WP.Children.Add(obj); // Add objects into scripthub panel
-                            }
-
-                        }
-                        GC.Collect();
-
-                    });
-
-                })
-
-                { }.Start();
+        private void GeneralScriptSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SearchScriptHub(sender, e);
+                e.Handled = true;
             }
         }
 
@@ -1953,42 +2040,88 @@ namespace BabisW
             SettingsGrid.Visibility = Visibility.Hidden;
         }
 
-        private void WRDStatus_Loaded_1(object sender, RoutedEventArgs e)
-        {
-            // wrd status checker
-
-            string WRDStatusDl = WebStuff.DownloadString("https://cdn.wearedevs.net/software/jjsploit/tauri.json");
-
-
-
-
-            dynamic WRDStatusFormat = JsonConvert.DeserializeObject(WRDStatusDl);
-            bool IsWRDPatched = WRDStatusFormat.patched;
-            WRDStatusTextFromWe.Text = $"Message from WRD: {WRDStatusFormat.serverMessage}";
-
-            if (!IsWRDPatched) // not patch
-            {
-                WRDStatus.Fill = new SolidColorBrush(Color.FromRgb(40, 195, 126));
-                WRDStatusText.Text = "Unpatched and working!";
-            }
-            else
-            {
-                WRDStatus.Fill = new SolidColorBrush(Color.FromRgb(255, 30, 30));
-                WRDStatusText.Text = "Currently patched";
-            }
-
-
-
-        }
-
         private void JoinTelegramGroup(object sender, MouseButtonEventArgs e)
         {
             Process.Start("https://t.me/babis-wnow");
         }
 
+        private static bool TryDownloadFile(string url, string destination, string expectedSha256 = null)
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+                uri.Scheme != Uri.UriSchemeHttps ||
+                !(string.Equals(uri.Host, "raw.githubusercontent.com", StringComparison.OrdinalIgnoreCase) ||
+                  string.Equals(uri.Host, "wrdcdn.net", StringComparison.OrdinalIgnoreCase)))
+            {
+                Console.WriteLine($"Blocked download from an untrusted host: {url}");
+                return false;
+            }
+
+            var temporaryPath = destination + ".download";
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile(uri, temporaryPath);
+                }
+
+                if (!string.IsNullOrWhiteSpace(expectedSha256))
+                {
+                    using (var stream = File.OpenRead(temporaryPath))
+                    using (var sha256 = SHA256.Create())
+                    {
+                        var hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty);
+                        if (!string.Equals(hash, expectedSha256, StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw new InvalidDataException("Downloaded file integrity validation failed.");
+                        }
+                    }
+                }
+
+                var directory = Path.GetDirectoryName(Path.GetFullPath(destination));
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                if (File.Exists(destination))
+                {
+                    File.Delete(destination);
+                }
+                File.Move(temporaryPath, destination);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Download failed for {destination}: {ex.Message}");
+                if (File.Exists(temporaryPath))
+                {
+                    File.Delete(temporaryPath);
+                }
+                return false;
+            }
+        }
+
+        private static bool HasSha256(string path, string expectedSha256)
+        {
+            try
+            {
+                using (var stream = File.OpenRead(path))
+                using (var sha256 = SHA256.Create())
+                {
+                    var hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty);
+                    return string.Equals(hash, expectedSha256, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to validate {path}: {ex.Message}");
+                return false;
+            }
+        }
+
         private void OpenGitHub(object sender, MouseButtonEventArgs e)
         {
-            Process.Start("https://github.com/Avaluate/BabisW");
+            Process.Start("https://github.com/" + GitHubRepository);
         }
     }
 }

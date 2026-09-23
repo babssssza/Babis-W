@@ -7,111 +7,70 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using QuorumAPI;
 
 namespace BabisW.Execution
 {
     class ExecutionHandler
     {
-        private static DateTime LastPipeWarning = DateTime.MinValue;
+        private static DateTime LastHealthWarning = DateTime.MinValue;
         private static DateTime InjectionStartedAt = DateTime.MinValue;
         public static bool WrapperResponsive { get; private set; }
         public static bool InjectionInProgress { get; private set; }
         public static bool InjectionTimedOut { get; private set; }
         public static bool NativeExecutionStarted { get; private set; }
         public static bool NativeHealthFailed { get; private set; }
+        private static readonly SemaphoreSlim InjectionGate = new SemaphoreSlim(1, 1);
+        private static int CommunicationStarted;
 
-        public static bool Inject()
+        public static async Task<bool> InjectAsync()
         {
-            if (SelectedAPI.API == "Selected API: WeAreDevs API")
-            {
-                InjectionInProgress = true;
-                InjectionTimedOut = false;
-                NativeExecutionStarted = false;
-                NativeHealthFailed = false;
-                InjectionStartedAt = DateTime.UtcNow;
-
-                try
-                {
-                // kill previous wrappers
-                try
-                {
-                    foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper"))
-                    {
-                        proc.Kill();
-                        proc.WaitForExit(5000);
-                    }
-                }
-                catch { }
-                try
-                {
-                    foreach (Process proc in Process.GetProcessesByName("WRDFakeServer"))
-                    {
-                        proc.Kill();
-                        proc.WaitForExit(5000);
-                    }
-                }
-                catch { }
-
-                string wrapperPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Babis-WWRDWrapper.exe");
-                if (!File.Exists(wrapperPath))
-                {
-                    MessageBox.Show($"The Babis-W wrapper is missing: {wrapperPath}", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
-                var wrapperProcess = Process.Start(new ProcessStartInfo
-                {
-                    FileName = wrapperPath,
-                    WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
-                    UseShellExecute = false
-                });
-                if (wrapperProcess == null)
-                {
-                    MessageBox.Show("The Babis-W wrapper could not be started.", "Babis-W", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
-                Thread.Sleep(500);
-                if (wrapperProcess.HasExited)
-                {
-                    MessageBox.Show(
-                        $"The Babis-W wrapper exited during startup (code {wrapperProcess.ExitCode}). Check the wrapper console for details.",
-                        "Babis-W",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                    return false;
-                }
-                try
-                {
-                    var Response = SelectedAPI.NewPipe.SendRequest<InjectionRequest>("Inject", new InjectionRequest{AdditionalData = "blank"}); // blank
-                    Console.WriteLine($"injection result: {Response}");
-                    if (Response.InjectionSuccessful == true)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        MessageBox.Show($"WRD injection failed: {Response.AdditionalData}");
-                        return false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"error during injection: {ex.Message}");
-                    return false;
-                }
-                finally
-                {
-                    InjectionInProgress = false;
-                }
-            }
-            else
+            if (SelectedAPI.API != "Selected API: Quorum API" ||
+                !await InjectionGate.WaitAsync(0))
             {
                 return false;
             }
+
+            InjectionInProgress = true;
+            InjectionTimedOut = false;
+            NativeExecutionStarted = false;
+            NativeHealthFailed = false;
+            WrapperResponsive = false;
+            InjectionStartedAt = DateTime.UtcNow;
+            try
+            {
+                var attached = await Task.Run(() =>
+                {
+                    QuorumModule.UseAutoUpdate(true);
+                    return QuorumModule.AttachAPIAsync();
+                });
+
+                if (attached)
+                {
+                    EnsureCommunication();
+                }
+
+                return attached;
+            }
+            catch (Exception ex)
+            {
+                NativeHealthFailed = true;
+                Console.WriteLine($"Quorum injection failed: {ex}");
+                MessageBox.Show(
+                    $"Babis-W could not complete the injection: {ex.Message}\n\nPlease make sure Roblox is fully loaded and try again.",
+                    "Babis-W",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return false;
+            }
+            finally
+            {
+                InjectionInProgress = false;
+                InjectionGate.Release();
+            }
         }
 
-        public static void Execute(string script)
+        public static async void Execute(string script)
         {
             Process[] pname = Process.GetProcessesByName("RobloxPlayerBeta");
             if (pname.Length < 1) // If Roblox is not running
@@ -120,20 +79,14 @@ namespace BabisW.Execution
                 return;
             }
 
-            if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+            if (Execution.SelectedAPI.API == "Selected API: Quorum API")
             {
-                Process[] pname1 = Process.GetProcessesByName("Babis-WWRDWrapper");
-                if (pname1.Length < 1) 
-                {
-                    MessageBox.Show("Please begin WRD injection first before attempting to execute a script");
-                    return;
-                }
-
                 try
                 {
-                    var Response = SelectedAPI.NewPipe.SendRequest<ExecutionRequest>("Execute", new ExecutionRequest { Script = script });
-                    Console.WriteLine($"execution result: {Response}");
-                    NativeExecutionStarted = true;
+                    if (!await QuorumModule.ExecuteScript(script, null))
+                    {
+                        throw new InvalidOperationException("Quorum API rejected the script.");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -145,33 +98,35 @@ namespace BabisW.Execution
 
         public static bool IsInjected()
         {   
-            if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+            if (Execution.SelectedAPI.API == "Selected API: Quorum API")
             {
-                if (NativeExecutionStarted)
-                {
-                    return true;
-                }
-
                 try
                 {
-                    var Response = SelectedAPI.NewPipe.SendRequest<IsInjectedRequest>("IsInjected", new IsInjectedRequest{ AdditionalData = "blank" }); // blank
+                    EnsureCommunication();
+                    var attached = QuorumModule.IsAttached();
                     WrapperResponsive = true;
-                    if (!Response.IsInjected &&
+                    if (attached)
+                    {
+                        NativeHealthFailed = false;
+                        InjectionTimedOut = false;
+                    }
+                    if (!attached &&
                         InjectionStartedAt != DateTime.MinValue &&
                         (DateTime.UtcNow - InjectionStartedAt).TotalSeconds >= 60)
                     {
                         InjectionTimedOut = true;
                     }
-                    return Response.IsInjected;
+                    return attached;
                 }
                 catch (Exception ex)
                 {
                     NativeHealthFailed = true;
-                    Console.WriteLine($"Error while checking for isinjected res: {ex}");
-                    if ((DateTime.UtcNow - LastPipeWarning).TotalSeconds >= 10)
+                    Console.WriteLine($"Error while checking Quorum attachment state: {ex}");
+                    NativeExecutionStarted = false;
+                    if ((DateTime.UtcNow - LastHealthWarning).TotalSeconds >= 10)
                     {
-                        Console.WriteLine("The Babis-W wrapper is not responding. Start injection to reconnect.");
-                        LastPipeWarning = DateTime.UtcNow;
+                        Console.WriteLine("The Quorum API is not responding. Try injection again.");
+                        LastHealthWarning = DateTime.UtcNow;
                     }
                     WrapperResponsive = false;
                     return false;
@@ -185,17 +140,34 @@ namespace BabisW.Execution
 
         public static void Stop()
         {
-            if (Execution.SelectedAPI.API == "Selected API: WeAreDevs API")
+            NativeExecutionStarted = false;
+            if (Interlocked.Exchange(ref CommunicationStarted, 0) == 1)
             {
                 try
                 {
-                    foreach (Process proc in Process.GetProcessesByName("Babis-WWRDWrapper"))
-                    {
-                        proc.Kill();
-                    }
+                    QuorumModule.StopCommunication();
                 }
-                catch { }
-            }    
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error stopping Quorum communication: {ex.Message}");
+                }
+            }
+        }
+
+        private static void EnsureCommunication()
+        {
+            if (Interlocked.CompareExchange(ref CommunicationStarted, 1, 0) == 0)
+            {
+                try
+                {
+                    QuorumModule.StartCommunication();
+                }
+                catch
+                {
+                    Interlocked.Exchange(ref CommunicationStarted, 0);
+                    throw;
+                }
+            }
         }
     }
 }

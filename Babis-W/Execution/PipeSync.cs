@@ -9,14 +9,19 @@ namespace BabisW.Execution
             Pipe = new PipeWrite(PipeName, Timeout);
         }
 
-        public T SendRequest<T>(string messageType, object data)
+        public T SendRequest<T>(string messageType, object data, int requestTimeoutMs = 5000)
         {
-            return Pipe.SendRequest<T>(messageType, data);
+            return Pipe.SendRequest<T>(messageType, data, requestTimeoutMs);
         }
 
         public void Dispose()
         {
             Pipe.Dispose();
+        }
+
+        public void ResetConnection()
+        {
+            Pipe.ResetConnection();
         }
     }
 }

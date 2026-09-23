@@ -43,6 +43,64 @@
         <SolidColorBrush x:Key="NormalBorderBrush" Color="#888" />
         <SolidColorBrush x:Key="HorizontalNormalBrush" Color="#FF686868" />
         <SolidColorBrush x:Key="HorizontalNormalBorderBrush" Color="#888" />
+        <SolidColorBrush x:Key="BabisBlue" Color="#1976D2" />
+        <SolidColorBrush x:Key="BabisBlueLight" Color="#42A5F5" />
+        <SolidColorBrush x:Key="MaterialSurface" Color="#FF101A27" />
+        <SolidColorBrush x:Key="MaterialSurfaceRaised" Color="#FF172638" />
+        <SolidColorBrush x:Key="MaterialSurfaceOverlay" Color="#E61B2A3A" />
+        <SolidColorBrush x:Key="MaterialSurfaceCard" Color="#CC20344A" />
+        <SolidColorBrush x:Key="MaterialDivider" Color="#5542A5F5" />
+        <SolidColorBrush x:Key="MaterialText" Color="#FFE8F1FA" />
+        <SolidColorBrush x:Key="MaterialTextMuted" Color="#FF9FB3C8" />
+        <SolidColorBrush x:Key="MaterialTextSubtle" Color="#FF7890A8" />
+        <Style x:Key="MaterialPanel" TargetType="{x:Type Grid}">
+            <Setter Property="Background" Value="{StaticResource MaterialSurfaceOverlay}" />
+        </Style>
+        <Style x:Key="MaterialCard" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{StaticResource MaterialSurfaceCard}" />
+            <Setter Property="BorderBrush" Value="{StaticResource MaterialDivider}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+        <Style x:Key="MaterialInput" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="{StaticResource MaterialSurfaceRaised}" />
+            <Setter Property="Foreground" Value="{StaticResource MaterialText}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BabisBlue}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="7,2" />
+            <Setter Property="CaretBrush" Value="{StaticResource BabisBlueLight}" />
+        </Style>
+        <Style x:Key="MaterialSearchButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource BabisBlue}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BabisBlueLight}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BabisBlueLight}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF0D47A1" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="{x:Type ToolTip}"
        TargetType="{x:Type ToolTip}">
             <Setter Property="Background"
@@ -1204,11 +1262,11 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Border x:Name="WindowBorder" BorderThickness="3" CornerRadius = "1" HorizontalAlignment="Left" Height="417" Margin="0" VerticalAlignment="Top" Width="700" Background="#FF141414">
+    <Border x:Name="WindowBorder" BorderThickness="1" CornerRadius = "8" HorizontalAlignment="Left" Height="417" Margin="0" VerticalAlignment="Top" Width="700" Background="{StaticResource MaterialSurface}">
         <Border.BorderBrush>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="#FF1F1F1F" Offset="0"/>
-                <GradientStop Color="#FF1F1F1F" Offset="1"/>
+                <GradientStop Color="#FF42A5F5" Offset="0"/>
+                <GradientStop Color="#FF1565C0" Offset="1"/>
             </LinearGradientBrush>
         </Border.BorderBrush>
         <Grid x:Name="MainGrid" HorizontalAlignment="Left" Height="411" VerticalAlignment="Top" Width="697" Loaded="ThemeLoading" Margin="-0.2,-0.2,-3.2,-0.4">
@@ -1252,8 +1310,8 @@
                 <RowDefinition Height="108*"/>
                 <RowDefinition Height="10*"/>
             </Grid.RowDefinitions>
-            <Rectangle x:Name="Topbar" Fill="#4C131517" HorizontalAlignment="Left" Height="30" Stroke="Transparent" VerticalAlignment="Top" Width="694" Grid.ColumnSpan="11" StrokeThickness="0" MouseDown="Rectangle_MouseDown" Margin="0,0,-1.2,0"/>
-            <Grid x:Name="HomeGrid" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" VerticalAlignment="Top" Width="655" Grid.ColumnSpan="11" Grid.RowSpan="12" Background="#33000000">
+            <Rectangle x:Name="Topbar" Fill="#E6152638" HorizontalAlignment="Left" Height="30" Stroke="#553A8DCC" VerticalAlignment="Top" Width="694" Grid.ColumnSpan="11" StrokeThickness="1" MouseDown="Rectangle_MouseDown" Margin="0,0,-1.2,0"/>
+            <Grid x:Name="HomeGrid" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" VerticalAlignment="Top" Width="655" Grid.ColumnSpan="11" Grid.RowSpan="12" Style="{StaticResource MaterialPanel}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="83*"/>
                     <ColumnDefinition Width="16*"/>
@@ -1262,8 +1320,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <Border BorderThickness="1" HorizontalAlignment="Left" Height="111" Margin="219,69,0,0" CornerRadius="3 3 3 3" VerticalAlignment="Top" Width="310" Background="#3E000000" Grid.Column="2" BorderBrush="#FF565656" Opacity="0.6"/>
-                <Border BorderThickness="1" HorizontalAlignment="Left" Height="110" Margin="219,228,0,0" CornerRadius="3 3 3 3" VerticalAlignment="Top" Width="310" Background="#3E000000" Grid.Column="2" BorderBrush="#FF565656" Opacity="0.6"/>
+                <Border Style="{StaticResource MaterialCard}" HorizontalAlignment="Left" Height="111" Margin="219,69,0,0" VerticalAlignment="Top" Width="310" Grid.Column="2" Opacity="0.9"/>
+                <Border Style="{StaticResource MaterialCard}" HorizontalAlignment="Left" Height="110" Margin="219,228,0,0" VerticalAlignment="Top" Width="310" Grid.Column="2" Opacity="0.9"/>
                 <Viewbox x:Name="JoinBabisW" Grid.ColumnSpan="3" Margin="18,129,498,221" Stretch="Fill" Opacity="0.75">
                     <Viewbox.Style>
                         <Style TargetType="{x:Type Viewbox}">
@@ -1299,7 +1357,7 @@
                             </TextBlock.RenderTransform><Run Language="en-hk" Text="Discord"/></TextBlock>
                     </Grid>
                 </Viewbox>
-                <TextBlock HorizontalAlignment="Left" Height="55" TextWrapping="Wrap" VerticalAlignment="Top" Width="309" Foreground="#FFD0CFCF" FontFamily="Calibri Light" FontSize="20" Margin="219,42,0,0" RenderTransformOrigin="1.338,2.769" Grid.Column="2" Text="Announcements"/>
+                <TextBlock HorizontalAlignment="Left" Height="55" TextWrapping="Wrap" VerticalAlignment="Top" Width="309" Foreground="{StaticResource MaterialText}" FontFamily="Calibri Light" FontSize="20" Margin="219,42,0,0" RenderTransformOrigin="1.338,2.769" Grid.Column="2" Text="Announcements"/>
                 <TextBlock HorizontalAlignment="Left" Height="29" TextWrapping="Wrap" Text="Welcome to BabisW!" VerticalAlignment="Top" Width="188" Foreground="#FFD0CFCF" FontFamily="Calibri" FontSize="20" Margin="22,99,0,0" RenderTransformOrigin="1.338,2.769" Grid.ColumnSpan="3">
                     <TextBlock.RenderTransform>
                         <TransformGroup>
@@ -1311,7 +1369,7 @@
                     </TextBlock.RenderTransform>
 
                 </TextBlock>
-                <TextBlock HorizontalAlignment="Left" Height="55" TextWrapping="Wrap" VerticalAlignment="Top" Width="309" Foreground="#FFD0CFCF" FontFamily="Calibri Light" FontSize="20" Margin="219,201,0,0" RenderTransformOrigin="1.338,2.769" Text="Changelog" Grid.Column="2"/>
+                <TextBlock HorizontalAlignment="Left" Height="55" TextWrapping="Wrap" VerticalAlignment="Top" Width="309" Foreground="{StaticResource MaterialText}" FontFamily="Calibri Light" FontSize="20" Margin="219,201,0,0" RenderTransformOrigin="1.338,2.769" Text="Changelog" Grid.Column="2"/>
                 <TextBlock x:Name="NoticeBoard" HorizontalAlignment="Left" Height="99" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Foreground="#FFB0B0B0" FontFamily="Calibri Light" Margin="226,74,0,0" RenderTransformOrigin="1.338,2.769" Loaded="Notice" FontSize="13" ScrollViewer.CanContentScroll="True" Grid.Column="2">
                     <TextBlock.RenderTransform>
                         <TransformGroup>
@@ -1548,7 +1606,7 @@
                     </Style>
                 </Image.Style>
             </Image>
-            <Grid x:Name="ExecutorGrid" Grid.ColumnSpan="11" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="655" Background="#34000000" Visibility="Hidden">
+            <Grid x:Name="ExecutorGrid" Grid.ColumnSpan="11" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="655" Style="{StaticResource MaterialPanel}" Visibility="Hidden">
 
 
                 <TabControl
@@ -1822,13 +1880,13 @@
                         <TextBlock HorizontalAlignment="Left" Height="16" TextWrapping="Wrap" Text="Save File" VerticalAlignment="Top" Width="52" Foreground="#FFEBEBEB" FontFamily="Calibri Light" Margin="25,6,0,0" MouseDown="TextBlock_MouseDown"/>
                     </Grid>
                 </Viewbox>
-                <Label x:Name="CurrentAPILabel" Content="Using WeAreDevs API" HorizontalAlignment="Right" Margin="0,361,1,-2" VerticalAlignment="Top" Width="149" HorizontalContentAlignment="Right" Foreground="#FFB4B4B4" FontSize="10" Loaded="SetAPI" FontFamily="Calibri Light"/>
+                <Label x:Name="CurrentAPILabel" Content="Using Babis-W Engine" HorizontalAlignment="Right" Margin="0,361,1,-2" VerticalAlignment="Top" Width="149" HorizontalContentAlignment="Right" Foreground="#FFB4B4B4" FontSize="10" Loaded="SetAPI" FontFamily="Calibri Light"/>
                 <Label  x:Name="InjectionStatus" Content="Roblox not opened" HorizontalAlignment="Right" Margin="0,346,1,0" VerticalAlignment="Top" Width="184" HorizontalContentAlignment="Right" Foreground="#FFC00000" Loaded="StartStatusCheck" FontWeight="Bold" FontFamily="Calibri"/>
                 <Grid x:Name="BlurTextbox" HorizontalAlignment="Left" Height="327" VerticalAlignment="Top" Width="655" Background="#FF131517" Margin="0,21,0,0" Visibility="Hidden">
                     <Label x:Name="CurrentAPILabel_Copy" Content="Textbox blurred out" HorizontalAlignment="Center" Margin="0,144,0,143" VerticalAlignment="Center" Width="655" HorizontalContentAlignment="Center" Foreground="#FFB4B4B4" FontSize="24" FontFamily="Calibri Light" RenderTransformOrigin="0.329,0.279" Height="40"/>
                 </Grid>
             </Grid>
-            <Grid x:Name="ScriptHubGrid" Grid.ColumnSpan="11" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="655" Background="#33000000" Visibility="Hidden">
+            <Grid x:Name="ScriptHubGrid" Grid.ColumnSpan="11" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="655" Background="#CC101A27" Visibility="Hidden">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="6*" />
@@ -1837,34 +1895,13 @@
                 <ScrollViewer x:Name="GeneralScriptScrollViewer" HorizontalAlignment="Left" Height="312" VerticalAlignment="Top" Width="627" Grid.IsSharedSizeScope="True" Margin="10,62,0,0" Grid.RowSpan="3">
                     <WrapPanel x:Name="WP" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="627" Loaded="WrapPanel_LoadedAsync" Grid.IsSharedSizeScope="True"/>
                 </ScrollViewer>
-                <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Script Hub" VerticalAlignment="Top" Width="140" Foreground="#FFE0E0E0" FontFamily="Calibri Light" FontSize="18" Margin="15,6,0,0" MouseDown="TextBlock_MouseDown" Grid.RowSpan="2"/>
+                <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Script Hub" VerticalAlignment="Top" Width="140" Foreground="{StaticResource MaterialText}" FontFamily="Calibri Light" FontSize="18" Margin="15,6,0,0" MouseDown="TextBlock_MouseDown" Grid.RowSpan="2"/>
                 <Rectangle Fill="#4C232323" HorizontalAlignment="Left" Height="23" Margin="14,34,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="192"/>
-                <TextBox x:Name="GeneralScriptSearch" CaretBrush ="#FF898989" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="23" Margin="38,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="167" GotFocus="GeneralScriptSearch_GotFocus" LostFocus="GeneralScriptSearch_LostFocus" GotKeyboardFocus="GeneralScriptSearch_GotFocus" LostKeyboardFocus="GeneralScriptSearch_LostFocus" Background="{x:Null}" Foreground="#FF898989" Text="Search for a script here" BorderBrush="{x:Null}" FontSize="10" SelectionBrush="{x:Null}" Style="{DynamicResource TextBoxStyle1}"/>
+                <TextBox x:Name="GeneralScriptSearch" CaretBrush="{StaticResource BabisBlueLight}" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="28" Margin="38,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="167" GotFocus="GeneralScriptSearch_GotFocus" LostFocus="GeneralScriptSearch_LostFocus" GotKeyboardFocus="GeneralScriptSearch_GotFocus" LostKeyboardFocus="GeneralScriptSearch_LostFocus" KeyDown="GeneralScriptSearch_KeyDown" Background="{StaticResource MaterialSurfaceRaised}" Foreground="{StaticResource MaterialText}" Text="Search for a script here" BorderBrush="{StaticResource BabisBlue}" FontSize="10" Padding="7,0" SelectionBrush="{StaticResource BabisBlueLight}" Style="{DynamicResource TextBoxStyle1}"/>
                 <Image RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Left" Height="13" Margin="21,39,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="19" Source="SearchBoxIcon.png" Opacity="0.3"/>
-                <Button x:Name="SearchGameHubButton_Copy" Template ="{DynamicResource NoHighlightBut}" Content="Search" Margin="211,33.15,374.8,316.75" Background="#4C2C2C2C" Foreground="#FFADADAD" BorderBrush="{x:Null}" Click="SearchScriptHub" Opacity="0.75" Height="24.5" BorderThickness="0" FontSize="10">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}">
-                            <Style.Triggers>
-                                <EventTrigger RoutedEvent="UIElement.MouseEnter">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.75" To="1" BeginTime="0:0:0" Duration="0:0:0.2"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="UIElement.MouseLeave">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.75" BeginTime="0:0:0" Duration="0:0:0.2"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <Button x:Name="SearchGameHubButton_Copy" Content="Search" Margin="211,32,374,315" Click="SearchScriptHub" Style="{StaticResource MaterialSearchButton}" Height="28" FontSize="10"/>
             </Grid>
-            <Grid x:Name="GameHubGrid" Grid.ColumnSpan="11" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="655" Background="#33000000" Visibility="Hidden">
+            <Grid x:Name="GameHubGrid" Grid.ColumnSpan="11" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="655" Style="{StaticResource MaterialPanel}" Visibility="Hidden">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="24*" />
@@ -1874,11 +1911,12 @@
                 <ScrollViewer x:Name="GameScriptScrollViewer" HorizontalAlignment="Left" Height="312" VerticalAlignment="Top" Width="627" Grid.IsSharedSizeScope="True" Margin="15,65,0,0" Grid.RowSpan="4">
                     <WrapPanel x:Name="WP1" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="627" Loaded="WP1_LoadedAsync" Grid.IsSharedSizeScope="True"/>
                 </ScrollViewer>
-                <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Game Hub" VerticalAlignment="Top" Width="140" Foreground="#FFE0E0E0" FontFamily="Calibri Light" FontSize="18" Margin="15,6,0,0" Grid.RowSpan="2"/>
+                <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Game Hub" VerticalAlignment="Top" Width="140" Foreground="{StaticResource MaterialText}" FontFamily="Calibri Light" FontSize="18" Margin="15,6,0,0" Grid.RowSpan="2"/>
                 <Rectangle Fill="#4C232323" HorizontalAlignment="Left" Height="23" Margin="14,34,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="192"/>
-                <TextBox x:Name="GameScriptSearch" CaretBrush ="#FF898989" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="23" Margin="39,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="167" GotFocus="GameScriptSearch_GotFocus" LostFocus="GameScriptSearch_LostFocus" GotKeyboardFocus="GameScriptSearch_GotFocus" LostKeyboardFocus="GameScriptSearch_LostFocus" Background="{x:Null}" Foreground="#FF898989" Text="Search for a script here" BorderBrush="{x:Null}" FontSize="10" SelectionBrush="{x:Null}" Style="{DynamicResource TextBoxStyle1}"/>
+                <TextBox x:Name="GameScriptSearch" CaretBrush="{StaticResource BabisBlueLight}" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="28" Margin="39,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="167" GotFocus="GameScriptSearch_GotFocus" LostFocus="GameScriptSearch_LostFocus" GotKeyboardFocus="GameScriptSearch_GotFocus" LostKeyboardFocus="GameScriptSearch_LostFocus" Background="{StaticResource MaterialSurfaceRaised}" Foreground="{StaticResource MaterialText}" Text="Search for a script here" BorderBrush="{StaticResource BabisBlue}" FontSize="10" Padding="7,0" SelectionBrush="{StaticResource BabisBlueLight}" Style="{DynamicResource TextBoxStyle1}"/>
                 <Image RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Left" Height="13" Margin="21,39,0,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="19" Source="SearchBoxIcon.png" Opacity="0.3"/>
-                <Button x:Name="SearchGameHubButton" Template ="{DynamicResource NoHighlightBut}" Content="Search" Margin="211,33,375,316.6" Background="#4C2C2C2C" Foreground="#FFADADAD" BorderBrush="{x:Null}" Click="SearchGameHub" Opacity="0.75" Height="24.5" BorderThickness="0" FontSize="10">
+                <Button x:Name="SearchGameHubButton" Content="Search" Margin="211,32,374,315" Click="SearchGameHub" Style="{StaticResource MaterialSearchButton}" Height="28" FontSize="10"/>
+                <!--
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
                             <Style.Triggers>
@@ -1899,11 +1937,11 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                </Button>
+                </Button>-->
             </Grid>
-            <Grid x:Name="ToolsGrid" Grid.ColumnSpan="11" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="655" Background="#33000000" Visibility="Hidden">
-                <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Tools" VerticalAlignment="Top" Width="140" Foreground="#FFA9A1A1" FontFamily="Calibri" FontSize="18" Margin="15,6,0,0"/>
-                <Border BorderThickness="1" HorizontalAlignment="Left" Height="138" Margin="16,34,0,0" CornerRadius="5 5 5 5" VerticalAlignment="Top" Width="147" Background="#0F000000" BorderBrush="#19A5A5A5"/>
+            <Grid x:Name="ToolsGrid" Grid.ColumnSpan="11" HorizontalAlignment="Left" Height="380" Margin="39,30,-1.2,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="655" Style="{StaticResource MaterialPanel}" Visibility="Hidden">
+                <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Tools" VerticalAlignment="Top" Width="140" Foreground="{StaticResource MaterialText}" FontFamily="Calibri" FontSize="18" Margin="15,6,0,0"/>
+                <Border Style="{StaticResource MaterialCard}" HorizontalAlignment="Left" Height="138" Margin="16,34,0,0" VerticalAlignment="Top" Width="147"/>
                 <TextBlock HorizontalAlignment="Left" Height="35" TextWrapping="Wrap" Text="Multiple Roblox" VerticalAlignment="Top" Width="131" Foreground="#FFC2C2C2" FontFamily="Calibri" FontSize="16" Margin="23,38,0,0" FontWeight="Bold"/>
                 <TextBlock HorizontalAlignment="Left" Height="35" TextWrapping="Wrap" VerticalAlignment="Top" Width="131" Foreground="#FF868585" FontFamily="Calibri Light" Margin="23,58,0,0" FontSize="10"><Run Text="by "/><Run Language="en-hk" Text="Avaluate (Main_EX)"/></TextBlock>
                 <TextBlock HorizontalAlignment="Left" Height="80" TextWrapping="Wrap" VerticalAlignment="Top" Width="130" Foreground="#FFC5BDBD" FontFamily="Calibri Light" Margin="23,73,0,0"><Run Text="Allows for"/><Run Language="en-hk" Text=" multiple "/><Run Text="Roblox window"/><Run Language="en-hk" Text="s"/><Run Text=" to be opened on different accounts."/><Run Language="en-hk" Text=" Run before opening Roblox."/></TextBlock>
@@ -1929,7 +1967,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Border BorderThickness="1" HorizontalAlignment="Left" Height="138" Margin="172,34,0,0" CornerRadius="5 5 5 5" VerticalAlignment="Top" Width="147" Background="#0F000000" BorderBrush="#19A5A5A5"/>
+                <Border Style="{StaticResource MaterialCard}" HorizontalAlignment="Left" Height="138" Margin="172,34,0,0" VerticalAlignment="Top" Width="147"/>
                 <TextBlock HorizontalAlignment="Left" Height="35" TextWrapping="Wrap" Text="FPS Unlocker" VerticalAlignment="Top" Width="131" Foreground="#FFC2C2C2" FontFamily="Calibri" FontSize="16" Margin="179,38,0,0" FontWeight="Bold"/>
                 <TextBlock HorizontalAlignment="Left" Height="35" TextWrapping="Wrap" VerticalAlignment="Top" Width="131" Foreground="#FF868585" FontFamily="Calibri Light" Margin="179,58,0,0" FontSize="10"><Run Text="by axstin"/><Run Language="en-hk" Text=" (github.com/axstin)"/></TextBlock>
                 <TextBlock HorizontalAlignment="Left" Height="80" TextWrapping="Wrap" VerticalAlignment="Top" Width="137" Foreground="#FFC5BDBD" FontFamily="Calibri Light" Margin="179,73,0,0"><Run Language="en-hk" Text="Although Roblox allows for maximum FPS setting now, some users may still find this tool useful."/></TextBlock>
@@ -1956,12 +1994,12 @@
                     </Button.Style>
                 </Button>
             </Grid>
-            <Grid x:Name="CustomisationGrid" HorizontalAlignment="Left" Height="375" Margin="44,35,0,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="650" Grid.ColumnSpan="11" Visibility="Hidden">
-                <TextBlock x:Name="Title" ToolTip="Made by Main_EX @ discord.io/babis-w" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FFEEEEEE" FontFamily="Calibri Light" FontSize="20" MouseDown="TextBlock_MouseDown" HorizontalAlignment="Center" Margin="233,0,235,0"><Run Text="Customisation Options"/><LineBreak/><Run/></TextBlock>
+            <Grid x:Name="CustomisationGrid" HorizontalAlignment="Left" Height="375" Margin="44,35,0,0" Grid.RowSpan="12" VerticalAlignment="Top" Width="650" Style="{StaticResource MaterialPanel}" Visibility="Hidden">
+                <TextBlock x:Name="Title" ToolTip="Made by Main_EX @ discord.io/babis-w" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="{StaticResource MaterialText}" FontFamily="Calibri Light" FontSize="20" MouseDown="TextBlock_MouseDown" HorizontalAlignment="Center" Margin="233,0,235,0"><Run Text="Customisation Options"/><LineBreak/><Run/></TextBlock>
                 <TextBlock x:Name="Title_Copy" ToolTip="Made by Main_EX @ discord.io/babis-w" Height="11" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FFB0B0B0" FontFamily="Calibri Light" FontSize="10" MouseDown="TextBlock_MouseDown" HorizontalAlignment="Center" Margin="275,25,276,0" Width="99"><Run Text="(still a work in progress!)"/><LineBreak/><Run/></TextBlock>
-                <TextBox x:Name="RightGradient_Copy" HorizontalAlignment="Left" Height="19" Margin="331,131,0,0" TextWrapping="Wrap" Text="Right hex code" VerticalAlignment="Top" Width="109" FontFamily="Consolas" FontSize="13" Foreground="#FFD1D1D1" Background="#19000000" BorderBrush="{x:Null}" TextAlignment="Center" RenderTransformOrigin="0.507,0.526"/>
+                <TextBox x:Name="RightGradient_Copy" HorizontalAlignment="Left" Height="19" Margin="331,131,0,0" TextWrapping="Wrap" Text="Right hex code" VerticalAlignment="Top" Width="109" FontFamily="Consolas" FontSize="13" Foreground="{StaticResource MaterialText}" Background="{StaticResource MaterialSurfaceRaised}" BorderBrush="{StaticResource BabisBlue}" TextAlignment="Center" RenderTransformOrigin="0.507,0.526"/>
                 <TextBlock HorizontalAlignment="Center" Height="27" TextWrapping="Wrap" VerticalAlignment="Center" Width="257" Foreground="#FFABABAB" FontFamily="Calibri Light" FontSize="15" Margin="207,155,186,193" Text="Background image url" TextAlignment="Center"/>
-                <TextBox x:Name="ImageLink_Copy" HorizontalAlignment="Left" Height="19" Margin="222,208,0,0" Text="(input valid url)" VerticalAlignment="Top" Width="257" FontFamily="Consolas" FontSize="13" Foreground="#FFD1D1D1" Background="#19000000" BorderBrush="{x:Null}" TextAlignment="Center"/>
+                <TextBox x:Name="ImageLink_Copy" HorizontalAlignment="Left" Height="19" Margin="222,208,0,0" Text="(input valid url)" VerticalAlignment="Top" Width="257" FontFamily="Consolas" FontSize="13" Foreground="{StaticResource MaterialText}" Background="{StaticResource MaterialSurfaceRaised}" BorderBrush="{StaticResource BabisBlue}" TextAlignment="Center"/>
                 <Button x:Name="ThemeDemo_Copy" Content="Theme Demo" Margin="222,325,301.2,23" Background="#214E4E4E" Foreground="#FFE4E4E4" Template ="{DynamicResource NoHighlightBut}" BorderBrush="{x:Null}" Click="ThemeDemo1" Opacity="0.75">
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
@@ -2006,12 +2044,12 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <TextBox x:Name="LeftGradient_Copy" HorizontalAlignment="Left" Height="19" Margin="216,131,0,0" TextWrapping="Wrap" Text="Left hex code" VerticalAlignment="Top" Width="112" FontFamily="Consolas" FontSize="13" Foreground="#FFD1D1D1" Background="#19000000" BorderBrush="{x:Null}" TextAlignment="Center" RenderTransformOrigin="0.507,0.526"/>
+                <TextBox x:Name="LeftGradient_Copy" HorizontalAlignment="Left" Height="19" Margin="216,131,0,0" TextWrapping="Wrap" Text="Left hex code" VerticalAlignment="Top" Width="112" FontFamily="Consolas" FontSize="13" Foreground="{StaticResource MaterialText}" Background="{StaticResource MaterialSurfaceRaised}" BorderBrush="{StaticResource BabisBlue}" TextAlignment="Center" RenderTransformOrigin="0.507,0.526"/>
                 <TextBlock HorizontalAlignment="Center" Height="30" TextWrapping="Wrap" VerticalAlignment="Center" Width="257" Foreground="#FFABABAB" FontFamily="Calibri Light" FontSize="15" Margin="221.9,232,171.1,113" Text="Image transparency" TextAlignment="Center"/>
-                <TextBox x:Name="ImageTransparency_Copy" HorizontalAlignment="Left" Height="19" Margin="273,260,0,0" Text="Value from 0-100" VerticalAlignment="Top" Width="153" FontFamily="Consolas" FontSize="13" Foreground="#FFD1D1D1" Background="#19000000" BorderBrush="{x:Null}" TextAlignment="Center"/>
+                <TextBox x:Name="ImageTransparency_Copy" HorizontalAlignment="Left" Height="19" Margin="273,260,0,0" Text="Value from 0-100" VerticalAlignment="Top" Width="153" FontFamily="Consolas" FontSize="13" Foreground="{StaticResource MaterialText}" Background="{StaticResource MaterialSurfaceRaised}" BorderBrush="{StaticResource BabisBlue}" TextAlignment="Center"/>
                 <TextBlock HorizontalAlignment="Center" Height="19" TextWrapping="Wrap" VerticalAlignment="Center" Width="224" Foreground="#FFABABAB" FontFamily="Calibri Light" FontSize="15" Margin="216,98,210,258" Text="Left and right border colours" TextAlignment="Center"/>
                 <TextBlock HorizontalAlignment="Left" Height="27" TextWrapping="Wrap" VerticalAlignment="Center" Width="224" Foreground="#FFABABAB" FontFamily="Calibri Light" FontSize="15" Margin="216,50,0,298" Text="Creator name" TextAlignment="Center"/>
-                <TextBox x:Name="CreatorName_Copy" HorizontalAlignment="Left" Height="18" Margin="216,73,0,0" Text="Theme creator name here" VerticalAlignment="Top" Width="224" FontFamily="Consolas" FontSize="13" Foreground="#FFD1D1D1" Background="#19000000" BorderBrush="{x:Null}" TextAlignment="Center"/>
+                <TextBox x:Name="CreatorName_Copy" HorizontalAlignment="Left" Height="18" Margin="216,73,0,0" Text="Theme creator name here" VerticalAlignment="Top" Width="224" FontFamily="Consolas" FontSize="13" Foreground="{StaticResource MaterialText}" Background="{StaticResource MaterialSurfaceRaised}" BorderBrush="{StaticResource BabisBlue}" TextAlignment="Center"/>
                 <Button x:Name="SaveToFile_Copy" Content="Save to file" Margin="352,325,171.2,22" Background="#214E4E4E" Foreground="#FFE4E4E4" Template ="{DynamicResource NoHighlightBut}" BorderBrush="{x:Null}" Click="ThemeSave" Opacity="0.75">
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
@@ -2035,12 +2073,12 @@
                     </Button.Style>
                 </Button>
                 <TextBlock HorizontalAlignment="Center" Height="12" TextWrapping="Wrap" VerticalAlignment="Center" Width="224" Foreground="#FF6F6F6F" FontFamily="Calibri Light" FontSize="10" Margin="216,117,210,246" Text="Make sure to include the hashtag" TextAlignment="Center"/>
-                <ListBox x:Name="ThemeListBox_Copy" HorizontalAlignment="Left" Height="279" Margin="26,73,0,0" VerticalAlignment="Top" Width="176" Background="#26000000" BorderBrush="#4CF0F0F0" Loaded="ThemeListBox_Loaded" Foreground="#FFCDCDCD" FontFamily="Calibri Light" SelectionChanged="ListBoxSelect" ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                <ListBox x:Name="ThemeListBox_Copy" HorizontalAlignment="Left" Height="279" Margin="26,73,0,0" VerticalAlignment="Top" Width="176" Background="{StaticResource MaterialSurfaceRaised}" BorderBrush="{StaticResource BabisBlue}" Loaded="ThemeListBox_Loaded" Foreground="{StaticResource MaterialText}" FontFamily="Calibri Light" SelectionChanged="ListBoxSelect" ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
                 <TextBlock HorizontalAlignment="Center" Height="19" TextWrapping="Wrap" VerticalAlignment="Center" Width="651" Foreground="#FF636363" FontFamily="Calibri Light" Margin="-1,358,0,-2" Text="You can set the current theme as a default theme in the General Options tab" TextAlignment="Center" FontSize="11"/>
                 <TextBlock HorizontalAlignment="Center" Height="30" TextWrapping="Wrap" VerticalAlignment="Center" Width="176" Foreground="#FFE4E4E4" FontFamily="Calibri Light" FontSize="15" Margin="26,50,448,295" Text="Theme List" TextAlignment="Center"/>
                 <TextBlock HorizontalAlignment="Left" Height="27" TextWrapping="Wrap" VerticalAlignment="Center" Width="224" Foreground="#FFABABAB" FontFamily="Calibri Light" FontSize="15" Margin="426,50,0,298" Text="Creator name" TextAlignment="Center"/>
             </Grid>
-            <Grid x:Name="SettingsGrid" HorizontalAlignment="Left" Height="382" Margin="39,30,-1.2,-0.395" VerticalAlignment="Top" Width="655" Grid.ColumnSpan="11" Grid.RowSpan="12" Visibility="Hidden">
+            <Grid x:Name="SettingsGrid" HorizontalAlignment="Left" Height="382" Margin="39,30,-1.2,-0.395" VerticalAlignment="Top" Width="655" Grid.ColumnSpan="11" Grid.RowSpan="12" Style="{StaticResource MaterialPanel}" Visibility="Hidden">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="161*"/>
                     <RowDefinition Height="30*"/>
@@ -2052,7 +2090,7 @@
                     <ColumnDefinition Width="6*"/>
                 </Grid.ColumnDefinitions>
                 <Rectangle x:Name="Sidebar_Copy" HorizontalAlignment="Left" Height="380" Stroke="Transparent" VerticalAlignment="Top" Width="166" StrokeThickness="0" Fill="#2D000000" Grid.RowSpan="2"/>
-                <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Options" VerticalAlignment="Top" Width="125" Foreground="#FFCACACA" FontFamily="Calibri Light" FontSize="19" Margin="5,4,0,0"/>
+                <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" Text="Options" VerticalAlignment="Top" Width="125" Foreground="{StaticResource MaterialText}" FontFamily="Calibri Light" FontSize="19" Margin="5,4,0,0"/>
                 <Viewbox x:Name="APISelectionButton" Margin="6,31,331.6,253.8" Stretch="Fill" Opacity="0.75">
                     <Viewbox.Style>
                         <Style TargetType="{x:Type Viewbox}">
@@ -2101,8 +2139,8 @@
                     </Grid.RowDefinitions>
                     <TextBlock HorizontalAlignment="Right" Height="31" TextWrapping="Wrap" VerticalAlignment="Center" Width="489" Foreground="#FFD1CFCF" FontFamily="Calibri Light" FontSize="19" Margin="0,2,0,325.4" TextAlignment="Center"><Run Text="API Selection"/><LineBreak/><Run/></TextBlock>
                     <Border BorderThickness="1" HorizontalAlignment="Center" Height="49" Margin="0,36,0,0" CornerRadius="9 9 9 9" VerticalAlignment="Top" Width="241" Background="#19000000" BorderBrush="#19A5A5A5"/>
-                    <Ellipse x:Name="WRDStatus" Fill="#FFFF1E1E" HorizontalAlignment="Left" Height="16" Margin="135,46,0,0" VerticalAlignment="Top" Width="16" Opacity="0.7" Loaded="WRDStatus_Loaded_1"/>
-                    <Button Content="Use" Margin="321,43,129,283" Background="#23656565" Template ="{DynamicResource NoHighlightBut}" Foreground="#FFE2E2E2" BorderBrush="{x:Null}" Click="Button_Click_1" Opacity="0.75">
+                    <Image x:Name="BabisWApiLogo" Source="Babis-WIcon.png" HorizontalAlignment="Left" Height="25" Margin="130,41,0,0" VerticalAlignment="Top" Width="25" Stretch="Uniform"/>
+                    <Button Content="Use Quorum" Margin="321,43,129,283" Background="#23656565" Template ="{DynamicResource NoHighlightBut}" Foreground="#FFE2E2E2" BorderBrush="{x:Null}" Click="Button_Click_1" Opacity="0.75">
                         <Button.Style>
                             <Style TargetType="{x:Type Button}">
                                 <Style.Triggers>
@@ -2124,8 +2162,8 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="124" Foreground="#FFD7D7D7" FontFamily="Calibri Light" FontSize="16" Margin="157,39,0,0" Text="WeAreDevs API"/>
-                    <TextBlock x:Name="WRDStatusText" HorizontalAlignment="Right" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Width="186" Foreground="#FF4F4F4F" FontFamily="Calibri Light" FontSize="9" Margin="0,57,146,0" Text="Unpatched and working!"/>
+                    <TextBlock HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Foreground="#FFD7D7D7" FontFamily="Calibri Light" FontSize="16" Margin="160,39,0,0" Text="Babis-W Engine"/>
+                    <TextBlock x:Name="WRDStatusText" HorizontalAlignment="Right" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Width="186" Foreground="#FF139549" FontFamily="Calibri Light" FontSize="9" Margin="0,57,146,0" Text="Ready for Roblox Studio testing"/>
                     <TextBlock x:Name="lol" HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="484" Foreground="#FFC7C7C7" FontFamily="Calibri Light" FontSize="19" Text="Notes on API selection" Margin="5,109,0,0" TextAlignment="Center"/>
                     <Border BorderThickness="1" HorizontalAlignment="Left" Height="94" Margin="13,140,0,0" CornerRadius="9 9 9 9" VerticalAlignment="Top" Width="228" Background="#19000000" BorderBrush="#19A5A5A5"/>
                     <TextBlock HorizontalAlignment="Left" Height="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" Foreground="#FFC2C1C1" FontFamily="Calibri Light" FontSize="14" Margin="20,146,0,0" TextAlignment="Center"><Run Text="All the APIs listed above have their key systems effectively bypassed"/><Run Language="en-hk" Text="."/></TextBlock>
@@ -2162,9 +2200,9 @@
                     </Button>
                     <TextBlock HorizontalAlignment="Left" Height="18" TextWrapping="Wrap" VerticalAlignment="Top" Width="224" Foreground="#FF918F8F" FontFamily="Calibri Light" Margin="251,285,0,0" Text="If you do, then please consider joining" TextAlignment="Center"/>
                     <TextBlock HorizontalAlignment="Center" Height="32" TextWrapping="Wrap" VerticalAlignment="Top" Width="462" Foreground="#FF6B6B6B" FontFamily="Calibri " FontSize="14" Margin="0,350,0,0" TextAlignment="Center" FontStyle="Italic" Grid.RowSpan="2"><Run Language="en-hk" Text="None of the APIs listed above are sponsored, neither are we sponsored."/></TextBlock>
-                    <TextBlock x:Name="WRDStatusTextFromWe" HorizontalAlignment="Right" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Width="186" Foreground="#FF4F4F4F" FontFamily="Calibri Light" FontSize="9" Margin="0,69,169,0"><Run Language="en-hk" Text="Message from WRD:"/></TextBlock>
-                    <TextBlock x:Name="WRDStatusText_Copy1" HorizontalAlignment="Right" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Width="59" Foreground="#FF139549" FontFamily="Calibri" FontSize="9" Margin="0,45,171,0"><Run Language="en-hk" Text="(key bypassed)"/></TextBlock>
-                    <TextBlock x:Name="APISelectionNotice" HorizontalAlignment="Right" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Width="186" Foreground="#FF4F4F4F" FontFamily="Calibri Light" FontSize="9" Margin="0,89,146,0"><Run Text="(at the moment, only"/><Run Language="en-hk" Text=" one exploit API is available"/><Run Text=")"/></TextBlock>
+                    <TextBlock x:Name="WRDStatusTextFromWe" Visibility="Collapsed"/>
+                    <TextBlock x:Name="WRDStatusText_Copy1" HorizontalAlignment="Right" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" Foreground="#FF139549" FontFamily="Calibri" FontSize="9" Margin="0,45,155,0" Text="(Babis-W active)"/>
+                    <TextBlock x:Name="APISelectionNotice" HorizontalAlignment="Right" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Width="186" Foreground="#FF4F4F4F" FontFamily="Calibri Light" FontSize="9" Margin="0,89,146,0" Text="(built for local testing)"/>
                 </Grid>
                 <Grid x:Name="GeneralOptions" Grid.ColumnSpan="4" HorizontalAlignment="Left" Height="380" Margin="166,0,0,0" VerticalAlignment="Top" Width="489" Background="#4C000000" Grid.RowSpan="2" Visibility="Hidden">
                     <Border CornerRadius = "3,3,3,3" BorderBrush="#19A5A5A5" BorderThickness="1" HorizontalAlignment="Left" Height="62" Margin="249,34,0,0" VerticalAlignment="Top" Width="234" Background="#33212121"/>
