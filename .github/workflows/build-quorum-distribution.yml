@@ -1,0 +1,37 @@
+name: Build Quorum distribution
+
+on:
+  push:
+    branches:
+      - babis-w-new-injection
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build Babis-W
+        shell: cmd
+        run: |
+          msbuild Babis-W.sln /restore /p:Configuration=Release /p:Platform=x64 /m
+
+      - name: Commit distribution executable
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Babis-W/bin/Release/Babis-W.exe Babis-W/QuorumAPI.dll
+          if (git diff --cached --quiet) {
+            Write-Host "No distribution changes to commit."
+            exit 0
+          }
+          git commit -m "Build Quorum distribution"
+          git push origin HEAD:${{ github.ref_name }}
