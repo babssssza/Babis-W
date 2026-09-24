@@ -21,7 +21,9 @@ jobs:
       - name: Build Babis-W
         shell: cmd
         run: |
-          msbuild Babis-W.sln /restore /p:Configuration=Release /p:Platform=x64 /m
+          "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe > msbuild-path.txt
+          set /p MSBUILD_PATH=<msbuild-path.txt
+          "%MSBUILD_PATH%" Babis-W.sln /restore /p:Configuration=Release /p:Platform=x64 /m
 
       - name: Commit distribution executable
         shell: pwsh
